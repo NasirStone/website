@@ -1,253 +1,178 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import DronesPage from "./pages/drones.jsx";
 
+const MONO = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
+
+const FG = "rgba(235,235,235,0.92)";
+const MUTED = "rgba(170, 170, 170, 0.75)";
+
+const KEYWORDS = [
+  "nasir",
+  "rocketry",
+  "drones",
+  "autonomous vehicles",
+  "cars",
+  "bikes",
+  "gaming",
+  "vintage audio",
+  "travel",
+  "driving",
+  "teaching",
+  "chinese",
+];
+
+const VALID_KEYWORDS = new Set(
+  KEYWORDS.map((k) => k.trim().toLowerCase()).filter((k) => k && k !== "nasir")
+);
+
+function seeded01(seed) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+function wordCloudStyle(seed) {
+  const leftPct = Math.floor(seeded01(seed + 1) * 96) + 2; // 2%..98%
+  const topPct = Math.floor(seeded01(seed + 2) * 96) + 2; // 2%..98%
+
+  const size = 1.3 + seeded01(seed + 3) * 2.2; // rem ~1.3..3.5
+  const duration = (5 + seeded01(seed + 5) * 7).toFixed(2) + "s"; // 5..12s
+  const delay = (seeded01(seed + 6) * 4).toFixed(2) + "s"; // 0..4s
+  const maxOpacity = (0.18 + seeded01(seed + 7) * 0.28).toFixed(2); // ~0.18..0.46
+
+  return {
+    leftPct,
+    topPct,
+    fontSizeRem: Number(size.toFixed(2)),
+    animationDuration: duration,
+    animationDelay: delay,
+    maxOpacity,
+  };
+}
+
 function Landing() {
   const navigate = useNavigate();
-  // Keywords you want floating in the whitespace
-  const keywords = useMemo(
-    () => [
-      "Nasir",
-      "rocketry",
-      "drones",
-      "autonomous vehicles",
-      "robotics",
-      "ai",
-      "computers",
-      "it",
-      "telemetry",
-      "mapping",
-      "cameras",
-      "avionics",
-      "cars",
-      "planes",
-      "trains",
-      "bikes",
-      "skateboards",
-      "gaming",
-      "music",
-      "vintage audio",
-      "travel",
-      "driving",
-      "teaching",
-      "chinese",
-      "lizards",
-      "secret",
-    ],
-    []
-  );
-
-  // --- Removed keywordPlacements. ---
-  function hashString(str) {
-    // Simple deterministic hash (stable across reloads)
-    let h = 2166136261;
-    for (let i = 0; i < str.length; i++) {
-      h ^= str.charCodeAt(i);
-      h = Math.imul(h, 16777619);
-    }
-    return h >>> 0;
-  }
-
-  function seeded01(seed) {
-    // Deterministic pseudo random in [0, 1)
-    const x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-  }
-
-  function wordCloudStyle(seed) {
-    // Spread words across the full viewport (clustered)
-    const leftPct = Math.floor(seeded01(seed + 1) * 86) + 7; // 7%..93%
-    const topPct = Math.floor(seeded01(seed + 2) * 84) + 8; // 8%..92%
-
-    // Larger sizes for word-cloud feel
-    const size = 1.3 + seeded01(seed + 3) * 2.2; // rem ~1.3..3.5
-    const rotate = "0deg"; // no rotation
-
-    // Fade in/out at different speeds and phases
-    const duration = (5 + seeded01(seed + 5) * 7).toFixed(2) + "s"; // 5..12s
-    const delay = (seeded01(seed + 6) * 4).toFixed(2) + "s"; // 0..4s
-
-    // Brighter peak opacity
-    const maxOpacity = (0.18 + seeded01(seed + 7) * 0.28).toFixed(2); // ~0.18..0.46
-
-    return {
-      leftPct,
-      topPct,
-      rotate,
-      fontSizeRem: Number(size.toFixed(2)),
-      animationDuration: duration,
-      animationDelay: delay,
-      maxOpacity,
-    };
-  }
-
-  // Map a command to a page "section"
-  const pages = useMemo(
-    () => ({
-      help: {
-        title: "Help",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>Type a keyword and press Enter.</p>
-            <p style={{ margin: "0.75rem 0 0" }}>
-              Commands: <span style={{ opacity: 0.9 }}>help</span>,{" "}
-              <span style={{ opacity: 0.9 }}>clear</span>
-            </p>
-          </>
-        ),
-      },
-      rocketry: {
-        title: "Rocketry",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Bi directional camera systems, avionics integration, flight data
-              capture.
-            </p>
-            <ul style={{ margin: "0.75rem 0 0", paddingLeft: "1.25rem" }}>
-              <li>Forward and aft rocket camera system</li>
-              <li>Telemetry and post flight analysis tooling</li>
-              <li>Flight readiness validation with subteams</li>
-            </ul>
-          </>
-        ),
-      },
-      drones: {
-        title: "Drones",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Mapping, SLAM assisted workflows, and field operations.
-            </p>
-            <ul style={{ margin: "0.75rem 0 0", paddingLeft: "1.25rem" }}>
-              <li>Photogrammetry and survey capture</li>
-              <li>Automation for repeatable processing</li>
-            </ul>
-          </>
-        ),
-      },
-      cars: {
-        title: "Cars",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Mechanical work, diagnostics, and systems thinking applied to real
-              hardware.
-            </p>
-          </>
-        ),
-      },
-      planes: {
-        title: "Planes",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Avionics software maintenance and reliability focused engineering.
-            </p>
-          </>
-        ),
-      },
-      trains: {
-        title: "Trains",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Interest area placeholder. Add a story or a project here.
-            </p>
-          </>
-        ),
-      },
-      bikes: {
-        title: "Bikes",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Interest area placeholder. Add a story or a project here.
-            </p>
-          </>
-        ),
-      },
-      avionics: {
-        title: "Avionics",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Embedded systems, telemetry, and software architecture for flight
-              conditions.
-            </p>
-          </>
-        ),
-      },
-      ai: {
-        title: "AI",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Applied ML systems, perception pipelines, and product oriented
-              prototypes.
-            </p>
-          </>
-        ),
-      },
-      telemetry: {
-        title: "Telemetry",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              RF systems and protocols for reliable downlink and recovery.
-            </p>
-          </>
-        ),
-      },
-      mapping: {
-        title: "Mapping",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Geospatial capture, processing automation, and visualization.
-            </p>
-          </>
-        ),
-      },
-      robotics: {
-        title: "Robotics",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              ROS2 based pipelines for perception and control.
-            </p>
-          </>
-        ),
-      },
-      cameras: {
-        title: "Cameras",
-        body: (
-          <>
-            <p style={{ margin: 0 }}>
-              Video capture, encoding, and fast retrieval workflows for field
-              use.
-            </p>
-          </>
-        ),
-      },
-    }),
-    [keywords]
-  );
 
   const [input, setInput] = useState("");
-  const [activeKey, setActiveKey] = useState("help");
-  const [history, setHistory] = useState([
-    { type: "system", text: "# Type a keyword to begin" },
-  ]);
+  const [history, setHistory] = useState(() => {
+    try {
+      const raw = sessionStorage.getItem("terminalHistory");
+      const parsed = raw ? JSON.parse(raw) : null;
+      return Array.isArray(parsed)
+        ? parsed
+        : [{ type: "system", text: "# Type a keyword to begin" }];
+    } catch {
+      return [{ type: "system", text: "# Type a keyword to begin" }];
+    }
+  });
+  const [showTip, setShowTip] = useState(() => {
+    try {
+      const raw = sessionStorage.getItem("terminalShowTip");
+      return raw === null ? true : raw === "true";
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("terminalHistory", JSON.stringify(history));
+      sessionStorage.setItem("terminalShowTip", String(showTip));
+    } catch {
+      // ignore
+    }
+  }, [history, showTip]);
 
   const [wordCloudItems, setWordCloudItems] = useState([]);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingPct, setLoadingPct] = useState(0);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const sidebarKeywords = KEYWORDS.filter(
+    (k) => k.trim().toLowerCase() !== "nasir"
+  );
+
+  // Draggable terminal window position (top-left in px)
+  const [terminalPos, setTerminalPos] = useState({ x: 0, y: 0 });
+  const draggingRef = useRef({ active: false, dx: 0, dy: 0 });
+  const [isCompact, setIsCompact] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 640;
+  });
   useEffect(() => {
-    function generateWordCloud() {
-      const repeats = 6;
+    function centerIfUnset() {
+      setTerminalPos((p) => {
+        if (p.x !== 0 || p.y !== 0) return p;
+
+        const vw = window.innerWidth || 1200;
+        const vh = window.innerHeight || 800;
+
+        // Approximate terminal size to center it (matches render sizes)
+        const w = Math.min(740, vw * 0.88);
+        const h = Math.min(560, vh * 0.7);
+
+        const x = Math.max(12, Math.round(vw / 2 - w / 2));
+        const y = Math.max(12, Math.round(vh / 2 - h / 2));
+        return { x, y };
+      });
+    }
+
+    centerIfUnset();
+
+    function onResize() {
+      setIsCompact(window.innerWidth < 640);
+      // Clamp terminal into view on resize
+      setTerminalPos((p) => {
+        const vw = window.innerWidth || 1200;
+        const vh = window.innerHeight || 800;
+        const w = Math.min(740, vw * 0.88);
+        const h = Math.min(560, vh * 0.7);
+
+        const x = Math.min(Math.max(12, p.x), Math.max(12, vw - w - 12));
+        const y = Math.min(Math.max(12, p.y), Math.max(12, vh - h - 12));
+        return { x, y };
+      });
+    }
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    function onMove(e) {
+      if (!draggingRef.current.active) return;
 
       const vw = window.innerWidth || 1200;
       const vh = window.innerHeight || 800;
+      const w = Math.min(740, vw * 0.88);
+      const h = Math.min(560, vh * 0.7);
+
+      const nextX = e.clientX - draggingRef.current.dx;
+      const nextY = e.clientY - draggingRef.current.dy;
+
+      const x = Math.min(Math.max(12, nextX), Math.max(12, vw - w - 12));
+      const y = Math.min(Math.max(12, nextY), Math.max(12, vh - h - 12));
+
+      setTerminalPos({ x, y });
+    }
+
+    function onUp() {
+      draggingRef.current.active = false;
+    }
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+  }, []);
+
+  useEffect(() => {
+    function generateWordCloud() {
+      const vw = window.innerWidth || 1200;
+      const vh = window.innerHeight || 800;
+      const isSmall = vw < 640;
+      const repeats = isSmall ? 3 : 6;
 
       // Terminal approximate bounds in pixels (to avoid placing words behind it)
       const terminalW = Math.min(740, vw * 0.88);
@@ -285,11 +210,11 @@ function Landing() {
       const placed = [];
       const items = [];
 
-      const total = keywords.length * repeats;
+      const total = KEYWORDS.length * repeats;
 
       for (let idx = 0; idx < total; idx++) {
-        const word = keywords[idx % keywords.length];
-        const rep = Math.floor(idx / keywords.length);
+        const word = KEYWORDS[idx % KEYWORDS.length];
+        const rep = Math.floor(idx / KEYWORDS.length);
 
         // Try a bunch of times to find a non-overlapping location
         let chosen = null;
@@ -302,8 +227,8 @@ function Landing() {
           const jitterLeft = (Math.random() - 0.5) * 6; // +/- 3%
           const jitterTop = (Math.random() - 0.5) * 6; // +/- 3%
 
-          const leftPct = Math.min(95, Math.max(3, s.leftPct + jitterLeft));
-          const topPct = Math.min(95, Math.max(3, s.topPct + jitterTop));
+          const leftPct = Math.min(98, Math.max(2, s.leftPct + jitterLeft));
+          const topPct = Math.min(98, Math.max(2, s.topPct + jitterTop));
 
           const rect = estimateRect(word, s.fontSizeRem, leftPct, topPct);
 
@@ -330,10 +255,12 @@ function Landing() {
           chosen = {
             word,
             rep,
-            seed,
             left: `${leftPct}%`,
             top: `${topPct}%`,
-            fontSize: `${s.fontSizeRem}rem`,
+            fontSize: `${(isSmall
+              ? s.fontSizeRem * 0.72
+              : s.fontSizeRem
+            ).toFixed(2)}rem`,
             animationDuration: s.animationDuration,
             animationDelay: s.animationDelay,
             maxOpacity: s.maxOpacity,
@@ -350,10 +277,12 @@ function Landing() {
           chosen = {
             word,
             rep,
-            seed,
             left: `${s.leftPct}%`,
             top: `${s.topPct}%`,
-            fontSize: `${Math.max(1.1, s.fontSizeRem * 0.85)}rem`,
+            fontSize: `${Math.max(
+              0.95,
+              isSmall ? s.fontSizeRem * 0.65 : s.fontSizeRem * 0.85
+            ).toFixed(2)}rem`,
             animationDuration: s.animationDuration,
             animationDelay: s.animationDelay,
             maxOpacity: s.maxOpacity,
@@ -374,37 +303,114 @@ function Landing() {
     }
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
-  }, [keywords]);
+  }, []);
+
+  function formatColumns(items, cols) {
+    const list = items.slice();
+    const maxLen = list.reduce((m, s) => Math.max(m, s.length), 0);
+    const colW = Math.max(10, maxLen + 3);
+
+    const rows = Math.ceil(list.length / cols);
+    const lines = [];
+
+    for (let r = 0; r < rows; r++) {
+      let line = "";
+      for (let c = 0; c < cols; c++) {
+        const i = r + c * rows;
+        if (i >= list.length) continue;
+
+        const cell = list[i];
+        const isLastCol = c === cols - 1 || r + (c + 1) * rows >= list.length;
+
+        line += isLastCol ? cell : cell.padEnd(colW, " ");
+      }
+      lines.push(line);
+    }
+    return lines;
+  }
 
   function runCommand(raw) {
     const cmd = raw.trim().toLowerCase();
 
     if (!cmd) return;
 
-    if (cmd === "clear") {
-      setHistory([
-        { type: "system", text: "Cleared. Type a keyword. Try: help" },
+    if (cmd === "ls") {
+      const list = Array.from(VALID_KEYWORDS).sort();
+      const cols = isCompact ? 2 : 4;
+      const lines = formatColumns(list, cols);
+
+      setHistory((h) => [
+        ...h,
+        { type: "prompt", text: `nasir % ${cmd}` },
+        ...lines.map((t) => ({ type: "system", text: t })),
       ]);
-      setActiveKey("help");
+      setShowTip(false);
       return;
     }
 
-    if (pages[cmd]) {
-      // special case: route to /drones
+    if (cmd === "clear") {
+      setHistory([]);
+      setShowTip(false);
+      return;
+    }
+
+    if (cmd === "help") {
+      setHistory((h) => [
+        ...h,
+        { type: "prompt", text: `nasir % ${cmd}` },
+        {
+          type: "system",
+          text: "# How to use: type a keyword you see and press Enter to open its page.",
+        },
+        { type: "system", text: "# Commands: help, ls, clear" },
+      ]);
+      setShowTip(false);
+      return;
+    }
+
+    if (VALID_KEYWORDS.has(cmd)) {
+      // routes that exist today
       if (cmd === "drones") {
-        setHistory((h) => [...h, { type: "prompt", text: `Nasir % ${cmd}` }]);
-        navigate("/drones");
+        setHistory((h) => [
+          ...h,
+          { type: "prompt", text: `nasir % ${cmd}` },
+          { type: "system", text: "# loading drones…" },
+        ]);
+        setShowTip(false);
+
+        // short visible loading bar (< 0.5s total)
+        setIsLoading(true);
+        setLoadingPct(0);
+
+        const steps = [35, 70, 100];
+        steps.forEach((pct, i) => {
+          setTimeout(() => setLoadingPct(pct), 90 + i * 90);
+        });
+
+        setTimeout(() => {
+          setIsLoading(false);
+          setIsSidebarOpen(false);
+          navigate("/drones");
+        }, 320);
+
         return;
       }
 
-      setActiveKey(cmd);
-      setHistory((h) => [...h, { type: "prompt", text: `Nasir % ${cmd}` }]);
+      setHistory((h) => [
+        ...h,
+        { type: "prompt", text: `nasir % ${cmd}` },
+        {
+          type: "system",
+          text: "That page is not ready yet. Check back later!",
+        },
+      ]);
+      setShowTip(false);
       return;
     }
 
     setHistory((h) => [
       ...h,
-      { type: "prompt", text: `Nasir % ${cmd}` },
+      { type: "prompt", text: `nasir % ${cmd}` },
       {
         type: "error",
         text: `Command not found: ${cmd}. Type help for commands.`,
@@ -419,14 +425,11 @@ function Landing() {
     runCommand(raw);
   }
 
-  const active = pages[activeKey] ?? pages.help;
-
   return (
     <div
       style={{
         minHeight: "100vh",
         width: "100vw",
-        minWidth: "100vw",
         background:
           "radial-gradient(1200px 800px at 50% 0%, rgba(255,255,255,0.05), rgba(0,0,0,0.92)), #0b0b0c",
         color: "#e7eaf0",
@@ -435,6 +438,76 @@ function Landing() {
       }}
     >
       <style>{`
+        .sidebarOverlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0,0,0,0.35);
+          z-index: 20;
+        }
+        .sidebar {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          width: 260px;
+          max-height: calc(100vh - 24px);
+          overflow: auto;
+          border-radius: 14px;
+          border: 1px solid rgba(255,255,255,0.14);
+          background: rgba(0, 0, 0, 0.86);
+          box-shadow: 0 18px 55px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          color: rgba(235,235,235,0.92);
+          padding: 0.9rem 0.85rem;
+          backdrop-filter: blur(12px);
+        }
+        @media (max-width: 640px) {
+          .sidebar {
+            left: 10px;
+            right: 10px;
+            width: auto;
+            top: 10px;
+            max-height: calc(100vh - 20px);
+          }
+        }
+        .sidebarHeader {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          margin-bottom: 0.6rem;
+          opacity: 0.9;
+          font-size: 0.9rem;
+        }
+        .sidebarCloseBtn {
+          background: rgba(255,255,255,0.08);
+          border: 1px solid rgba(255,255,255,0.14);
+          color: rgba(235,235,235,0.92);
+          border-radius: 10px;
+          padding: 0.35rem 0.55rem;
+          cursor: pointer;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 0.8rem;
+        }
+        .keywordBtn {
+          width: 100%;
+          text-align: left;
+          background: rgba(255,255,255,0.03);
+          border: 1px solid rgba(255,255,255,0.10);
+          color: rgba(235,235,235,0.92);
+          border-radius: 10px;
+          padding: 0.55rem 0.65rem;
+          cursor: pointer;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 0.85rem;
+          line-height: 1.25;
+        }
+        .keywordBtn:hover {
+          background: rgba(255,255,255,0.06);
+        }
+        .keywordGrid {
+          display: grid;
+          gap: 0.55rem;
+        }
         html, body, #root {
           height: 100%;
           width: 100%;
@@ -444,13 +517,75 @@ function Landing() {
           overflow: hidden;
         }
         @keyframes wordFade {
-          0% { opacity: 0.05; filter: blur(0px); }
+          0% { opacity: 0.08; filter: blur(0px); }
           35% { opacity: var(--max-opacity); filter: blur(0px); }
           70% { opacity: 0.06; filter: blur(0px); }
-          100% { opacity: 0.05; filter: blur(0px); }
+          100% { opacity: 0.08; filter: blur(0px); }
+        }
+        @keyframes blockBlink {
+          0%, 49% { opacity: 1; }
+          50%, 100% { opacity: 0; }
+        }
+        .terminalWindow {
+          width: min(740px, 88vw);
+          height: min(560px, 70vh);
+          max-height: 70vh;
+        }
+        @media (max-width: 640px) {
+          .terminalWindow {
+            width: min(560px, 94vw);
+            height: min(520px, 78vh);
+            max-height: 78vh;
+          }
+        }
+        .terminalBody {
+          font-size: 0.9rem;
+        }
+        @media (max-width: 640px) {
+          .terminalBody {
+            font-size: 0.85rem;
+          }
         }
       `}</style>
-      {/* floating keywords in the whitespace */}
+      {isSidebarOpen ? (
+        <div
+          className="sidebarOverlay"
+          onClick={() => setIsSidebarOpen(false)}
+          role="presentation"
+        >
+          <div
+            className="sidebar"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-label="Keywords"
+          >
+            <div className="sidebarHeader">
+              <div>Keywords</div>
+              <button
+                type="button"
+                className="sidebarCloseBtn"
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                Close
+              </button>
+            </div>
+
+            <div className="keywordGrid">
+              {sidebarKeywords.map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  className="keywordBtn"
+                  onClick={() => runCommand(k)}
+                >
+                  {k}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {wordCloudItems.map((item, i) => (
         <span
           key={`${item.word}-${item.rep}-${i}`}
@@ -458,12 +593,9 @@ function Landing() {
             position: "absolute",
             left: item.left,
             top: item.top,
-            transform: "rotate(0deg)",
-            fontFamily:
-              "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+            fontFamily: MONO,
             fontSize: item.fontSize,
-            opacity: 0.08,
-            letterSpacing: "0.00em",
+            opacity: 0.12,
             userSelect: "none",
             pointerEvents: "none",
             whiteSpace: "nowrap",
@@ -474,33 +606,33 @@ function Landing() {
             animationDelay: item.animationDelay,
             textTransform: "capitalize",
             ["--max-opacity"]: item.maxOpacity,
+            color: "rgba(255,255,255,0.78)",
+            textShadow: "0 1px 10px rgba(0,0,0,0.55)",
           }}
         >
           {item.word}
         </span>
       ))}
 
-      {/* center container */}
+      {/* terminal window (draggable) */}
       <div
         style={{
-          minHeight: "100vh",
-          display: "grid",
-          placeItems: "center",
-          padding: "2.5rem 1.25rem",
+          position: "absolute",
+          left: terminalPos.x,
+          top: terminalPos.y,
+          zIndex: 5,
         }}
       >
         {/* terminal window */}
         <div
+          className="terminalWindow"
           style={{
-            width: "min(740px, 88vw)",
-            height: "min(560px, 70vh)",
-            maxHeight: "70vh",
             borderRadius: 14,
             border: "1px solid rgba(255,255,255,0.14)",
             background: "rgba(0, 0, 0, 0.82)",
             boxShadow:
               "0 24px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.06) inset",
-            backdropFilter: "blur(14px)",
+            backdropFilter: isCompact ? "none" : "blur(14px)",
             overflow: "hidden",
           }}
         >
@@ -513,6 +645,30 @@ function Landing() {
               padding: "0.75rem 1rem",
               borderBottom: "1px solid rgba(255,255,255,0.08)",
               background: "rgba(255,255,255,0.04)",
+              cursor: isCompact ? "default" : "grab",
+              userSelect: "none",
+              touchAction: "none",
+            }}
+            onPointerDown={(e) => {
+              if (isCompact) return;
+              // Don't start dragging when clicking interactive controls in the header
+              if (e.target && typeof e.target.closest === "function") {
+                const btn = e.target.closest("button");
+                if (btn) return;
+              }
+              if (e.button !== 0) return;
+
+              draggingRef.current.active = true;
+              draggingRef.current.dx = e.clientX - terminalPos.x;
+              draggingRef.current.dy = e.clientY - terminalPos.y;
+
+              if (e.currentTarget.setPointerCapture) {
+                try {
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                } catch {
+                  // ignore
+                }
+              }
             }}
           >
             <div style={{ display: "flex", gap: 8 }}>
@@ -543,38 +699,67 @@ function Landing() {
             </div>
             <div
               style={{
-                fontFamily:
-                  "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-                fontSize: "0.9rem",
-                opacity: 0.8,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 12,
+                width: "100%",
               }}
             >
-              Terminal
+              <div
+                style={{
+                  fontFamily: MONO,
+                  fontSize: "0.9rem",
+                  opacity: 0.8,
+                }}
+              >
+                Terminal
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsSidebarOpen((v) => !v)}
+                onPointerDown={(e) => e.stopPropagation()}
+                style={{
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.14)",
+                  color: FG,
+                  borderRadius: 10,
+                  padding: "0.35rem 0.6rem",
+                  cursor: "pointer",
+                  fontFamily: MONO,
+                  fontSize: "0.8rem",
+                }}
+              >
+                Keywords
+              </button>
             </div>
           </div>
 
           {/* terminal body */}
           <div
+            className="terminalBody"
             style={{
               padding: "1rem 1.1rem",
-              fontFamily:
-                "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-              fontSize: "0.9rem",
+              fontFamily: MONO,
               lineHeight: 1.55,
-              color: "rgba(235,235,235,0.92)",
+              color: FG,
             }}
           >
             {/* history */}
-            <div style={{ display: "grid", gap: "0.35rem" }}>
+            <div
+              style={{
+                display: "grid",
+                gap: "0.35rem",
+              }}
+            >
               {history.map((line, idx) => (
                 <div
                   key={idx}
                   style={{
                     opacity: 1,
-                    color:
-                      line.type === "system"
-                        ? "rgba(170, 170, 170, 0.75)"
-                        : undefined,
+                    color: line.type === "system" ? MUTED : undefined,
+                    whiteSpace: "pre",
                   }}
                 >
                   {line.type === "error" ? (
@@ -588,40 +773,110 @@ function Landing() {
               ))}
             </div>
 
-            {/* input */}
-            <form onSubmit={onSubmit} style={{ marginTop: "1.25rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ opacity: 0.95 }}>Nasir %</span>
-                <input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="type a keyword and press Enter"
-                  autoFocus
-                  spellCheck={false}
-                  style={{
-                    flex: 1,
-                    background: "transparent",
-                    border: "none",
-                    outline: "none",
-                    color: "#e7eaf0",
-                    fontFamily:
-                      "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-                    fontSize: "0.95rem",
-                    padding: "0.35rem 0",
-                  }}
-                />
-              </div>
+            {isLoading ? (
               <div
                 style={{
-                  marginTop: "0.35rem",
-                  fontSize: "0.8rem",
-                  opacity: 0.6,
+                  marginTop: "0.75rem",
+                  color: MUTED,
                 }}
               >
-                Tip: type <span style={{ opacity: 0.9 }}>help</span> for
-                commands or <span style={{ opacity: 0.9 }}>clear</span> to
-                reset.
+                <span style={{ fontFamily: "inherit" }}>
+                  {`# [${"="
+                    .repeat(Math.round((loadingPct / 100) * 18))
+                    .padEnd(18, " ")}] ${loadingPct}%`}
+                </span>
               </div>
+            ) : null}
+
+            {/* input */}
+            <form
+              onSubmit={onSubmit}
+              style={{
+                marginTop: history.length || isLoading ? "1.25rem" : "0.25rem",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span
+                  style={{
+                    color: FG,
+                    fontFamily: MONO,
+                    fontSize: "0.9rem",
+                    lineHeight: 1.55,
+                  }}
+                >
+                  nasir %
+                </span>
+
+                <div
+                  style={{ position: "relative", flex: 1, height: "1.3rem" }}
+                >
+                  {/* visible overlay line */}
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      color: FG,
+                      fontFamily: MONO,
+                      fontSize: "0.9rem",
+                      lineHeight: 1.55,
+                      whiteSpace: "pre",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <span>{input}</span>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: "0.62em",
+                        height: "1.15em",
+                        marginLeft: "2px",
+                        background: "rgba(235,235,235,0.85)",
+                        animation: "blockBlink 1s steps(1, end) infinite",
+                      }}
+                    />
+                  </div>
+
+                  {/* real input (captures typing) */}
+                  <input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    autoFocus
+                    spellCheck={false}
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background: "transparent",
+                      border: "none",
+                      outline: "none",
+                      caretColor: "transparent",
+                      color: "transparent",
+                      textShadow: `0 0 0 ${FG}`,
+                      fontFamily: MONO,
+                      fontSize: "0.9rem",
+                      lineHeight: 1.55,
+                      padding: 0,
+                    }}
+                  />
+                </div>
+              </div>
+              {showTip ? (
+                <div
+                  style={{
+                    marginTop: "0.35rem",
+                    fontSize: "0.8rem",
+                    color: MUTED,
+                  }}
+                >
+                  # type a keyword into the terminal to access the page,{" "}
+                  <span style={{ color: "rgba(220,220,220,0.85)" }}>help</span>{" "}
+                  for commands, or{" "}
+                  <span style={{ color: "rgba(220,220,220,0.85)" }}>clear</span>{" "}
+                  to reset.
+                </div>
+              ) : null}
             </form>
           </div>
         </div>
