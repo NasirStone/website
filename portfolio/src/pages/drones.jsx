@@ -6,13 +6,12 @@ import { MONO } from "../components/uiConstants.js";
 
 export default function DronesPage() {
   const navigate = useNavigate();
-  const base = import.meta.env.BASE_URL;
 
   const images = [
-    `${base}images/drones/b_entr.webp`,
-    `${base}images/drones/camp.webp`,
-    `${base}images/drones/chap.webp`,
-    `${base}images/drones/fp.webp`,
+    "images/drones/b_entr.webp",
+    "images/drones/camp.webp",
+    "images/drones/chap.webp",
+    "images/drones/fp.webp",
   ];
 
   return (
@@ -24,13 +23,17 @@ export default function DronesPage() {
           WashU Drone Pilot Internship
         </div>
         <div style={{ marginTop: "0.5rem" }}>
-          In the summer of 2025, I spent my days flying drones for WashU's
-          Faciliities, Planning & Management Department. Working under my boss,
-          I led mapping missions for WashU's campus and other assets to help
-          create a 'digital twin' of WashU. Combining photogrammetry and LiDAR,
-          I applied SLAM-supported workflows to refine ground, building, and
-          vegetation classes for accurate change detection, including seasonal
-          foliage variation.
+          In the summer of 2025, I spent my days flying DJI Drones for WashU's
+          Facilities, Planning & Management Department. I primarily flew a DJI
+          Matrice 300 RTK, where I led mapping missions for WashU's campus and
+          other assets to help create a 'digital twin' of WashU. Combining
+          photogrammetry and LiDAR, I applied SLAM-supported workflows to refine
+          ground, building, and vegetation classes for accurate change
+          detection, including seasonal foliage variation.
+          {/* <br />
+          <br />
+          This position taught me a great deal about Geospatial Information Systems (GIS), and how different
+          technologies interface with this data, such as LiDAR, Photogrammetry, and  */}
         </div>
       </TextBox>
     </PageShell>

@@ -1,4 +1,4 @@
-import { BORDER, FG, MONO, PANEL_BG, PANEL_SHADOW } from "./uiConstants.js";
+import { MONO } from "./uiConstants.js";
 
 export default function PageShell({
   title,
@@ -11,8 +11,8 @@ export default function PageShell({
       style={{
         minHeight: "100vh",
         width: "100vw",
-        background: "#0b0b0c",
-        color: FG,
+        background: "var(--page-bg)",
+        color: "var(--fg)",
         display: "grid",
         placeItems: "center",
         padding: "1.5rem 0.75rem",
@@ -22,9 +22,9 @@ export default function PageShell({
         style={{
           width: `min(${maxWidth}, 98vw)`,
           borderRadius: 14,
-          border: BORDER,
-          background: PANEL_BG,
-          boxShadow: PANEL_SHADOW,
+          border: "1px solid var(--shell-border)",
+          background: "var(--shell-bg)",
+          boxShadow: "var(--shadow)",
           padding: "1.25rem 1.25rem 1.5rem",
         }}
       >
@@ -32,7 +32,7 @@ export default function PageShell({
           style={{
             fontFamily: MONO,
             fontSize: "0.9rem",
-            opacity: 0.85,
+            opacity: 0.9,
             marginBottom: "1.0rem",
           }}
         >
@@ -46,9 +46,9 @@ export default function PageShell({
             onClick={onBack}
             style={{
               marginTop: "1.25rem",
-              background: "rgba(255,255,255,0.08)",
-              border: BORDER,
-              color: FG,
+              background: "var(--panel-bg)",
+              border: "1px solid var(--panel-border)",
+              color: "var(--fg)",
               borderRadius: 10,
               padding: "0.55rem 0.8rem",
               cursor: "pointer",
@@ -59,6 +59,21 @@ export default function PageShell({
             ← Back to terminal
           </button>
         ) : null}
+        <div
+          style={{
+            marginTop: "2.25rem",
+            paddingTop: "1.0rem",
+            borderTop: "1px solid var(--shell-border)",
+            textAlign: "right",
+            fontFamily: MONO,
+            fontSize: "0.8rem",
+            color: "var(--muted)",
+            opacity: 0.9,
+          }}
+          aria-hidden="true"
+        >
+          © 2026 Nasir Sims
+        </div>
       </div>
     </div>
   );

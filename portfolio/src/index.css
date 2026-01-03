@@ -11,23 +11,58 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --bg: #060607;
+  --fg: rgba(235, 235, 235, 0.92);
+  --muted: rgba(170, 170, 170, 0.75);
+
+  --panel-bg: rgba(0, 0, 0, 0.86);
+  --panel-fg: rgba(235, 235, 235, 0.92);
+  --panel-border: rgba(255, 255, 255, 0.14);
+
+  --chip-bg: rgba(255, 255, 255, 0.03);
+  --chip-border: rgba(255, 255, 255, 0.1);
+
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+}
+
+html[data-theme="light"] {
+  --bg: #f5f3ee; /* soft vanilla */
+  --fg: rgba(20, 15, 15, 0.92); /* warm black (tiny red tint) */
+  --muted: rgba(55, 45, 45, 0.7);
+
+  --panel-bg: rgba(235, 233, 229, 0.92);
+  --panel-fg: rgba(20, 15, 15, 0.92);
+  --panel-border: rgba(0, 0, 0, 0.12);
+
+  --chip-bg: rgba(0, 0, 0, 0.03);
+  --chip-border: rgba(0, 0, 0, 0.1);
+
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.06) inset;
 }
 
 a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: inherit;
 }
 a:hover {
-  color: #535bf2;
+  opacity: 0.9;
+}
+
+button:hover {
+  border-color: transparent;
+}
+button:focus,
+button:focus-visible {
+  outline: none;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
 }
 
 h1 {
@@ -53,7 +88,7 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
-
+/* 
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -65,4 +100,4 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
-}
+} */

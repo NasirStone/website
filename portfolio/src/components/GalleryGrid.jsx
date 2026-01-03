@@ -1,9 +1,22 @@
+import { asset } from "./uiConstants.js";
+
+function isAbsoluteUrl(src) {
+  return (
+    /^https?:\/\//i.test(src) || /^data:/i.test(src) || /^blob:/i.test(src)
+  );
+}
+
 export default function GalleryGrid({
   images,
   columns = 2,
   gap = "1.0rem",
   aspect = "16 / 9",
 }) {
+  const resolved = (images || []).map((src) => {
+    if (!src) return src;
+    return isAbsoluteUrl(src) ? src : asset(src);
+  });
+
   return (
     <div
       style={{
@@ -12,7 +25,7 @@ export default function GalleryGrid({
         gap,
       }}
     >
-      {images.map((src, i) => (
+      {resolved.map((src, i) => (
         <div
           key={`${src}-${i}`}
           style={{
