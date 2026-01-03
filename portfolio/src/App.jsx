@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import DronesPage from "./pages/drones.jsx";
 import NasirPage from "./pages/nasir.jsx";
@@ -98,14 +98,10 @@ function Landing({ theme, setTheme }) {
 
   const isLight = theme === "light";
 
-  // Theme tokens
-  const FG = isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)";
-  const MUTED = isLight
-    ? "rgba(40, 24, 26, 0.62)"
-    : "rgba(170, 170, 170, 0.75)";
-  const PAGE_BG = isLight
-    ? "radial-gradient(1400px 900px at 50% 0%, rgba(0,0,0,0.035), rgba(0,0,0,0.00)), #f4f6f8"
-    : "radial-gradient(1400px 900px at 50% 0%, rgba(255,255,255,0.02), rgba(0,0,0,0.985)), #060607";
+  // Theme tokens (source of truth lives in App via CSS variables)
+  const FG = "var(--fg)";
+  const MUTED = "var(--muted)";
+  const PAGE_BG = "var(--page-bg)";
 
   // Terminal surface
   const TERM_BG = isLight ? "rgba(245, 247, 249, 0.88)" : "rgba(12,12,13,0.90)";
@@ -116,7 +112,7 @@ function Landing({ theme, setTheme }) {
   const CLOUD_COLOR = isLight ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.55)";
 
   // Menu button
-  const MENU_BG = isLight ? "rgba(245, 247, 249, 0.72)" : "rgba(0,0,0,0.55)";
+  const MENU_BG = "var(--shell-bg)";
   const [input, setInput] = useState("");
   const [history, setHistory] = useState(() => {
     try {
@@ -157,9 +153,25 @@ function Landing({ theme, setTheme }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sidebarIn, setSidebarIn] = useState(false);
   const sidebarKeywords = KEYWORDS_NORMALIZED;
+  const sortedKeywords = useMemo(() => Array.from(VALID_KEYWORDS).sort(), []);
 
   // Draggable terminal window position (top-left in px)
-  const [terminalPos, setTerminalPos] = useState({ x: 0, y: 0 });
+  const [terminalPos, setTerminalPos] = useState(() => {
+    if (typeof window === "undefined") {
+      return { x: 0, y: 0 };
+    }
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    const w = Math.min(733, vw * 0.8712);
+    const h = Math.min(554, vh * 0.693);
+
+    return {
+      x: Math.max(12, Math.round(vw / 2 - w / 2)),
+      y: Math.max(12, Math.round(vh / 2 - h / 2 + 18)),
+    };
+  });
   const [terminalSize, setTerminalSize] = useState({ w: 0, h: 0 });
   const draggingRef = useRef({ active: false, dx: 0, dy: 0 });
   const inputRef = useRef(null);
@@ -199,24 +211,6 @@ function Landing({ theme, setTheme }) {
     return window.innerWidth < 640;
   });
   useEffect(() => {
-    function centerIfUnset() {
-      setTerminalPos((p) => {
-        if (p.x !== 0 || p.y !== 0) return p;
-
-        const vw = window.innerWidth || 1200;
-        const vh = window.innerHeight || 800;
-
-        // Approximate terminal size to center it (matches render sizes)
-        const w = Math.min(733, vw * 0.8712);
-        const h = Math.min(554, vh * 0.693);
-        setTerminalSize({ w, h });
-
-        const x = Math.max(12, Math.round(vw / 2 - w / 2));
-        const y = Math.max(12, Math.round(vh / 2 - h / 2 + 18));
-        return { x, y };
-      });
-    }
-
     // initialize size immediately
     try {
       const vw = window.innerWidth || 1200;
@@ -228,18 +222,17 @@ function Landing({ theme, setTheme }) {
       // ignore
     }
 
-    centerIfUnset();
-
     function onResize() {
-      setIsCompact(window.innerWidth < 640);
+      const vw = window.innerWidth || 1200;
+      const vh = window.innerHeight || 800;
+      setIsCompact(vw < 640);
+
+      const w = Math.min(733, vw * 0.8712);
+      const h = Math.min(554, vh * 0.693);
+      setTerminalSize({ w, h });
+
       // Clamp terminal into view on resize
       setTerminalPos((p) => {
-        const vw = window.innerWidth || 1200;
-        const vh = window.innerHeight || 800;
-        const w = Math.min(733, vw * 0.8712);
-        const h = Math.min(554, vh * 0.693);
-        setTerminalSize({ w, h });
-
         const x = Math.min(Math.max(12, p.x), Math.max(12, vw - w - 12));
         const y = Math.min(Math.max(12, p.y), Math.max(12, vh - h - 12));
         return { x, y };
@@ -302,15 +295,25 @@ function Landing({ theme, setTheme }) {
       const isSmall = vw < 640;
       const repeats = isSmall ? 3 : 6;
 
-      // Deterministic RNG per session so the cloud doesn't jump around between navigations.
+      // Deterministic during SPA navigation, but re-randomize on a full page refresh.
+      // We do this by generating a new seed once per runtime and caching it in sessionStorage.
       let seedBase = 0;
       try {
+        const win = window;
+        const runtimeKey = "__wordCloudSeedInitialized";
         const existing = sessionStorage.getItem("wordCloudSeed");
-        if (existing) seedBase = Number(existing) || 0;
-        if (!seedBase) {
+
+        // If this JS runtime already initialized the seed, reuse it (prevents jumps when navigating away/back).
+        if (win && win[runtimeKey] && existing) {
+          seedBase = Number(existing) || 0;
+        } else {
+          // New runtime (e.g., hard refresh) -> new seed.
           seedBase = Math.floor(Math.random() * 1_000_000_000);
           sessionStorage.setItem("wordCloudSeed", String(seedBase));
+          if (win) win[runtimeKey] = true;
         }
+
+        if (!seedBase) seedBase = 123456789;
       } catch {
         seedBase = 123456789;
       }
@@ -578,14 +581,16 @@ function Landing({ theme, setTheme }) {
       });
     }
 
-    window.addEventListener("focus", refocus);
-    document.addEventListener("visibilitychange", () => {
+    function onVis() {
       if (document.visibilityState === "visible") refocus();
-    });
+    }
+
+    window.addEventListener("focus", refocus);
+    document.addEventListener("visibilitychange", onVis);
 
     return () => {
       window.removeEventListener("focus", refocus);
-      // cannot remove anonymous visibility handler; keep it named
+      document.removeEventListener("visibilitychange", onVis);
     };
   }, []);
 
@@ -597,6 +602,30 @@ function Landing({ theme, setTheme }) {
       return () => window.clearTimeout(t);
     }
   }, [isSidebarOpen]);
+
+  function navigateWithLoading({ cmd, path, label }) {
+    setHistory((h) => [
+      ...h,
+      { type: "prompt", text: `nasir % ${cmd}` },
+      { type: "system", text: `# loading ${label}…` },
+    ]);
+    setShowTip(false);
+
+    setIsLoading(true);
+    setLoadingPct(0);
+
+    const steps = [45, 80, 100];
+    steps.forEach((pct, i) => {
+      setTimeout(() => setLoadingPct(pct), 45 + i * 45);
+    });
+
+    setTimeout(() => {
+      setIsLoading(false);
+      setSidebarIn(false);
+      setIsSidebarOpen(false);
+      navigate(path);
+    }, 180);
+  }
 
   function runCommand(raw) {
     const cmd = normalizeKeyword(raw);
@@ -622,7 +651,7 @@ function Landing({ theme, setTheme }) {
     }
 
     if (cmd === "ls") {
-      const list = Array.from(VALID_KEYWORDS).sort();
+      const list = sortedKeywords;
       const cols = isCompact ? 2 : 4;
       const lines = formatColumns(list, cols);
 
@@ -705,54 +734,12 @@ function Landing({ theme, setTheme }) {
       }
 
       if (cmd === "about me") {
-        setHistory((h) => [
-          ...h,
-          { type: "prompt", text: `nasir % ${cmd}` },
-          { type: "system", text: "# loading about me…" },
-        ]);
-        setShowTip(false);
-
-        setIsLoading(true);
-        setLoadingPct(0);
-
-        const steps = [45, 80, 100];
-        steps.forEach((pct, i) => {
-          setTimeout(() => setLoadingPct(pct), 45 + i * 45);
-        });
-
-        setTimeout(() => {
-          setIsLoading(false);
-          setSidebarIn(false);
-          setIsSidebarOpen(false);
-          navigate("/nasir");
-        }, 180);
+        navigateWithLoading({ cmd, path: "/nasir", label: "about me" });
         return;
       }
 
       if (cmd === "drones") {
-        setHistory((h) => [
-          ...h,
-          { type: "prompt", text: `nasir % ${cmd}` },
-          { type: "system", text: "# loading drones…" },
-        ]);
-        setShowTip(false);
-
-        // short visible loading bar (< 0.5s total)
-        setIsLoading(true);
-        setLoadingPct(0);
-
-        const steps = [45, 80, 100];
-        steps.forEach((pct, i) => {
-          setTimeout(() => setLoadingPct(pct), 45 + i * 45);
-        });
-
-        setTimeout(() => {
-          setIsLoading(false);
-          setSidebarIn(false);
-          setIsSidebarOpen(false);
-          navigate("/drones");
-        }, 180);
-
+        navigateWithLoading({ cmd, path: "/drones", label: "drones" });
         return;
       }
 
@@ -966,7 +953,7 @@ function Landing({ theme, setTheme }) {
           width: 100%;
           margin: 0;
           padding: 0;
-          background: ${isLight ? "#f4f6f8" : "#0b0b0c"};
+          background: var(--page-bg);
           overflow: hidden;
         }
         @keyframes wordFade {
@@ -1145,20 +1132,29 @@ function Landing({ theme, setTheme }) {
             }}
           >
             <span>{bgTopText}</span>
-          </span>
-          {bgStage === "top" ? (
             <span
+              aria-hidden="true"
               style={{
+                position: "absolute",
+                left: "100%",
+                top: 0,
                 display: "inline-block",
                 width: "0.62em",
                 height: "1.15em",
                 marginLeft: "2px",
                 background: "var(--caret-block)",
-                animation: "blockBlink 1s steps(1, end) infinite",
+                // animation: "blockBlink 1s steps(1, end) infinite",
+                animation:
+                  bgStage === "top"
+                    ? "blockBlink 1s steps(1, end) infinite"
+                    : "none",
                 verticalAlign: "-0.15em",
+                opacity: bgStage === "top" ? 1 : 0,
+                transition: "opacity 120ms ease",
+                pointerEvents: "none",
               }}
             />
-          ) : null}
+          </span>
         </div>
 
         {/* bottom line */}
@@ -1196,7 +1192,11 @@ function Landing({ theme, setTheme }) {
                 height: "1.15em",
                 marginLeft: "2px",
                 background: "var(--caret-block)",
-                animation: "blockBlink 1s steps(1, end) infinite",
+                // animation: "blockBlink 1s steps(1, end) infinite",
+                animation:
+                  bgStage === "bottom"
+                    ? "blockBlink 1s steps(1, end) infinite"
+                    : "none",
                 verticalAlign: "-0.15em",
                 opacity: isDragging ? 0 : 1,
                 transition: "opacity 220ms ease",
@@ -1394,7 +1394,10 @@ function Landing({ theme, setTheme }) {
                       target={line.newTab ? "_blank" : undefined}
                       rel={line.newTab ? "noreferrer" : undefined}
                       style={{
-                        color: "rgba(220,220,220,0.92)",
+                        color:
+                          theme === "light"
+                            ? "rgba(18, 10, 12, 0.85)"
+                            : "rgba(220,220,220,0.92)",
                         textDecoration: "underline",
                       }}
                     >
@@ -1568,9 +1571,11 @@ function Landing({ theme, setTheme }) {
           pointerEvents: "none",
           fontFamily: MONO,
           fontSize: "0.75rem",
-          color: "rgba(235,235,235,0.9)",
+          color: isLight ? "rgba(18, 10, 12, 0.68)" : "rgba(235,235,235,0.9)",
           opacity: 0.9,
-          textShadow: "0 2px 14px rgba(0,0,0,0.7)",
+          textShadow: isLight
+            ? "0 2px 14px rgba(0,0,0,0.18)"
+            : "0 2px 14px rgba(0,0,0,0.7)",
         }}
         aria-hidden="true"
       >
