@@ -17,16 +17,47 @@ const PORTFOLIO_STORY = [
   "",
   "For my first portfolio, I set out to make something bold and creative.",
   "",
-  "Inspired by an assignment in my Object Oriented Programming class, a 'mock os',",
-  "I loved the ability to program my own arguments with C++. This design language",
-  "inspired the layout of this website.",
+  "Inspired by an assignment in my OOP class, a 'mock os',",
+  "I loved the ability to program my own arguments with C++.",
+  "This design language inspired the layout of this website.",
   "",
   "For anyone familiar with Bash, this should be intuitive,",
   "(you can even use cd to move between directories)",
-  "However I also wanted this portfolio to be accessible to the non-technical, so",
+  "However I also wanted thisp to be accessible to the non-technical, so",
   "creating a website that is inviting, yet unique was important to me.",
   "",
   "I hope you enjoy!",
+];
+
+// Terminal text for the `contact` keyword.
+const CONTACT_STORY = [
+  { type: "output", text: "" },
+
+  { type: "output", text: "Email:" },
+  {
+    type: "link",
+    text: "nasir@wustl.edu",
+    href: "mailto:nasir@wustl.edu",
+    newTab: true,
+  },
+
+  { type: "output", text: "" },
+  { type: "output", text: "LinkedIn:" },
+  {
+    type: "link",
+    text: "linkedin.com/in/nasir-sims",
+    href: "https://www.linkedin.com/in/nasir-sims",
+    newTab: true,
+  },
+
+  { type: "output", text: "" },
+  { type: "output", text: "GitHub:" },
+  {
+    type: "link",
+    text: "github.com/NasirStone",
+    href: "https://github.com/NasirStone",
+    newTab: true,
+  },
 ];
 
 const KEYWORDS = [
@@ -35,11 +66,11 @@ const KEYWORDS = [
   "drones",
   "autonomous vehicles",
   "cars",
+  "contact",
   "portfolio",
   "resume",
   "vintage audio",
   "travel",
-  "driving",
   "teaching",
   "chinese",
 ];
@@ -120,9 +151,9 @@ function Landing({ theme, setTheme }) {
       const parsed = raw ? JSON.parse(raw) : null;
       return Array.isArray(parsed)
         ? parsed
-        : [{ type: "system", text: "# Type a keyword to begin" }];
+        : [{ type: "system", text: "Type a keyword to begin" }];
     } catch {
-      return [{ type: "system", text: "# Type a keyword to begin" }];
+      return [{ type: "system", text: "Type a keyword to begin" }];
     }
   });
   const [showTip, setShowTip] = useState(() => {
@@ -629,15 +660,21 @@ function Landing({ theme, setTheme }) {
 
   function runCommand(raw) {
     const cmd = normalizeKeyword(raw);
+    // Easter egg: allow `cd <keyword>` as an alias for navigating to a keyword
+    let effectiveCmd = cmd;
+    if (cmd.startsWith("cd ")) {
+      const target = normalizeKeyword(cmd.slice(3));
+      if (target) effectiveCmd = target;
+    }
 
-    if (!cmd) return;
+    if (!effectiveCmd) return;
 
-    if (cmd === "lightmode" || cmd === "darkmode") {
-      const next = cmd === "lightmode" ? "light" : "dark";
+    if (effectiveCmd === "lightmode" || effectiveCmd === "darkmode") {
+      const next = effectiveCmd === "lightmode" ? "light" : "dark";
       setTheme(next);
       setHistory((h) => [
         ...h,
-        { type: "prompt", text: `nasir % ${cmd}` },
+        { type: "prompt", text: `nasir % ${raw}` },
         {
           type: "output",
           text:
@@ -650,30 +687,30 @@ function Landing({ theme, setTheme }) {
       return;
     }
 
-    if (cmd === "ls") {
+    if (effectiveCmd === "ls") {
       const list = sortedKeywords;
       const cols = isCompact ? 2 : 4;
       const lines = formatColumns(list, cols);
 
       setHistory((h) => [
         ...h,
-        { type: "prompt", text: `nasir % ${cmd}` },
+        { type: "prompt", text: `nasir % ${raw}` },
         ...lines.map((t) => ({ type: "output", text: t })),
       ]);
       setShowTip(false);
       return;
     }
 
-    if (cmd === "clear") {
+    if (effectiveCmd === "clear") {
       setHistory([]);
       setShowTip(false);
       return;
     }
 
-    if (cmd === "help") {
+    if (effectiveCmd === "help") {
       setHistory((h) => [
         ...h,
-        { type: "prompt", text: `nasir % ${cmd}` },
+        { type: "prompt", text: `nasir % ${raw}` },
         {
           type: "output",
           text: "Terminal Navigation",
@@ -681,11 +718,11 @@ function Landing({ theme, setTheme }) {
         { type: "output", text: "" },
         {
           type: "output",
-          text: "Type a keyword and press Enter to open its page.",
+          text: "Type a keyword and press Enter to open its page",
         },
         {
           type: "output",
-          text: "Find keywords in the background, the menu button (top-left), or by running 'ls'.",
+          text: "Find keywords in the background, the menu button (top-left), or by running 'ls'",
         },
         { type: "output", text: "" },
         { type: "output", text: "Usage:" },
@@ -704,23 +741,33 @@ function Landing({ theme, setTheme }) {
       return;
     }
 
-    if (VALID_KEYWORDS.has(cmd)) {
+    if (VALID_KEYWORDS.has(effectiveCmd)) {
       // routes that exist today
 
-      if (cmd === "portfolio") {
+      if (effectiveCmd === "portfolio") {
         setHistory((h) => [
           ...h,
-          { type: "prompt", text: `nasir % ${cmd}` },
+          { type: "prompt", text: `nasir % ${raw}` },
           ...PORTFOLIO_STORY.map((t) => ({ type: "output", text: t })),
         ]);
         setShowTip(false);
         return;
       }
 
-      if (cmd === "resume") {
+      if (effectiveCmd === "contact") {
         setHistory((h) => [
           ...h,
-          { type: "prompt", text: `nasir % ${cmd}` },
+          { type: "prompt", text: `nasir % ${raw}` },
+          ...CONTACT_STORY,
+        ]);
+        setShowTip(false);
+        return;
+      }
+
+      if (effectiveCmd === "resume") {
+        setHistory((h) => [
+          ...h,
+          { type: "prompt", text: `nasir % ${raw}` },
           {
             type: "link",
             text: "Download résumé (PDF)",
@@ -733,19 +780,19 @@ function Landing({ theme, setTheme }) {
         return;
       }
 
-      if (cmd === "about me") {
-        navigateWithLoading({ cmd, path: "/nasir", label: "about me" });
+      if (effectiveCmd === "about me") {
+        navigateWithLoading({ cmd: raw, path: "/nasir", label: "about me" });
         return;
       }
 
-      if (cmd === "drones") {
-        navigateWithLoading({ cmd, path: "/drones", label: "drones" });
+      if (effectiveCmd === "drones") {
+        navigateWithLoading({ cmd: raw, path: "/drones", label: "drones" });
         return;
       }
 
       setHistory((h) => [
         ...h,
-        { type: "prompt", text: `nasir % ${cmd}` },
+        { type: "prompt", text: `nasir % ${raw}` },
         {
           type: "system",
           text: "That page is not ready yet. Check back later!",
@@ -757,12 +804,12 @@ function Landing({ theme, setTheme }) {
 
     setHistory((h) => [
       ...h,
-      { type: "prompt", text: `nasir % ${cmd}` },
+      { type: "prompt", text: `nasir % ${raw}` },
       {
         type: "error",
-        text: `Command not found: ${cmd}. Type help for commands.`,
+        text: `Command not found: ${effectiveCmd}. Type help for commands.`,
       },
-    ]);
+    ]);c
   }
 
   function onSubmit(e) {
@@ -1542,21 +1589,6 @@ function Landing({ theme, setTheme }) {
                   />
                 </div>
               </div>
-              {showTip ? (
-                <div
-                  style={{
-                    marginTop: "0.35rem",
-                    fontSize: "0.8rem",
-                    color: MUTED,
-                  }}
-                >
-                  # type a keyword into the terminal to access the page,{" "}
-                  <span style={{ color: "rgba(220,220,220,0.85)" }}>help</span>{" "}
-                  for commands, or{" "}
-                  <span style={{ color: "rgba(220,220,220,0.85)" }}>clear</span>{" "}
-                  to reset.
-                </div>
-              ) : null}
             </form>
           </div>
         </div>

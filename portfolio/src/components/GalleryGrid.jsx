@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from "react";
 import { asset } from "./uiConstants.js";
 
 function isAbsoluteUrl(src) {
@@ -11,11 +12,29 @@ export default function GalleryGrid({
   columns = 2,
   gap = "1.0rem",
   aspect = "16 / 9",
+  preloadCount = 4,
 }) {
-  const resolved = (images || []).map((src) => {
-    if (!src) return src;
-    return isAbsoluteUrl(src) ? src : asset(src);
-  });
+  const resolved = useMemo(() => {
+    return (images || []).map((src) => {
+      if (!src) return src;
+      return isAbsoluteUrl(src) ? src : asset(src);
+    });
+  }, [images]);
+
+  // Prefetch first images so they hit cache ASAP
+  useEffect(() => {
+    const n = Math.max(0, Math.min(preloadCount, resolved.length));
+    if (!n) return;
+
+    for (let i = 0; i < n; i++) {
+      const src = resolved[i];
+      if (!src) continue;
+      const img = new Image();
+      if (i < 2) img.fetchPriority = "high";
+      img.decoding = "async";
+      img.src = src;
+    }
+  }, [resolved, preloadCount]);
 
   return (
     <div
@@ -40,8 +59,8 @@ export default function GalleryGrid({
             src={src}
             alt={`Gallery image ${i + 1}`}
             decoding="async"
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
+            loading={i < preloadCount ? "eager" : "lazy"}
+            fetchPriority={i < 2 ? "high" : "auto"}
             style={{
               width: "100%",
               height: "100%",

@@ -41,13 +41,14 @@ export default function NasirPage() {
             for MGT2001 - Introduction to Business Fundamentals.
             <br />
             <br />
-            Outside of school, I love to fix things and get my hands dirty. I
-            repair anything from cars, bikes, to vintage audio equipment. I love
-            road trips (my longest was 6,000+ miles), I collect all different
-            formats of music, and I have a pet lizard whom I adore very much.
+            Outside of school, I love fixing things and getting my hands dirty.
+            I repair anything from cars and bikes to vintage audio equipment. I
+            love road trips (my longest was 6,000+ miles), I collect all
+            different music formats, and I have a pet lizard whom I adore very
+            much.
             <br />
             <br />I built this website not only to showcase my software
-            projects, but to also reveal my interests. Thanks for visiting!
+            projects, but also to reveal my interests. Thanks for visiting!
           </TextPanel>
         </TwoColumnLayout>
       </div>
