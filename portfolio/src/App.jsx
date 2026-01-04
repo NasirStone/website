@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import DronesPage from "./pages/drones.jsx";
 import NasirPage from "./pages/nasir.jsx";
+import AutonomousVehiclesPage from "./pages/autonomousvehicles.jsx";
+import RocketryPage from "./pages/rocketry.jsx";
 
 const SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif';
@@ -70,9 +72,7 @@ const KEYWORDS = [
   "portfolio",
   "resume",
   "vintage audio",
-  "travel",
-  "teaching",
-  "chinese",
+  "travel"
 ];
 
 function normalizeKeyword(s) {
@@ -790,6 +790,20 @@ function Landing({ theme, setTheme }) {
         return;
       }
 
+      if (effectiveCmd === "autonomous vehicles") {
+        navigateWithLoading({
+          cmd: raw,
+          path: "/autonomous-vehicles",
+          label: "autonomous vehicles",
+        });
+        return;
+      }
+
+      if (effectiveCmd === "rocketry") {
+        navigateWithLoading({ cmd: raw, path: "/rocketry", label: "rocketry" });
+        return;
+      }
+
       setHistory((h) => [
         ...h,
         { type: "prompt", text: `nasir % ${raw}` },
@@ -809,7 +823,7 @@ function Landing({ theme, setTheme }) {
         type: "error",
         text: `Command not found: ${effectiveCmd}. Type help for commands.`,
       },
-    ]);c
+    ]);
   }
 
   function onSubmit(e) {
@@ -1096,8 +1110,8 @@ function Landing({ theme, setTheme }) {
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 46,
-          height: 40,
+          width: 51,
+          height: 44,
           background: MENU_BG,
           border: "none",
           borderRadius: 12,
@@ -1114,24 +1128,24 @@ function Landing({ theme, setTheme }) {
         <span aria-hidden="true" style={{ display: "grid", gap: 4 }}>
           <span
             style={{
-              width: 20,
-              height: 2,
+              width: 22,
+              height: 2.2,
               borderRadius: 999,
               background: FG,
             }}
           />
           <span
             style={{
-              width: 20,
-              height: 2,
+              width: 22,
+              height: 2.2,
               borderRadius: 999,
               background: FG,
             }}
           />
           <span
             style={{
-              width: 20,
-              height: 2,
+              width: 22,
+              height: 2.2,
               borderRadius: 999,
               background: FG,
             }}
@@ -1227,7 +1241,11 @@ function Landing({ theme, setTheme }) {
             transition: `opacity ${isDragging ? 140 : 650}ms ease`,
             fontSize: "1.05rem",
             whiteSpace: "pre-wrap",
-            textShadow: "0 2px 16px rgba(0,0,0,0.7)",
+            textShadow: "0 2px 18px rgba(0,0,0,0.75)",
+            color:
+              theme === "light"
+                ? "rgba(18, 10, 12, 0.92)"
+                : "rgba(245,245,245,0.96)",
           }}
         >
           <span>{bgBottomText}</span>
@@ -1689,6 +1707,8 @@ export default function App() {
       <Route path="/" element={<Landing theme={theme} setTheme={setTheme} />} />
       <Route path="/drones" element={<DronesPage />} />
       <Route path="/nasir" element={<NasirPage />} />
+      <Route path="/autonomous-vehicles" element={<AutonomousVehiclesPage />} />
+      <Route path="/rocketry" element={<RocketryPage />} />
     </Routes>
   );
 }

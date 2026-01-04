@@ -13,8 +13,9 @@ export default function PageShell({
         width: "100vw",
         background: "var(--page-bg)",
         color: "var(--fg)",
-        display: "grid",
-        placeItems: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         padding: "1.5rem 0.75rem",
       }}
     >
@@ -28,16 +29,18 @@ export default function PageShell({
           padding: "1.25rem 1.25rem 1.5rem",
         }}
       >
-        <div
-          style={{
-            fontFamily: MONO,
-            fontSize: "0.9rem",
-            opacity: 0.9,
-            marginBottom: "1.0rem",
-          }}
-        >
-          {title}
-        </div>
+        {title ? (
+          <div
+            style={{
+              fontFamily: MONO,
+              fontSize: "0.9rem",
+              opacity: 0.9,
+              marginBottom: "1.0rem",
+            }}
+          >
+            {title}
+          </div>
+        ) : null}
 
         {children}
 
