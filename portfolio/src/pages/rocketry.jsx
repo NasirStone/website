@@ -425,29 +425,44 @@ export default function RocketryPage() {
           >
             <div style={{ width: "min(1100px, 100%)" }}>
               <SectionHeading style={{ margin: "0 0 12px" }}>
-                Rocket Overview
+                Ursa Major
               </SectionHeading>
               <TextPanel style={styles.centeredPanelBody}>
-                This vehicle was built for the NASA Student Launch competition
-                with one goal in mind: fly repeatably, recover cleanly, and
-                learn from every flight. The architecture is modular by design,
-                with clear interfaces between airframe, avionics, propulsion,
-                and recovery so we can iterate fast without breaking the whole
-                system.
+                Ursa Major is WURocketry's 2024-2025 NASA Student Launch
+                vehicle: a reusable, innovative high-powered rocket designed to
+                fly repeatably, recover cleanly, and improve every time it
+                leaves the rail. The airframe and coupler are both made from G12
+                fiberglass. It uses a 6in inner diameter / 6.17in outer diameter
+                airframe, with a total length of 114in (53 fwd, 16in mid, 45in
+                aft). The vehicle's wet mass is ~48lbs and dry mass is ~42lbs,
+                and OpenRocket predicted a 2.55 caliber stability margin with
+                the CG ahead of the CP.
                 <br />
                 <br />
-                My work focused on the parts that turn a rocket into an
-                instrumented platform. That includes reliable sensing, telemetry
-                for real time visibility, and control surfaces that can correct
-                for real world uncertainty. Each subsystem is validated through
-                bench tests and end to end checkouts before flight, then refined
-                using logs and post flight analysis.
+                Inside, Ursa Major is built around instrumentation and
+                recoverability. A dual-deploy recovery profile brings the rocket
+                down in three tethered sections, with a drogue event near apogee
+                and a main deployment near 550 ft AGL. The recovery electronics
+                are redundant: a primary flight computer (TeleMega) handles the
+                nominal sequence, while a secondary computer (EasyMini) fires
+                backup events on offset timing to protect against single-point
+                failures. The result is a vehicle that prioritises clean data,
+                reliable deployment, and fast iteration.
                 <br />
                 <br />
-                Use this section to summarize the mission profile, performance
-                targets, and how the major subsystems fit together. You can also
-                add quick callouts for materials, manufacturing, and safety
-                constraints.
+                Beyond the core vehicle, Ursa Major includes extremely creative
+                design challenges. The NASA Student Launch payload challenge is
+                treated like a first class subsystem, with dedicated space,
+                interfaces, and wiring paths so integration does not feel like
+                an afterthought. To ensure an accurate target altitude, the
+                rocket also employs an active airbrake control system that
+                introduces controllable drag after burnout, letting us correct
+                for motor variability and changing conditions. Finally, the
+                onboard bi-directional camera system captures forward and aft
+                footage so we can validate deployment events and airbrake
+                behaviour with visual evidence, not just logs.
+                <br />
+                <br />
               </TextPanel>
             </div>
           </div>
@@ -462,7 +477,7 @@ export default function RocketryPage() {
           }}
         >
           <div style={{ width: "min(1100px, 100%)", display: "grid", gap: 12 }}>
-            <SectionHeading>Projects</SectionHeading>
+            <SectionHeading>My Projects</SectionHeading>
 
             <div
               style={{
@@ -519,32 +534,32 @@ export default function RocketryPage() {
               }}
             >
               <CenteredPanel title="Bi-Directional Camera System">
-                I rebuilt WURocketry's onboard camera system from the ground up
-                so we could reliably capture both forward and aft flight footage
-                for post flight analysis and airbrake verification. After
-                becoming Avionics Lead, I wanted to give my team room to own
-                that work while I took on a project I genuinely care about:
-                cameras and visual storytelling. It fit naturally with my film
-                minor, but it also forced me to learn a lot of practical
-                embedded engineering.
+                Another project I took on was rebuilding our onboard camera
+                system. This redesign was necessary to more reliably capture
+                both forward and aft flight footage for post flight analysis and
+                airbrake verification. After becoming Avionics Lead, I wanted to
+                give my team room to own that work while I took on a project I
+                genuinely care about: cameras and visual storytelling. It fit
+                naturally with my film minor, but it also forced me to learn a
+                lot of practical embedded engineering.
                 <br />
                 <br />
                 Our previous setup used off the shelf spy cameras mounted
                 externally, and they were a constant source of frustration. On
-                impact, they could shift or pop loose, and we would lose the
-                exact footage we needed to validate deployment. I worked with
-                avionics and someone from the EE team to redesign the system
-                around Raspberry Pi Zero 2W modules with compact camera
-                attachments so everything could live cleanly inside the rocket.
-                Each unit boots directly into recording using minimal startup
-                scripts, which means we do not rely on anyone remembering to hit
-                record at the pad.
+                landing, they could shift or pop loose, and we would lose
+                crucial footage necessary to validate deployment. I worked with
+                avionics and various subteams to redesign the system around
+                Raspberry Pi Zero 2W modules with compact camera attachments so
+                everything could live cleanly inside the rocket. Each unit boots
+                directly into recording using minimal startup scripts, which
+                means we do not rely on anyone remembering to hit record at the
+                pad.
                 <br />
                 <br />
                 The hardest part ended up being power and durability. We moved
-                from bulky temporary batteries to the rocket's existing LiPo
-                power, then iterated on the connectors after we saw strain and
-                broken joints during handling and flight. Once the hardware was
+                from bulky powerbanks to the rocket's existing LiPo power, then
+                iterated on the connector design after we saw strain and broken
+                joints during handling and flight. Once the hardware was
                 dependable, I focused on making the footage easy to retrieve. By
                 combining hotspot transfer with local encoding and simple
                 conversion scripts, we cut post flight recovery from hours down
@@ -562,8 +577,11 @@ export default function RocketryPage() {
                   gap="14px"
                   objectFit="contain"
                   itemStyle={{
-                    padding: "6px",
-                    background: "var(--panel-bg)",
+                    padding: 0,
+                    background: "transparent",
+                    border: "none",
+                    boxShadow: "none",
+                    outline: "none",
                   }}
                 />
               </div>

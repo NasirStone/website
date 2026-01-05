@@ -72,7 +72,7 @@ const KEYWORDS = [
   "portfolio",
   "resume",
   "vintage audio",
-  "travel"
+  "travel",
 ];
 
 function normalizeKeyword(s) {
@@ -877,7 +877,7 @@ function Landing({ theme, setTheme }) {
           position: absolute;
           top: 12px;
           left: 12px;
-          width: 260px;
+          width: 272px;
           max-height: calc(100vh - 24px);
           overflow: auto;
           border-radius: 14px;
@@ -892,7 +892,7 @@ function Landing({ theme, setTheme }) {
           color: ${
             isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"
           };
-          padding: 0.9rem 0.85rem;
+          padding: 0.95rem 0.9rem;
           backdrop-filter: blur(12px);
           transform: translateX(-110%);
           transition: transform 180ms ease, opacity 180ms ease;
@@ -927,7 +927,7 @@ function Landing({ theme, setTheme }) {
           margin-top: -4px;
           margin-bottom: 0.55rem;
           opacity: 0.9;
-          font-size: 0.9rem;
+          font-size: 0.86rem;
           line-height: 1;
         }
         .sidebarTitle {
@@ -981,10 +981,10 @@ function Landing({ theme, setTheme }) {
             isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"
           };
           border-radius: 10px;
-          padding: 0.55rem 0.65rem;
+          padding: 0.56rem 0.68rem;
           cursor: pointer;
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: 0.85rem;
+          font-size: 0.90rem;
           line-height: 1.25;
         }
         .keywordBtn:hover {
@@ -1110,8 +1110,8 @@ function Landing({ theme, setTheme }) {
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          width: 51,
-          height: 44,
+          width: 56,
+          height: 48,
           background: MENU_BG,
           border: "none",
           borderRadius: 12,
@@ -1128,24 +1128,24 @@ function Landing({ theme, setTheme }) {
         <span aria-hidden="true" style={{ display: "grid", gap: 4 }}>
           <span
             style={{
-              width: 22,
-              height: 2.2,
+              width: 24,
+              height: 2.4,
               borderRadius: 999,
               background: FG,
             }}
           />
           <span
             style={{
-              width: 22,
-              height: 2.2,
+              width: 24,
+              height: 2.4,
               borderRadius: 999,
               background: FG,
             }}
           />
           <span
             style={{
-              width: 22,
-              height: 2.2,
+              width: 24,
+              height: 2.4,
               borderRadius: 999,
               background: FG,
             }}
