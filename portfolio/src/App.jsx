@@ -4,6 +4,7 @@ import DronesPage from "./pages/drones.jsx";
 import NasirPage from "./pages/nasir.jsx";
 import AutonomousVehiclesPage from "./pages/autonomousvehicles.jsx";
 import RocketryPage from "./pages/rocketry.jsx";
+import TravelPage from "./pages/travel.jsx";
 
 const SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif';
@@ -25,7 +26,7 @@ const PORTFOLIO_STORY = [
   "",
   "For anyone familiar with Bash, this should be intuitive,",
   "(you can even use cd to move between directories)",
-  "However I also wanted thisp to be accessible to the non-technical, so",
+  "However I also wanted this to be accessible to the non-technical, so",
   "creating a website that is inviting, yet unique was important to me.",
   "",
   "I hope you enjoy!",
@@ -63,7 +64,7 @@ const CONTACT_STORY = [
 ];
 
 const KEYWORDS = [
-  "about me",
+  "about",
   "rocketry",
   "drones",
   "autonomous vehicles",
@@ -151,9 +152,9 @@ function Landing({ theme, setTheme }) {
       const parsed = raw ? JSON.parse(raw) : null;
       return Array.isArray(parsed)
         ? parsed
-        : [{ type: "system", text: "Type a keyword to begin" }];
+        : [{ type: "system", text: "Nasir Sims Portfolio [Version Beta]" }];
     } catch {
-      return [{ type: "system", text: "Type a keyword to begin" }];
+      return [{ type: "system", text: "Nasir Sims Portfolio [Version Beta]" }];
     }
   });
   const [showTip, setShowTip] = useState(() => {
@@ -780,8 +781,8 @@ function Landing({ theme, setTheme }) {
         return;
       }
 
-      if (effectiveCmd === "about me") {
-        navigateWithLoading({ cmd: raw, path: "/nasir", label: "about me" });
+      if (effectiveCmd === "about") {
+        navigateWithLoading({ cmd: raw, path: "/nasir", label: "about" });
         return;
       }
 
@@ -801,6 +802,11 @@ function Landing({ theme, setTheme }) {
 
       if (effectiveCmd === "rocketry") {
         navigateWithLoading({ cmd: raw, path: "/rocketry", label: "rocketry" });
+        return;
+      }
+
+      if (effectiveCmd === "travel") {
+        navigateWithLoading({ cmd: raw, path: "/travel", label: "travel" });
         return;
       }
 
@@ -1709,6 +1715,7 @@ export default function App() {
       <Route path="/nasir" element={<NasirPage />} />
       <Route path="/autonomous-vehicles" element={<AutonomousVehiclesPage />} />
       <Route path="/rocketry" element={<RocketryPage />} />
+      <Route path="/travel" element={<TravelPage />} />
     </Routes>
   );
 }

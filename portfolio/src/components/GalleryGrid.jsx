@@ -51,7 +51,7 @@ export default function GalleryGrid({
               objectFit: "cover",
               display: "block",
             }}
-          />
+          />t
         </div>
       ))}
     </div>

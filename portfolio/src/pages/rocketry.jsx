@@ -486,28 +486,33 @@ export default function RocketryPage() {
                 gridTemplateColumns: "1.1fr 0.9fr",
                 gap: "32px",
                 alignItems: "start",
+                position: "relative",
               }}
             >
-              <CenteredPanel title="Airbrake Control System">
-                WURocketry's Airbrake Control System is a mechanism designed to
-                regulate rocket apogee by dynamically increasing aerodynamic
-                drag during ascent. The system uses four radially mounted
-                paddles that extend into the airflow, allowing the vehicle to
-                compensate for motor performance, wind conditions, and mass.
-                <br />
-                <br />
-                I led the development of embedded control software for the
-                system. On the software side, I helped implement a feedforward
-                control strategy using state estimation and Kalman filtering to
-                predict apogee in real time, paired with PID motor control for
-                precise paddle positioning. The system was extensively tested
-                through bench tests, elevator tests, and telemetry-driven
-                validation to ensure reliable deployment and retraction.
-                <br />
-                <br />
-              </CenteredPanel>
+              <div style={{ position: "relative", zIndex: 2 }}>
+                <CenteredPanel title="Airbrake Control System">
+                  WURocketry's Airbrake Control System is a mechanism designed
+                  to regulate rocket apogee by dynamically increasing
+                  aerodynamic drag during ascent. The system uses four radially
+                  mounted paddles that extend into the airflow, allowing the
+                  vehicle to compensate for motor performance, wind conditions,
+                  and mass.
+                  <br />
+                  <br />
+                  I led the development of embedded control software for the
+                  system. On the software side, I helped implement a feedforward
+                  control strategy using state estimation and Kalman filtering
+                  to predict apogee in real time, paired with PID motor control
+                  for precise paddle positioning. The system was extensively
+                  tested through bench tests, elevator tests, and
+                  telemetry-driven validation to ensure reliable deployment and
+                  retraction.
+                  <br />
+                  <br />
+                </CenteredPanel>
+              </div>
 
-              <div style={{ width: "100%" }}>
+              <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
                 <GalleryGrid
                   images={airbrakeImages}
                   columns={2}
@@ -531,42 +536,46 @@ export default function RocketryPage() {
                 gridTemplateColumns: "1.1fr 0.9fr",
                 gap: "32px",
                 alignItems: "start",
+                position: "relative",
               }}
             >
-              <CenteredPanel title="Bi-Directional Camera System">
-                Another project I took on was rebuilding our onboard camera
-                system. This redesign was necessary to more reliably capture
-                both forward and aft flight footage for post flight analysis and
-                airbrake verification. After becoming Avionics Lead, I wanted to
-                give my team room to own that work while I took on a project I
-                genuinely care about: cameras and visual storytelling. It fit
-                naturally with my film minor, but it also forced me to learn a
-                lot of practical embedded engineering.
-                <br />
-                <br />
-                Our previous setup used off the shelf spy cameras mounted
-                externally, and they were a constant source of frustration. On
-                landing, they could shift or pop loose, and we would lose
-                crucial footage necessary to validate deployment. I worked with
-                avionics and various subteams to redesign the system around
-                Raspberry Pi Zero 2W modules with compact camera attachments so
-                everything could live cleanly inside the rocket. Each unit boots
-                directly into recording using minimal startup scripts, which
-                means we do not rely on anyone remembering to hit record at the
-                pad.
-                <br />
-                <br />
-                The hardest part ended up being power and durability. We moved
-                from bulky powerbanks to the rocket's existing LiPo power, then
-                iterated on the connector design after we saw strain and broken
-                joints during handling and flight. Once the hardware was
-                dependable, I focused on making the footage easy to retrieve. By
-                combining hotspot transfer with local encoding and simple
-                conversion scripts, we cut post flight recovery from hours down
-                to seconds so the team could review results immediately.
-              </CenteredPanel>
+              <div style={{ position: "relative", zIndex: 2 }}>
+                <CenteredPanel title="Bi-Directional Camera System">
+                  Another project I took on was rebuilding our onboard camera
+                  system. This redesign was necessary to more reliably capture
+                  both forward and aft flight footage for post flight analysis
+                  and airbrake verification. After becoming Avionics Lead, I
+                  wanted to give my team room to own that work while I took on a
+                  project I genuinely care about: cameras and visual
+                  storytelling. It fit naturally with my film minor, but it also
+                  forced me to learn a lot of practical embedded engineering.
+                  <br />
+                  <br />
+                  Our previous setup used off the shelf spy cameras mounted
+                  externally, and they were a constant source of frustration. On
+                  landing, they could shift or pop loose, and we would lose
+                  crucial footage necessary to validate deployment. I worked
+                  with avionics and various subteams to redesign the system
+                  around Raspberry Pi Zero 2W modules with compact camera
+                  attachments so everything could live cleanly inside the
+                  rocket. Each unit boots directly into recording using minimal
+                  startup scripts, which means we do not rely on anyone
+                  remembering to hit record at the pad.
+                  <br />
+                  <br />
+                  The hardest part ended up being power and durability. We moved
+                  from bulky powerbanks to the rocket's existing LiPo power,
+                  then iterated on the connector design after we saw strain and
+                  broken joints during handling and flight. Once the hardware
+                  was dependable, I focused on making the footage easy to
+                  retrieve. By combining hotspot transfer with local encoding
+                  and simple conversion scripts, we cut post flight recovery
+                  from hours down to seconds so the team could review results
+                  immediately.
+                </CenteredPanel>
+              </div>
 
-              <div style={{ width: "100%" }}>
+              <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
                 <GalleryGrid
                   images={[
                     "images/FS_Camera_Inserts.webp",
