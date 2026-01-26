@@ -6,17 +6,19 @@ import { asset } from "../components/uiConstants.js";
 import GalleryGrid from "../components/GalleryGrid.jsx";
 
 const VIDEO_SRC = asset("videos/rocketry.mp4");
-const LOGO_WHITE = asset("images/logo.png");
+const LOGO_WHITE = asset("images/rocketry/logo.png");
 
 const airbrakeImages = [
-  "images/Airbrakes Assembly Solo Retracted Top.webp", // 3
-  "images/Airbrakes Assembly Solo Extended Top.webp", // 1
-  "images/Airbrakes Assembly Solo Iso.webp", // 2
-  "images/FS_Assembled_Paddle.webp", // 4
+  "images/rocketry/Airbrakes Assembly Solo Retracted Top.webp", // 3
+  "images/rocketry/Airbrakes Assembly Solo Extended Top.webp", // 1
+  "images/rocketry/Airbrakes Assembly Solo Iso.webp", // 2
+  "images/rocketry/FS_Assembled_Paddle.webp", // 4
 ];
 
-const fullAssemblyImg = asset("images/Full_Assembly.webp");
-const fullAssemblyExplodedImg = asset("images/Full_Assembly_Exploded.webp");
+const fullAssemblyImg = asset("images/rocketry/Full_Assembly.webp");
+const fullAssemblyExplodedImg = asset(
+  "images/rocketry/Full_Assembly_Exploded.webp"
+);
 
 function clamp01(x) {
   return Math.max(0, Math.min(1, x));
@@ -83,11 +85,16 @@ function SectionHeading({ children, style }) {
   return <div style={{ ...styles.sectionHeading, ...style }}>{children}</div>;
 }
 
-function CenteredPanel({ title, children }) {
+function CenteredPanel({ title, children, panelStyle }) {
   return (
     <TextPanel
       title={title}
-      style={{ fontSize: "1.08rem", lineHeight: 1.7, textAlign: "center" }}
+      style={{
+        fontSize: "1.08rem",
+        lineHeight: 1.7,
+        textAlign: "center",
+        ...(panelStyle || {}),
+      }}
     >
       <div style={styles.constrainedBody}>{children}</div>
     </TextPanel>
@@ -540,7 +547,21 @@ export default function RocketryPage() {
               }}
             >
               <div style={{ position: "relative", zIndex: 2 }}>
-                <CenteredPanel title="Bi-Directional Camera System">
+                <CenteredPanel
+                  title="Bi-Directional Camera System"
+                  panelStyle={{
+                    // Fix light-mode banding on very tall panels (common in Safari):
+                    // use a tighter shadow + isolate the layer so the blur doesn't "stripe".
+                    boxShadow:
+                      "0 14px 28px rgba(0,0,0,0.12), 0 2px 10px rgba(0,0,0,0.08)",
+                    isolation: "isolate",
+                    transform: "translateZ(0)",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    willChange: "transform",
+                    backgroundClip: "padding-box",
+                  }}
+                >
                   Another project I took on was rebuilding our onboard camera
                   system. This redesign was necessary to more reliably capture
                   both forward and aft flight footage for post flight analysis
@@ -578,8 +599,8 @@ export default function RocketryPage() {
               <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
                 <GalleryGrid
                   images={[
-                    "images/FS_Camera_Inserts.webp",
-                    "images/Zero_Spy_Camera.webp",
+                    "images/rocketry/FS_Camera_Inserts.webp",
+                    "images/rocketry/Zero_Spy_Camera.webp",
                   ]}
                   columns={1}
                   aspect="4 / 3"

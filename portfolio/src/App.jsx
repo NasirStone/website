@@ -5,6 +5,7 @@ import NasirPage from "./pages/nasir.jsx";
 import AutonomousVehiclesPage from "./pages/autonomousvehicles.jsx";
 import RocketryPage from "./pages/rocketry.jsx";
 import TravelPage from "./pages/travel.jsx";
+import VintageAudioPage from "./pages/vintageaudio.jsx";
 
 const SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif';
@@ -65,15 +66,15 @@ const CONTACT_STORY = [
 
 const KEYWORDS = [
   "about",
-  "rocketry",
-  "drones",
   "autonomous vehicles",
-  "cars",
   "contact",
+  "drones",
+  "music",
   "portfolio",
   "resume",
-  "vintage audio",
+  "rocketry",
   "travel",
+  "vintage audio",
 ];
 
 function normalizeKeyword(s) {
@@ -142,6 +143,15 @@ function Landing({ theme, setTheme }) {
   const INSET_LINE = isLight ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.06)";
   // Word cloud (darker/inkier, less “glowy”)
   const CLOUD_COLOR = isLight ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.55)";
+
+  // Frosted glass backing for the hero title + bottom hint
+  const FROST_BG = isLight
+    ? "rgba(255,255,255,0.55)"
+    : "rgba(255,255,255,0.11)";
+  const FROST_BORDER = isLight ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.14)";
+  const FROST_SHADOW = isLight
+    ? "0 10px 28px rgba(0,0,0,0.10)"
+    : "0 16px 44px rgba(0,0,0,0.55)";
 
   // Menu button
   const MENU_BG = "var(--shell-bg)";
@@ -488,7 +498,7 @@ function Landing({ theme, setTheme }) {
   useEffect(() => {
     const top = "Nasir Sims";
     const bottom =
-      "Type any word you see into the terminal to access a page. Type 'help' to learn more.";
+      "Type a highlighted word into the terminal to access a page. Type 'help' to learn more.";
     let cancelled = false;
 
     function typeLine(line, setLine, onDone, speed = 1) {
@@ -639,7 +649,7 @@ function Landing({ theme, setTheme }) {
     setHistory((h) => [
       ...h,
       { type: "prompt", text: `nasir % ${cmd}` },
-      { type: "system", text: `# loading ${label}…` },
+      { type: "system", text: `loading ${label}…` },
     ]);
     setShowTip(false);
 
@@ -765,16 +775,31 @@ function Landing({ theme, setTheme }) {
         return;
       }
 
+      if (effectiveCmd === "music") {
+        setHistory((h) => [
+          ...h,
+          { type: "prompt", text: `nasir % ${raw}` },
+          { type: "output", text: "My Physical Music Collection" },
+          {
+            type: "link",
+            text: "discogs.com/user/nasedition/collection",
+            href: "https://www.discogs.com/user/nasedition/collection?header=1",
+            newTab: true,
+          },
+        ]);
+        setShowTip(false);
+        return;
+      }
+
       if (effectiveCmd === "resume") {
         setHistory((h) => [
           ...h,
           { type: "prompt", text: `nasir % ${raw}` },
           {
             type: "link",
-            text: "Download résumé (PDF)",
+            text: "View Résumé (PDF)",
             href: RESUME_URL,
-            download: true,
-            newTab: false,
+            newTab: true,
           },
         ]);
         setShowTip(false);
@@ -810,6 +835,15 @@ function Landing({ theme, setTheme }) {
         return;
       }
 
+      if (effectiveCmd === "vintage audio") {
+        navigateWithLoading({
+          cmd: raw,
+          path: "/vintage-audio",
+          label: "vintage audio",
+        });
+        return;
+      }
+
       setHistory((h) => [
         ...h,
         { type: "prompt", text: `nasir % ${raw}` },
@@ -827,7 +861,7 @@ function Landing({ theme, setTheme }) {
       { type: "prompt", text: `nasir % ${raw}` },
       {
         type: "error",
-        text: `Command not found: ${effectiveCmd}. Type help for commands.`,
+        text: `zsh: command not found: ${effectiveCmd}`,
       },
     ]);
   }
@@ -1188,39 +1222,52 @@ function Landing({ theme, setTheme }) {
             letterSpacing: "-0.05em",
             lineHeight: "1.2",
             whiteSpace: "pre-wrap",
-            textShadow: "0 2px 18px rgba(0,0,0,0.75)",
+            textShadow: isLight
+              ? "0 2px 18px rgba(0,0,0,0.35)"
+              : "0 2px 18px rgba(0,0,0,0.75)",
           }}
         >
           <span
             style={{
               position: "relative",
-              display: "inline-block",
-              paddingBottom: 10,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0.14em 0.32em",
+              borderRadius: 16,
+              background: FROST_BG,
+              border: `1px solid ${FROST_BORDER}`,
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              boxShadow: FROST_SHADOW,
+              // Harmonize title text with bottom hint:
+              color:
+                theme === "light"
+                  ? "rgba(18, 10, 12, 0.92)"
+                  : "rgba(245,245,245,0.96)",
+              opacity: 0.94,
+              textShadow: isLight
+                ? "0 2px 14px rgba(0,0,0,0.30)"
+                : "0 2px 14px rgba(0,0,0,0.65)",
             }}
           >
             <span>{bgTopText}</span>
-            <span
-              aria-hidden="true"
-              style={{
-                position: "absolute",
-                left: "100%",
-                top: 0,
-                display: "inline-block",
-                width: "0.62em",
-                height: "1.15em",
-                marginLeft: "2px",
-                background: "var(--caret-block)",
-                // animation: "blockBlink 1s steps(1, end) infinite",
-                animation:
-                  bgStage === "top"
-                    ? "blockBlink 1s steps(1, end) infinite"
-                    : "none",
-                verticalAlign: "-0.15em",
-                opacity: bgStage === "top" ? 1 : 0,
-                transition: "opacity 120ms ease",
-                pointerEvents: "none",
-              }}
-            />
+            {bgStage === "top" ? (
+              <span
+                aria-hidden="true"
+                style={{
+                  display: "inline-block",
+                  width: "0.55em",
+                  height: "0.85em",
+                  marginLeft: "10px",
+                  background: "var(--caret-block)",
+                  animation: "blockBlink 1s steps(1, end) infinite",
+                  opacity: 1,
+                  transform: "translateY(0.02em)",
+                  pointerEvents: "none",
+                }}
+              />
+            ) : null}
           </span>
         </div>
 
@@ -1246,34 +1293,62 @@ function Landing({ theme, setTheme }) {
             opacity: isDragging ? 0 : 0.92,
             transition: `opacity ${isDragging ? 140 : 650}ms ease`,
             fontSize: "1.05rem",
+            lineHeight: 1.35,
             whiteSpace: "pre-wrap",
-            textShadow: "0 2px 18px rgba(0,0,0,0.75)",
+            textShadow: isLight
+              ? "0 2px 18px rgba(0,0,0,0.35)"
+              : "0 2px 18px rgba(0,0,0,0.75)",
             color:
               theme === "light"
                 ? "rgba(18, 10, 12, 0.92)"
                 : "rgba(245,245,245,0.96)",
           }}
         >
-          <span>{bgBottomText}</span>
-          {bgStage === "bottom" ? (
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 6,
+              maxWidth: "100%",
+            }}
+          >
             <span
               style={{
                 display: "inline-block",
-                width: "0.62em",
-                height: "1.15em",
-                marginLeft: "2px",
-                background: "var(--caret-block)",
-                // animation: "blockBlink 1s steps(1, end) infinite",
-                animation:
-                  bgStage === "bottom"
-                    ? "blockBlink 1s steps(1, end) infinite"
-                    : "none",
-                verticalAlign: "-0.15em",
-                opacity: isDragging ? 0 : 1,
-                transition: "opacity 220ms ease",
+                maxWidth: "100%",
+                padding: "0.34em 0.70em",
+                borderRadius: 14,
+                lineHeight: 1.55,
+                whiteSpace: "pre-wrap",
+                background: FROST_BG,
+                border: `1px solid ${FROST_BORDER}`,
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
+                boxShadow: FROST_SHADOW,
               }}
-            />
-          ) : null}
+            >
+              {bgBottomText}
+            </span>
+
+            {bgStage === "bottom" ? (
+              <span
+                style={{
+                  display: "inline-block",
+                  width: "0.62em",
+                  height: "1.15em",
+                  background: "var(--caret-block)",
+                  animation:
+                    bgStage === "bottom"
+                      ? "blockBlink 1s steps(1, end) infinite"
+                      : "none",
+                  verticalAlign: "-0.15em",
+                  opacity: isDragging ? 0 : 1,
+                  transition: "opacity 220ms ease",
+                }}
+              />
+            ) : null}
+          </span>
         </div>
       </div>
 
@@ -1716,6 +1791,7 @@ export default function App() {
       <Route path="/autonomous-vehicles" element={<AutonomousVehiclesPage />} />
       <Route path="/rocketry" element={<RocketryPage />} />
       <Route path="/travel" element={<TravelPage />} />
+      <Route path="/vintage-audio" element={<VintageAudioPage />} />
     </Routes>
   );
 }

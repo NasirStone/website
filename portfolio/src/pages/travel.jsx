@@ -18,7 +18,7 @@ const TRAVEL_ENTRIES = [
     id: "Europe-2023",
     date: "Summer 2023",
     title: "Füssen, Germany",
-    images: ["images/travel/IMG_3564.webp", "images/travel/IMG_3636.webp"],
+    images: ["images/travel/castle.webp", "images/travel/lake.webp"],
     body: (
       <>
         In the summer of 2023, my dad and I travelled to Füssen, Germany to
@@ -33,7 +33,7 @@ const TRAVEL_ENTRIES = [
     id: "barcelona-paris",
     date: "Summer 2023",
     title: "Barcelona, Spain & Paris, France",
-    images: ["images/travel/F1.mp4", "images/travel/IMG_3967.webp"],
+    images: ["images/travel/F1.mp4", "images/travel/cour.webp"],
     body: (
       <>
         Right after travelling in Germany, I met up with my best friend Conor,
@@ -49,7 +49,7 @@ const TRAVEL_ENTRIES = [
     id: "portland",
     date: "Spring 2024",
     title: "Portland, OR",
-    images: ["images/travel/DSC_6292.webp", "images/travel/img_7589.webp"],
+    images: ["images/travel/beach.webp", "images/travel/hood.webp"],
     body: (
       <>
         During 2024 Spring Break, my friends Jack, Conor and I stayed with our
@@ -63,7 +63,7 @@ const TRAVEL_ENTRIES = [
     id: "johnson",
     date: "Spring 2024",
     title: "Johnson Shut-Ins, MO",
-    images: ["images/travel/IMG_0174.webp", "images/travel/IMG_8196.webp"],
+    images: ["images/travel/hike.webp", "images/travel/shutin.webp"],
     body: (
       <>
         The weekend before finals, my girlfriend Gabbi, and our other friend
@@ -81,10 +81,10 @@ const TRAVEL_ENTRIES = [
     date: "Summer 2024",
     title: "Western US Road Trip",
     images: [
-      "images/travel/20240517_195933_1EA5D8.webp",
-      "images/travel/20240517_200058_135BF1.webp",
-      "images/travel/20240524_074129_19641A.webp",
-      "images/travel/20240525_042043_1A097F.webp",
+      "images/travel/teton.webp",
+      "images/travel/drive.webp",
+      "images/travel/cali_water.webp",
+      "images/travel/utah.webp",
     ],
     body: (
       <>
@@ -103,10 +103,10 @@ const TRAVEL_ENTRIES = [
     date: "Spring 2025",
     title: "Puerto Rico",
     images: [
-      "images/travel/DSC00415.webp",
-      "images/travel/DSC00213.webp",
-      "images/travel/DSC00307.webp",
-      "images/travel/IMG_0489.webp",
+      "images/travel/prgabbi.webp",
+      "images/travel/flags.webp",
+      "images/travel/pose.webp",
+      "images/travel/prtogether.webp",
     ],
     body: (
       <>
@@ -122,7 +122,7 @@ const TRAVEL_ENTRIES = [
     id: "vermont-road-trip",
     date: "Summer 2025",
     title: "Chicago → Canada → Vermont",
-    images: ["images/travel/IMG_8243.webp", "images/travel/DSCF0727.webp"],
+    images: ["images/travel/vermont1.webp", "images/travel/montreal.webp"],
     body: (
       <>
         In the early summer of 2025, Conor was heading out to Burlington,
@@ -142,7 +142,7 @@ const TRAVEL_ENTRIES = [
   {
     id: "texas",
     title: "San Francisco, CA → Houston, TX",
-    images: ["images/travel/DSC01120.webp"],
+    images: ["images/travel/texas_trip.webp"],
     body: (
       <>
         In the last week of summer, Conor was gearing up for his Co-Op at NASA
@@ -161,7 +161,7 @@ const TRAVEL_ENTRIES = [
     id: "ozarks",
     date: "Fall 2025",
     title: "Lake of the Ozarks, MO",
-    images: ["images/travel/IMG_0653.webp"],
+    images: ["images/travel/ozark.webp"],
     body: (
       <>
         For Fall Break, 8 friends and I packed two sedans for the 3 hour drive
@@ -179,10 +179,10 @@ const TRAVEL_ENTRIES = [
     date: "Today",
     title: "Study Abroad at The University of Edinburgh",
     images: [
-      "images/travel/IMG_0399.webp",
-      "images/travel/IMG_0360.webp",
-      "images/travel/IMG_0293.webp",
-      "images/travel/IMG_0107.webp",
+      "images/travel/jan.webp",
+      "images/travel/arthur2.webp",
+      "images/travel/arthur3.webp",
+      "images/travel/arthur1.webp",
     ],
     body: (
       <>
@@ -221,6 +221,7 @@ function MediaTile({ src, eager }) {
           height: "100%",
           objectFit: "cover",
           display: "block",
+          borderRadius: "inherit",
         }}
       />
     );
@@ -236,6 +237,7 @@ function MediaTile({ src, eager }) {
         height: "100%",
         objectFit: "cover",
         display: "block",
+        borderRadius: "inherit",
       }}
     />
   );
@@ -462,9 +464,10 @@ export default function TravelPage() {
   const sectionRefs = useRef({});
   const markerRefs = useRef({});
 
-  const { timelineInnerRef, lastTimelineBtnRef, timelineLineHeight } =
-    useTimelineLineHeight(TRAVEL_ENTRIES);
-  const { activeIdx, onJump } = useTimelineActive(TRAVEL_ENTRIES, markerRefs);
+  // Timeline temporarily disabled
+  // const { timelineInnerRef, lastTimelineBtnRef, timelineLineHeight } =
+  //   useTimelineLineHeight(TRAVEL_ENTRIES);
+  // const { activeIdx, onJump } = useTimelineActive(TRAVEL_ENTRIES, markerRefs);
 
   return (
     <PageShell title="Travel" onBack={() => navigate("/")}>
@@ -480,63 +483,105 @@ export default function TravelPage() {
         <div
           style={{
             width: "min(1200px, 100%)",
-            display: "grid",
-            gridTemplateColumns: "280px 1fr",
-            gap: "clamp(16px, 3vw, 36px)",
-            alignItems: "start",
+            display: "block",
+            // alignItems: "flex-start",
           }}
         >
-          {/* Timeline */}
+          {/* 
           <div
             style={{
-              position: "sticky",
-              top: "clamp(18px, 3vw, 28px)",
-              alignSelf: "start",
+              flex: "0 0 280px",
+              flexShrink: 0,
+              alignSelf: "flex-start",
               paddingTop: "6px",
-              height: "calc(100vh - clamp(18px, 3vw, 28px))",
-              overflow: "visible",
+              position: "relative",
             }}
           >
             <div
-              ref={timelineInnerRef}
               style={{
-                position: "relative",
-                paddingLeft: "18px",
+                position: "sticky",
+                top: 24,
+                left: 0,
               }}
             >
-              {/* vertical line */}
               <div
-                aria-hidden
+                ref={timelineInnerRef}
                 style={{
-                  position: "absolute",
-                  left: "7px",
-                  top: 0,
-                  height: timelineLineHeight
-                    ? `${timelineLineHeight}px`
-                    : "100%",
-                  bottom: "auto",
-                  width: "2px",
-                  background: "var(--panel-border)",
-                  opacity: 0.75,
-                  borderRadius: "2px",
+                  position: "relative",
+                  paddingLeft: "18px",
                 }}
-              />
-              {TRAVEL_ENTRIES.map((entry, idx) => (
-                <TimelineItem
-                  key={entry.id}
-                  entry={entry}
-                  idx={idx}
-                  isActive={idx === activeIdx}
-                  onJump={onJump}
-                  isLast={idx === TRAVEL_ENTRIES.length - 1}
-                  btnRef={lastTimelineBtnRef}
+              >
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "7px",
+                    top: 0,
+                    height: timelineLineHeight
+                      ? `${timelineLineHeight}px`
+                      : "100%",
+                    bottom: "auto",
+                    width: "2px",
+                    background: "var(--panel-border)",
+                    opacity: 0.75,
+                    borderRadius: "2px",
+                  }}
                 />
-              ))}
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "3px",
+                    top: "-6px",
+                    width: 0,
+                    height: 0,
+                    borderLeft: "5px solid transparent",
+                    borderRight: "5px solid transparent",
+                    borderBottom: "6px solid var(--panel-border)",
+                    opacity: 0.75,
+                  }}
+                />
+                <div
+                  aria-hidden
+                  style={{
+                    position: "absolute",
+                    left: "3px",
+                    top: timelineLineHeight
+                      ? timelineLineHeight - 0
+                      : "calc(100% - 0px)",
+                    transform: "translateY(-0px)",
+                    width: 0,
+                    height: 0,
+                    borderLeft: "5px solid transparent",
+                    borderRight: "5px solid transparent",
+                    borderTop: "6px solid var(--panel-border)",
+                    opacity: 0.75,
+                  }}
+                />
+                {TRAVEL_ENTRIES.map((entry, idx) => (
+                  <TimelineItem
+                    key={entry.id}
+                    entry={entry}
+                    idx={idx}
+                    isActive={idx === activeIdx}
+                    onJump={onJump}
+                    isLast={idx === TRAVEL_ENTRIES.length - 1}
+                    btnRef={lastTimelineBtnRef}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Content */}
-          <div style={{ width: "100%" }}>
+          <div
+            style={{
+              flex: "1 1 auto",
+              minWidth: 0,
+              position: "relative",
+              zIndex: 1,
+            }}
+          >
             {TRAVEL_ENTRIES.map((entry, idx) => (
               <EntrySection
                 key={entry.id}

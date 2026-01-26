@@ -21,7 +21,7 @@ export default function NasirPage() {
       >
         <TwoColumnLayout>
           <FramedImage
-            src={`${base}images/Headshot.webp`}
+            src={`${base}images/about/Headshot.webp`}
             alt="Nasir headshot"
             size="420px"
             aspect="1 / 1"

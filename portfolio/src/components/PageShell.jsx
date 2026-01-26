@@ -10,18 +10,22 @@ export default function PageShell({
     <div
       style={{
         minHeight: "100vh",
-        width: "100vw",
+        width: "100%",
         background: "var(--page-bg)",
         color: "var(--fg)",
         display: "flex",
+        flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
         padding: "1.5rem 0.75rem",
+        justifyContent: "center",
+        boxSizing: "border-box",
       }}
     >
       <div
         style={{
-          width: `min(${maxWidth}, 98vw)`,
+          transform: "translateY(18px)",
+          width: `min(${maxWidth}, 100%)`,
+          boxSizing: "border-box",
           borderRadius: 14,
           border: "1px solid var(--shell-border)",
           background: "var(--shell-bg)",

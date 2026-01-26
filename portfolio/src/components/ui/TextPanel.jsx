@@ -8,12 +8,13 @@ export default function TextPanel({
 }) {
   return (
     <div
+      data-panel="true"
       style={{
         marginTop,
         borderRadius: 18,
         border: "1px solid var(--panel-border)",
         background: "var(--panel-bg)",
-        boxShadow: "var(--shadow)",
+        boxShadow: "var(--panel-shadow, var(--shadow))",
         padding,
         lineHeight: 1.65,
         ...style,
@@ -32,7 +33,9 @@ export default function TextPanel({
       ) : null}
 
       {header ? (
-        <div style={{ fontSize: "0.85rem", opacity: 0.85, marginBottom: "0.5rem" }}>
+        <div
+          style={{ fontSize: "0.85rem", opacity: 0.85, marginBottom: "0.5rem" }}
+        >
           {header}
         </div>
       ) : null}
