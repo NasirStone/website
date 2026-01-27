@@ -129,6 +129,7 @@ export default function RocketryPage() {
     };
 
     update();
+
     window.addEventListener("scroll", onTick, { passive: true });
     window.addEventListener("resize", onTick);
 
@@ -161,6 +162,34 @@ export default function RocketryPage() {
   return (
     <PageShell title="" onBack={() => navigate("/")}>
       <div style={styles.pageWrap}>
+        <style>{`
+          .projectsRow {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 32px;
+            align-items: start;
+            position: relative;
+          }
+          .projectText {
+            position: relative;
+            z-index: 2;
+          }
+          .projectMedia {
+            width: 100%;
+            position: relative;
+            z-index: 1;
+          }
+          @media (max-width: 720px) {
+            .projectsRow {
+              grid-template-columns: 1fr;
+              gap: 14px;
+            }
+            .projectMedia { order: 1; }
+            .projectText { order: 2; }
+            .airbrakeRow .projectHero { display: none; }
+          }
+        `}</style>
         {/* Sticky video region: video does not move, content scrolls over it */}
         <section
           ref={stickyRegionRef}
@@ -277,7 +306,7 @@ export default function RocketryPage() {
                 position: "absolute",
                 left: 0,
                 right: 0,
-                bottom: "70px",
+                bottom: "clamp(96px, 2vh, 140px)",
                 display: "flex",
                 justifyContent: "center",
                 pointerEvents: "none",
@@ -322,17 +351,17 @@ export default function RocketryPage() {
               >
                 <TextPanel style={{ textAlign: "center", fontSize: "1.1rem" }}>
                   WURocketry is Washington University in St. Louis's
-                  High-Powered Rocketry team. My freshman year I was a member of
-                  the Avionics subteam, where I led the development of a LoRa
-                  Telemetry Base Station to track flight variables during
-                  launch. My sophomore year, I was a Co-Lead of the Avionics
-                  subteam, where I helped develop our Airbrake Control System,
-                  as well as a full redesign of our camera system.
+                  High-Powered Rocketry team. In my freshman year, I was a
+                  member of the Avionics subteam, where I led the development of
+                  a LoRa Telemetry Base Station to track flight parameters
+                  during launch. In my sophomore year, I was a Co-Lead of the
+                  Avionics subteam, where I helped develop our Airbrake Control
+                  System and a full redesign of our camera system.
                   <br />
-                  As a junior, I serve as Chief Safety Officer of the team,
-                  where I am the primary liaison between WURocketry and NASA
-                  safety officials, ensuring compliance with NASA Student Launch
-                  safety requirements.
+                  Now, as a junior, I serve as the team's Chief Safety Officer,
+                  acting as the primary liaison between WURocketry and NASA
+                  safety officials and ensuring compliance with NASA Student
+                  Launch safety requirements.
                 </TextPanel>
               </div>
             </div>
@@ -432,42 +461,39 @@ export default function RocketryPage() {
           >
             <div style={{ width: "min(1100px, 100%)" }}>
               <SectionHeading style={{ margin: "0 0 12px" }}>
-                Ursa Major
+                Ursa Major (2024-2025)
               </SectionHeading>
               <TextPanel style={styles.centeredPanelBody}>
                 Ursa Major is WURocketry's 2024-2025 NASA Student Launch
-                vehicle: a reusable, innovative high-powered rocket designed to
-                fly repeatably, recover cleanly, and improve every time it
-                leaves the rail. The airframe and coupler are both made from G12
-                fiberglass. It uses a 6in inner diameter / 6.17in outer diameter
-                airframe, with a total length of 114in (53 fwd, 16in mid, 45in
-                aft). The vehicle's wet mass is ~48lbs and dry mass is ~42lbs,
-                and OpenRocket predicted a 2.55 caliber stability margin with
-                the CG ahead of the CP.
+                vehicle. Ursa is a reusable, innovative, high-powered rocket
+                designed to fly repeatedly, recover cleanly, and serve as a
+                platform for rapid improvement. The airframe and coupler are
+                both made from G12 fiberglass, with an inner diameter of 6 in
+                and a total length of 9.5ft. The vehicle's wet mass is ~48lbs.
                 <br />
                 <br />
                 Inside, Ursa Major is built around instrumentation and
                 recoverability. A dual-deploy recovery profile brings the rocket
                 down in three tethered sections, with a drogue event near apogee
-                and a main deployment near 550 ft AGL. The recovery electronics
-                are redundant: a primary flight computer (TeleMega) handles the
-                nominal sequence, while a secondary computer (EasyMini) fires
-                backup events on offset timing to protect against single-point
-                failures. The result is a vehicle that prioritises clean data,
-                reliable deployment, and fast iteration.
+                and a main deployment around 550 ft AGL. The recovery
+                electronics are redundant: a primary flight computer (TeleMega)
+                handles the nominal sequence, while a secondary computer
+                (EasyMini) fires backup events on offset timing to protect
+                against single-point failures. The result is a vehicle that
+                prioritises clean data, reliable deployment, and fast iteration.
                 <br />
                 <br />
-                Beyond the core vehicle, Ursa Major includes extremely creative
-                design challenges. The NASA Student Launch payload challenge is
-                treated like a first class subsystem, with dedicated space,
-                interfaces, and wiring paths so integration does not feel like
-                an afterthought. To ensure an accurate target altitude, the
-                rocket also employs an active airbrake control system that
-                introduces controllable drag after burnout, letting us correct
-                for motor variability and changing conditions. Finally, the
-                onboard bi-directional camera system captures forward and aft
-                footage so we can validate deployment events and airbrake
-                behaviour with visual evidence, not just logs.
+                Ursa Major is also built around creative design challenges. The
+                NASA Student Launch payload challenge is treated like a
+                first-class subsystem, with dedicated space, interfaces, and
+                wiring paths so integration does not feel like an afterthought.
+                To ensure an accurate target altitude, the rocket also employs a
+                feedforward airbrake control system that introduces controllable
+                drag after burnout, letting us correct for motor variability and
+                changing conditions. Finally, the onboard bi-directional camera
+                system captures forward and aft footage, so we can validate
+                deployment events and airbrake behaviour with visual evidence
+                outside of datalogs.
                 <br />
                 <br />
               </TextPanel>
@@ -486,40 +512,8 @@ export default function RocketryPage() {
           <div style={{ width: "min(1100px, 100%)", display: "grid", gap: 12 }}>
             <SectionHeading>My Projects</SectionHeading>
 
-            <div
-              style={{
-                width: "100%",
-                display: "grid",
-                gridTemplateColumns: "1.1fr 0.9fr",
-                gap: "32px",
-                alignItems: "start",
-                position: "relative",
-              }}
-            >
-              <div style={{ position: "relative", zIndex: 2 }}>
-                <CenteredPanel title="Airbrake Control System">
-                  WURocketry's Airbrake Control System is a mechanism designed
-                  to regulate rocket apogee by dynamically increasing
-                  aerodynamic drag during ascent. The system uses four radially
-                  mounted paddles that extend into the airflow, allowing the
-                  vehicle to compensate for motor performance, wind conditions,
-                  and mass.
-                  <br />
-                  <br />
-                  I led the development of embedded control software for the
-                  system. On the software side, I helped implement a feedforward
-                  control strategy using state estimation and Kalman filtering
-                  to predict apogee in real time, paired with PID motor control
-                  for precise paddle positioning. The system was extensively
-                  tested through bench tests, elevator tests, and
-                  telemetry-driven validation to ensure reliable deployment and
-                  retraction.
-                  <br />
-                  <br />
-                </CenteredPanel>
-              </div>
-
-              <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
+            <div className="projectsRow">
+              <div className="projectMedia">
                 <GalleryGrid
                   images={airbrakeImages}
                   columns={2}
@@ -532,71 +526,33 @@ export default function RocketryPage() {
                   }}
                 />
               </div>
+              <div className="projectText">
+                <CenteredPanel title="Airbrake Control System">
+                  Our Airbrake Control System is a mechanism that dynamically
+                  increases aerodynamic drag after motor burnout to control
+                  rocket apogee. The system uses four radially mounted paddles
+                  that extend into the airflow, allowing the vehicle to
+                  compensate for motor performance, wind conditions, and mass.
+                  <br />
+                  <br />
+                  As project lead, I directed the development of the system's
+                  embedded control software. I spearheaded the implementation of
+                  a feedforward control strategy using state estimation and
+                  Kalman filtering to predict apogee in real time, complemented
+                  by PID motor control for precise paddle positioning. Under my
+                  leadership, the system underwent extensive bench tests,
+                  elevator tests, and telemetry-driven validation to ensure
+                  reliable deployment and retraction.
+                  <br />
+                  <br />
+                </CenteredPanel>
+              </div>
             </div>
 
             <div aria-hidden style={{ height: "clamp(12px, 2vw, 18px)" }} />
 
-            <div
-              style={{
-                width: "100%",
-                display: "grid",
-                gridTemplateColumns: "1.1fr 0.9fr",
-                gap: "32px",
-                alignItems: "start",
-                position: "relative",
-              }}
-            >
-              <div style={{ position: "relative", zIndex: 2 }}>
-                <CenteredPanel
-                  title="Bi-Directional Camera System"
-                  panelStyle={{
-                    // Fix light-mode banding on very tall panels (common in Safari):
-                    // use a tighter shadow + isolate the layer so the blur doesn't "stripe".
-                    boxShadow:
-                      "0 14px 28px rgba(0,0,0,0.12), 0 2px 10px rgba(0,0,0,0.08)",
-                    isolation: "isolate",
-                    transform: "translateZ(0)",
-                    backfaceVisibility: "hidden",
-                    WebkitBackfaceVisibility: "hidden",
-                    willChange: "transform",
-                    backgroundClip: "padding-box",
-                  }}
-                >
-                  Another project I took on was rebuilding our onboard camera
-                  system. This redesign was necessary to more reliably capture
-                  both forward and aft flight footage for post flight analysis
-                  and airbrake verification. After becoming Avionics Lead, I
-                  wanted to give my team room to own that work while I took on a
-                  project I genuinely care about: cameras and visual
-                  storytelling. It fit naturally with my film minor, but it also
-                  forced me to learn a lot of practical embedded engineering.
-                  <br />
-                  <br />
-                  Our previous setup used off the shelf spy cameras mounted
-                  externally, and they were a constant source of frustration. On
-                  landing, they could shift or pop loose, and we would lose
-                  crucial footage necessary to validate deployment. I worked
-                  with avionics and various subteams to redesign the system
-                  around Raspberry Pi Zero 2W modules with compact camera
-                  attachments so everything could live cleanly inside the
-                  rocket. Each unit boots directly into recording using minimal
-                  startup scripts, which means we do not rely on anyone
-                  remembering to hit record at the pad.
-                  <br />
-                  <br />
-                  The hardest part ended up being power and durability. We moved
-                  from bulky powerbanks to the rocket's existing LiPo power,
-                  then iterated on the connector design after we saw strain and
-                  broken joints during handling and flight. Once the hardware
-                  was dependable, I focused on making the footage easy to
-                  retrieve. By combining hotspot transfer with local encoding
-                  and simple conversion scripts, we cut post flight recovery
-                  from hours down to seconds so the team could review results
-                  immediately.
-                </CenteredPanel>
-              </div>
-
-              <div style={{ width: "100%", position: "relative", zIndex: 1 }}>
+            <div className="projectsRow">
+              <div className="projectMedia">
                 <GalleryGrid
                   images={[
                     "images/rocketry/FS_Camera_Inserts.webp",
@@ -614,6 +570,47 @@ export default function RocketryPage() {
                     outline: "none",
                   }}
                 />
+              </div>
+
+              <div className="projectText">
+                <CenteredPanel
+                  title="Bi-Directional Camera System"
+                  panelStyle={{
+                    boxShadow:
+                      "0 14px 28px rgba(0,0,0,0.12), 0 2px 10px rgba(0,0,0,0.08)",
+                    isolation: "isolate",
+                    transform: "translateZ(0)",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    willChange: "transform",
+                    backgroundClip: "padding-box",
+                  }}
+                >
+                  Another project I took on was rebuilding our onboard camera
+                  system. This redesign was necessary to more reliably capture
+                  both forward and aft flight footage for post-flight analysis
+                  and airbrake verification.
+                  <br />
+                  <br />
+                  Our previous setup used off-the-shelf spy cameras mounted
+                  externally, and they were a constant source of frustration. On
+                  landing, they could shift or pop loose, and we would lose
+                  footage necessary to validate deployment. I worked with
+                  various subteams to redesign the system around Raspberry Pi
+                  Zero modules with compact camera attachments, so everything
+                  could be cleanly housed inside the rocket. Each unit boots
+                  directly into recording using a lightweight startup script.
+                  <br />
+                  <br />
+                  The biggest challenge was power and durability. We moved from
+                  bulky power banks to the rocket's existing LiPo batteries,
+                  then iterated on the connector design after we saw strain and
+                  broken solder joints after flight. Once the hardware was
+                  dependable, I focused on making the footage easy to retrieve.
+                  By combining SSH access via hotspot with local encoding and
+                  simple conversion scripts, we cut post-flight recovery from
+                  hours down to seconds.
+                </CenteredPanel>
               </div>
             </div>
           </div>

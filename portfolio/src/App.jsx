@@ -15,24 +15,6 @@ const MONO = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 // but can be overridden via Vite env var VITE_RESUME_URL.
 const RESUME_URL = (import.meta?.env?.VITE_RESUME_URL || "/resume.pdf").trim();
 
-// Terminal story for the `portfolio` command.
-// Edit the lines below to customize what gets printed in-terminal.
-const PORTFOLIO_STORY = [
-  "",
-  "For my first portfolio, I set out to make something bold and creative.",
-  "",
-  "Inspired by an assignment in my OOP class, a 'mock os',",
-  "I loved the ability to program my own arguments with C++.",
-  "This design language inspired the layout of this website.",
-  "",
-  "For anyone familiar with Bash, this should be intuitive,",
-  "(you can even use cd to move between directories)",
-  "However I also wanted this to be accessible to the non-technical, so",
-  "creating a website that is inviting, yet unique was important to me.",
-  "",
-  "I hope you enjoy!",
-];
-
 // Terminal text for the `contact` keyword.
 const CONTACT_STORY = [
   { type: "output", text: "" },
@@ -70,7 +52,6 @@ const KEYWORDS = [
   "contact",
   "drones",
   "music",
-  "portfolio",
   "resume",
   "rocketry",
   "travel",
@@ -127,9 +108,68 @@ function wordCloudStyle(seed) {
 }
 
 function Landing({ theme, setTheme }) {
+  // Theme toggle button for landing page only
+  function ThemeToggle() {
+    const isLightMode = theme === "light";
+
+    return (
+      <button
+        type="button"
+        aria-label={
+          isLightMode ? "Switch to dark mode" : "Switch to light mode"
+        }
+        onClick={() => setTheme((t) => (t === "light" ? "dark" : "light"))}
+        style={{
+          position: "fixed",
+          left: 14,
+          bottom: 14,
+          zIndex: 50,
+          width: 44,
+          height: 38,
+          borderRadius: 10,
+          border: `1px solid ${
+            isLightMode ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)"
+          }`,
+          background: isLightMode
+            ? "rgba(245, 247, 249, 0.78)"
+            : "rgba(0,0,0,0.58)",
+          color: isLightMode
+            ? "rgba(18, 10, 12, 0.92)"
+            : "rgba(235,235,235,0.92)",
+          boxShadow: "0 18px 55px rgba(0,0,0,0.28)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          cursor: "pointer",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily:
+            "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+          fontSize: "1.05rem",
+          lineHeight: 1,
+          padding: 0,
+          WebkitTapHighlightColor: "transparent",
+        }}
+      >
+        <span aria-hidden="true">{isLightMode ? "☾" : "☀"}</span>
+      </button>
+    );
+  }
   const navigate = useNavigate();
 
   const isLight = theme === "light";
+  function isTabletLike(vw, vh) {
+    return (vw >= 900 && vw <= 1200) || (vh > 520 && vh < 820 && vw >= 820);
+  }
+
+  function minTerminalY(vw, vh) {
+    return isTabletLike(vw, vh) ? 190 : 12;
+  }
+
+  function tabletYOffset(vw, vh) {
+    // Nudge the whole hero composition upward on iPad-mini/tablet-like viewports.
+    return isTabletLike(vw, vh) ? -42 : 0;
+  }
 
   // Theme tokens (source of truth lives in App via CSS variables)
   const FG = "var(--fg)";
@@ -194,6 +234,8 @@ function Landing({ theme, setTheme }) {
   const [loadingPct, setLoadingPct] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [sidebarIn, setSidebarIn] = useState(false);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [contactModalIn, setContactModalIn] = useState(false);
   const sidebarKeywords = KEYWORDS_NORMALIZED;
   const sortedKeywords = useMemo(() => Array.from(VALID_KEYWORDS).sort(), []);
 
@@ -211,7 +253,10 @@ function Landing({ theme, setTheme }) {
 
     return {
       x: Math.max(12, Math.round(vw / 2 - w / 2)),
-      y: Math.max(12, Math.round(vh / 2 - h / 2 + 18)),
+      y: Math.max(
+        minTerminalY(vw, vh),
+        Math.round(vh / 2 - h / 2 + 18 + tabletYOffset(vw, vh))
+      ),
     };
   });
   const [terminalSize, setTerminalSize] = useState({ w: 0, h: 0 });
@@ -252,6 +297,11 @@ function Landing({ theme, setTheme }) {
     if (typeof window === "undefined") return false;
     return window.innerWidth < 640;
   });
+  const [isTouchUI, setIsTouchUI] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.innerWidth < 920;
+  });
+
   useEffect(() => {
     // initialize size immediately
     try {
@@ -268,6 +318,7 @@ function Landing({ theme, setTheme }) {
       const vw = window.innerWidth || 1200;
       const vh = window.innerHeight || 800;
       setIsCompact(vw < 640);
+      setIsTouchUI(vw < 920);
 
       const w = Math.min(733, vw * 0.8712);
       const h = Math.min(554, vh * 0.693);
@@ -276,7 +327,8 @@ function Landing({ theme, setTheme }) {
       // Clamp terminal into view on resize
       setTerminalPos((p) => {
         const x = Math.min(Math.max(12, p.x), Math.max(12, vw - w - 12));
-        const y = Math.min(Math.max(12, p.y), Math.max(12, vh - h - 12));
+        const minY = minTerminalY(vw, vh);
+        const y = Math.min(Math.max(minY, p.y), Math.max(minY, vh - h - 12));
         return { x, y };
       });
     }
@@ -298,7 +350,8 @@ function Landing({ theme, setTheme }) {
       const nextY = e.clientY - draggingRef.current.dy;
 
       const x = Math.min(Math.max(12, nextX), Math.max(12, vw - w - 12));
-      const y = Math.min(Math.max(12, nextY), Math.max(12, vh - h - 12));
+      const minY = minTerminalY(vw, vh);
+      const y = Math.min(Math.max(minY, nextY), Math.max(minY, vh - h - 12));
 
       setTerminalPos({ x, y });
     }
@@ -601,6 +654,16 @@ function Landing({ theme, setTheme }) {
     }, 180);
   }
 
+  function openContactModal() {
+    setContactModalOpen(true);
+    requestAnimationFrame(() => setContactModalIn(true));
+  }
+
+  function closeContactModal() {
+    setContactModalIn(false);
+    window.setTimeout(() => setContactModalOpen(false), 160);
+  }
+
   useEffect(() => {
     function refocus() {
       // Only refocus if we’re on the landing page and the sidebar isn’t actively capturing clicks.
@@ -755,16 +818,6 @@ function Landing({ theme, setTheme }) {
     if (VALID_KEYWORDS.has(effectiveCmd)) {
       // routes that exist today
 
-      if (effectiveCmd === "portfolio") {
-        setHistory((h) => [
-          ...h,
-          { type: "prompt", text: `nasir % ${raw}` },
-          ...PORTFOLIO_STORY.map((t) => ({ type: "output", text: t })),
-        ]);
-        setShowTip(false);
-        return;
-      }
-
       if (effectiveCmd === "contact") {
         setHistory((h) => [
           ...h,
@@ -884,6 +937,41 @@ function Landing({ theme, setTheme }) {
     runCommand(raw);
   }
 
+  // Helper component for always-visible Pages panel on touch UI
+  function PagesPanel({ onPick }) {
+    return (
+      <div
+        className="sidebarTouch"
+        style={{
+          opacity: 1,
+          transition: "none",
+        }}
+        role="dialog"
+        aria-label="Pages"
+      >
+        <div className="sidebarHeader" style={{ marginTop: 0 }}>
+          <div className="sidebarTitle">Pages</div>
+          <div aria-hidden style={{ opacity: 0.6 }}>
+            tap
+          </div>
+        </div>
+
+        <div className="keywordGrid">
+          {sidebarKeywords.map((k) => (
+            <button
+              key={k}
+              type="button"
+              className="keywordBtn"
+              onClick={() => onPick(k)}
+            >
+              {titleCaseWords(k)}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -905,6 +993,7 @@ function Landing({ theme, setTheme }) {
         focusInput();
       }}
     >
+      <ThemeToggle />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap');
         .sidebarOverlay {
@@ -938,6 +1027,37 @@ function Landing({ theme, setTheme }) {
           transition: transform 180ms ease, opacity 180ms ease;
           opacity: 0;
           will-change: transform, opacity;
+        }
+        .sidebarTouch {
+          position: relative;
+          width: min(420px, calc(100% - 36px));
+          max-height: calc(100vh - 24px);
+          overflow: auto;
+          border-radius: 14px;
+          border: 1px solid ${
+            isLight ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)"
+          };
+          background: ${
+            isLight ? "rgba(245, 247, 249, 0.92)" : "rgba(0, 0, 0, 0.86)"
+          };
+          box-shadow: 0 18px 55px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          color: ${
+            isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"
+          };
+          padding: 0.95rem 0.9rem;
+          backdrop-filter: blur(12px);
+          transform: none;
+          opacity: 1;
+          transition: none;
+          box-sizing: border-box;
+          margin: 0 auto;
+        }
+        @media (max-width: 640px) {
+          .sidebarTouch {
+            width: calc(100% - 36px);
+            max-height: calc(100vh - 20px);
+          }
         }
         .sidebarIn {
           transform: translateX(0);
@@ -1093,7 +1213,7 @@ function Landing({ theme, setTheme }) {
           }
         }
       `}</style>
-      {isSidebarOpen ? (
+      {!isTouchUI && isSidebarOpen ? (
         <div
           className={`sidebarOverlay sidebarOverlayFade ${
             sidebarIn ? "sidebarOverlayIn" : ""
@@ -1135,222 +1255,235 @@ function Landing({ theme, setTheme }) {
         </div>
       ) : null}
 
-      {/* global nav */}
-      <button
-        type="button"
-        aria-label="Menu"
-        className="menuBtn"
-        onClick={() => (isSidebarOpen ? closeSidebar() : openSidebar())}
-        onPointerDown={(e) => e.preventDefault()}
-        style={{
-          position: "absolute",
-          left: 14,
-          top: 14,
-          zIndex: 21,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: 56,
-          height: 48,
-          background: MENU_BG,
-          border: "none",
-          borderRadius: 12,
-          cursor: "pointer",
-          padding: 0,
-          backdropFilter: "blur(10px)",
-          boxShadow: "0 18px 55px rgba(0,0,0,0.35)",
-          opacity: isSidebarOpen ? 0 : 1,
-          transform: isSidebarOpen ? "scale(0.92)" : "scale(1)",
-          transition: "opacity 140ms ease, transform 140ms ease",
-          pointerEvents: isSidebarOpen ? "none" : "auto",
-        }}
-      >
-        <span aria-hidden="true" style={{ display: "grid", gap: 4 }}>
-          <span
+      {!isTouchUI ? (
+        <>
+          {/* global nav */}
+          <button
+            type="button"
+            aria-label="Menu"
+            className="menuBtn"
+            onClick={() => (isSidebarOpen ? closeSidebar() : openSidebar())}
+            onPointerDown={(e) => e.preventDefault()}
             style={{
-              width: 24,
-              height: 2.4,
-              borderRadius: 999,
-              background: FG,
-            }}
-          />
-          <span
-            style={{
-              width: 24,
-              height: 2.4,
-              borderRadius: 999,
-              background: FG,
-            }}
-          />
-          <span
-            style={{
-              width: 24,
-              height: 2.4,
-              borderRadius: 999,
-              background: FG,
-            }}
-          />
-        </span>
-      </button>
-
-      {/* background typed text (behind terminal, above keywords) */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          zIndex: 2,
-          pointerEvents: "none",
-          fontFamily: MONO,
-          color: FG,
-        }}
-        aria-hidden="true"
-      >
-        {/* top line */}
-        <div
-          style={{
-            position: "absolute",
-            left: "50%",
-            top: 110,
-            transform: "translateX(-50%)",
-            width: "fit-content",
-            maxWidth: "min(1100px, calc(100vw - 24px))",
-            textAlign: "left",
-            opacity: 0.92,
-            fontFamily: SANS,
-            fontSize: "clamp(2.4rem, 6vw, 4.2rem)",
-            fontWeight: 600,
-            letterSpacing: "-0.05em",
-            lineHeight: "1.2",
-            whiteSpace: "pre-wrap",
-            textShadow: isLight
-              ? "0 2px 18px rgba(0,0,0,0.35)"
-              : "0 2px 18px rgba(0,0,0,0.75)",
-          }}
-        >
-          <span
-            style={{
-              position: "relative",
+              position: "absolute",
+              left: 14,
+              top: 14,
+              zIndex: 21,
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "0.14em 0.32em",
-              borderRadius: 16,
-              background: FROST_BG,
-              border: `1px solid ${FROST_BORDER}`,
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              boxShadow: FROST_SHADOW,
-              // Harmonize title text with bottom hint:
-              color:
-                theme === "light"
-                  ? "rgba(18, 10, 12, 0.92)"
-                  : "rgba(245,245,245,0.96)",
-              opacity: 0.94,
-              textShadow: isLight
-                ? "0 2px 14px rgba(0,0,0,0.30)"
-                : "0 2px 14px rgba(0,0,0,0.65)",
+              width: 56,
+              height: 48,
+              background: MENU_BG,
+              border: "none",
+              borderRadius: 12,
+              cursor: "pointer",
+              padding: 0,
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 18px 55px rgba(0,0,0,0.35)",
+              opacity: isSidebarOpen ? 0 : 1,
+              transform: isSidebarOpen ? "scale(0.92)" : "scale(1)",
+              transition: "opacity 140ms ease, transform 140ms ease",
+              pointerEvents: isSidebarOpen ? "none" : "auto",
             }}
           >
-            <span>{bgTopText}</span>
-            {bgStage === "top" ? (
+            <span aria-hidden="true" style={{ display: "grid", gap: 4 }}>
               <span
-                aria-hidden="true"
                 style={{
-                  display: "inline-block",
-                  width: "0.55em",
-                  height: "0.85em",
-                  marginLeft: "10px",
-                  background: "var(--caret-block)",
-                  animation: "blockBlink 1s steps(1, end) infinite",
-                  opacity: 1,
-                  transform: "translateY(0.02em)",
-                  pointerEvents: "none",
+                  width: 24,
+                  height: 2.4,
+                  borderRadius: 999,
+                  background: FG,
                 }}
               />
-            ) : null}
-          </span>
-        </div>
+              <span
+                style={{
+                  width: 24,
+                  height: 2.4,
+                  borderRadius: 999,
+                  background: FG,
+                }}
+              />
+              <span
+                style={{
+                  width: 24,
+                  height: 2.4,
+                  borderRadius: 999,
+                  background: FG,
+                }}
+              />
+            </span>
+          </button>
+        </>
+      ) : null}
 
-        {/* bottom line */}
-        <div
-          style={{
-            position: "absolute",
-            left: terminalPos.x + terminalSize.w / 2,
-            top: Math.min(
-              (typeof window !== "undefined"
-                ? window.innerHeight
-                : terminalPos.y + terminalSize.h) - 24,
-              terminalPos.y + terminalSize.h + 18
-            ),
-            transform: "translateX(-50%)",
-            width: Math.min(
-              terminalSize.w,
-              (typeof window !== "undefined"
-                ? window.innerWidth
-                : terminalSize.w) - 24
-            ),
-            textAlign: "center",
-            opacity: isDragging ? 0 : 0.92,
-            transition: `opacity ${isDragging ? 140 : 650}ms ease`,
-            fontSize: "1.05rem",
-            lineHeight: 1.35,
-            whiteSpace: "pre-wrap",
-            textShadow: isLight
-              ? "0 2px 18px rgba(0,0,0,0.35)"
-              : "0 2px 18px rgba(0,0,0,0.75)",
-            color:
-              theme === "light"
-                ? "rgba(18, 10, 12, 0.92)"
-                : "rgba(245,245,245,0.96)",
-          }}
-        >
-          <span
+      {!isTouchUI ? (
+        <>
+          {/* background typed text (behind terminal, above keywords) */}
+          <div
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 6,
-              maxWidth: "100%",
+              position: "absolute",
+              inset: 0,
+              zIndex: 2,
+              pointerEvents: "none",
+              fontFamily: MONO,
+              color: FG,
             }}
+            aria-hidden="true"
           >
-            <span
+            {/* top line */}
+            <div
               style={{
-                display: "inline-block",
-                maxWidth: "100%",
-                padding: "0.34em 0.70em",
-                borderRadius: 14,
-                lineHeight: 1.55,
+                position: "absolute",
+                left: "50%",
+                top:
+                  typeof window !== "undefined"
+                    ? (isTabletLike(window.innerWidth, window.innerHeight)
+                        ? 78
+                        : 110) +
+                      tabletYOffset(window.innerWidth, window.innerHeight)
+                    : 110,
+                transform: "translateX(-50%)",
+                width: "fit-content",
+                maxWidth: "min(1100px, calc(100vw - 24px))",
+                textAlign: "left",
+                opacity: 0.92,
+                fontFamily: SANS,
+                fontSize: "clamp(2.4rem, 6vw, 4.2rem)",
+                fontWeight: 600,
+                letterSpacing: "-0.05em",
+                lineHeight: "1.2",
                 whiteSpace: "pre-wrap",
-                background: FROST_BG,
-                border: `1px solid ${FROST_BORDER}`,
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
-                boxShadow: FROST_SHADOW,
+                textShadow: isLight
+                  ? "0 2px 18px rgba(0,0,0,0.35)"
+                  : "0 2px 18px rgba(0,0,0,0.75)",
               }}
             >
-              {bgBottomText}
-            </span>
-
-            {bgStage === "bottom" ? (
               <span
                 style={{
-                  display: "inline-block",
-                  width: "0.62em",
-                  height: "1.15em",
-                  background: "var(--caret-block)",
-                  animation:
-                    bgStage === "bottom"
-                      ? "blockBlink 1s steps(1, end) infinite"
-                      : "none",
-                  verticalAlign: "-0.15em",
-                  opacity: isDragging ? 0 : 1,
-                  transition: "opacity 220ms ease",
+                  position: "relative",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0.14em 0.32em",
+                  borderRadius: 16,
+                  background: FROST_BG,
+                  border: `1px solid ${FROST_BORDER}`,
+                  backdropFilter: "blur(14px)",
+                  WebkitBackdropFilter: "blur(14px)",
+                  boxShadow: FROST_SHADOW,
+                  // Harmonize title text with bottom hint:
+                  color:
+                    theme === "light"
+                      ? "rgba(18, 10, 12, 0.92)"
+                      : "rgba(245,245,245,0.96)",
+                  opacity: 0.94,
+                  textShadow: isLight
+                    ? "0 2px 14px rgba(0,0,0,0.30)"
+                    : "0 2px 14px rgba(0,0,0,0.65)",
                 }}
-              />
-            ) : null}
-          </span>
-        </div>
-      </div>
+              >
+                <span>{bgTopText}</span>
+                {bgStage === "top" ? (
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      display: "inline-block",
+                      width: "0.55em",
+                      height: "0.85em",
+                      marginLeft: "10px",
+                      background: "var(--caret-block)",
+                      animation: "blockBlink 1s steps(1, end) infinite",
+                      opacity: 1,
+                      transform: "translateY(0.02em)",
+                      pointerEvents: "none",
+                    }}
+                  />
+                ) : null}
+              </span>
+            </div>
+
+            {/* bottom line */}
+            <div
+              style={{
+                position: "absolute",
+                left: terminalPos.x + terminalSize.w / 2,
+                top: Math.min(
+                  (typeof window !== "undefined"
+                    ? window.innerHeight
+                    : terminalPos.y + terminalSize.h) - 96,
+                  terminalPos.y + terminalSize.h + 18
+                ),
+                transform: "translateX(-50%)",
+                width: Math.min(
+                  terminalSize.w,
+                  (typeof window !== "undefined"
+                    ? window.innerWidth
+                    : terminalSize.w) - 24
+                ),
+                textAlign: "center",
+                opacity: isDragging ? 0 : 0.92,
+                transition: `opacity ${isDragging ? 140 : 650}ms ease`,
+                fontSize: "1.05rem",
+                lineHeight: 1.35,
+                whiteSpace: "pre-wrap",
+                textShadow: isLight
+                  ? "0 2px 18px rgba(0,0,0,0.35)"
+                  : "0 2px 18px rgba(0,0,0,0.75)",
+                color:
+                  theme === "light"
+                    ? "rgba(18, 10, 12, 0.92)"
+                    : "rgba(245,245,245,0.96)",
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  maxWidth: "100%",
+                }}
+              >
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    maxWidth: "100%",
+                    padding: "0.34em 0.70em",
+                    borderRadius: 14,
+                    lineHeight: 1.55,
+                    whiteSpace: "pre-wrap",
+                    background: FROST_BG,
+                    border: `1px solid ${FROST_BORDER}`,
+                    backdropFilter: "blur(12px)",
+                    WebkitBackdropFilter: "blur(12px)",
+                    boxShadow: FROST_SHADOW,
+                    gap: 0,
+                  }}
+                >
+                  <span style={{ display: "inline-block" }}>{bgBottomText}</span>
+                  {bgStage === "bottom" ? (
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        display: "inline-block",
+                        width: "0.62em",
+                        height: "1.15em",
+                        marginLeft: "10px",
+                        background: "var(--caret-block)",
+                        animation: "blockBlink 1s steps(1, end) infinite",
+                        opacity: isDragging ? 0 : 1,
+                        transition: "opacity 220ms ease",
+                        transform: "translateY(0.02em)",
+                      }}
+                    />
+                  ) : null}
+                </span>
+              </span>
+            </div>
+          </div>
+        </>
+      ) : null}
 
       {wordCloudItems.map((item, i) => (
         <span
@@ -1391,327 +1524,557 @@ function Landing({ theme, setTheme }) {
         </span>
       ))}
 
-      {/* terminal window (draggable) */}
-      <div
-        style={{
-          position: "absolute",
-          left: terminalPos.x,
-          top: terminalPos.y,
-          zIndex: 5,
-        }}
-      >
-        {/* terminal window */}
+      {/* Touch UI: Centered name card and always-visible Pages panel */}
+      {isTouchUI ? (
         <div
-          className="terminalWindow"
           style={{
-            borderRadius: 14,
-            border: `1px solid ${TERM_BORDER}`,
-            background: TERM_BG,
-            boxShadow: `0 24px 70px rgba(0,0,0,0.55), 0 0 0 1px ${INSET_LINE} inset`,
-            backdropFilter: isCompact ? "none" : "blur(14px)",
-            overflow: "hidden",
+            position: "relative",
+            zIndex: 6,
+            minHeight: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingLeft: "18px",
+            paddingRight: "18px",
+            gap: 16,
           }}
         >
-          {/* terminal header */}
           <div
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: "0.75rem 1rem",
-              borderBottom: `1px solid ${
-                isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.08)"
-              }`,
-              background: TERM_HDR_BG,
-              cursor: isCompact ? "default" : "grab",
-              userSelect: "none",
-              touchAction: "none",
-            }}
-            onPointerDown={(e) => {
-              if (isCompact) return;
-              // Don't start dragging when clicking interactive controls in the header
-              if (e.target && typeof e.target.closest === "function") {
-                const btn = e.target.closest("button");
-                if (btn) return;
-              }
-              if (e.button !== 0) return;
+              fontFamily: SANS,
+              fontSize: "clamp(2.4rem, 6.5vw, 3.6rem)",
+              fontWeight: 650,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
+              padding: "0.18em 0.42em",
+              borderRadius: 18,
+              background: FROST_BG,
+              border: `1px solid ${FROST_BORDER}`,
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
+              boxShadow: FROST_SHADOW,
+              color:
+                theme === "light"
+                  ? "rgba(18, 10, 12, 0.92)"
+                  : "rgba(245,245,245,0.96)",
+              textAlign: "center",
 
-              draggingRef.current.active = true;
-              setIsDragging(true);
-
-              if (settleTimerRef.current) {
-                clearTimeout(settleTimerRef.current);
-                settleTimerRef.current = null;
-              }
-
-              draggingRef.current.dx = e.clientX - terminalPos.x;
-              draggingRef.current.dy = e.clientY - terminalPos.y;
-
-              if (e.currentTarget.setPointerCapture) {
-                try {
-                  e.currentTarget.setPointerCapture(e.pointerId);
-                } catch {
-                  // ignore
-                }
-              }
+              /* raise the title */
+              marginTop: "-48px",
             }}
           >
-            <div style={{ display: "flex", gap: 8 }}>
-              <span
+            Nasir Sims
+          </div>
+
+          <PagesPanel
+            onPick={(k) => {
+              const cmd = normalizeKeyword(k);
+
+              // On touch UI, some "terminal output" entries should behave like direct links.
+              if (cmd === "resume") {
+                try {
+                  window.open(RESUME_URL, "_blank", "noreferrer");
+                } catch {
+                  window.location.href = RESUME_URL;
+                }
+                return;
+              }
+
+              if (cmd === "music") {
+                const url =
+                  "https://www.discogs.com/user/nasedition/collection?header=1";
+                try {
+                  window.open(url, "_blank", "noreferrer");
+                } catch {
+                  window.location.href = url;
+                }
+                return;
+              }
+
+              if (cmd === "contact") {
+                openContactModal();
+                return;
+              }
+              // Default: use the same command routing as desktop
+              runCommand(k);
+            }}
+          />
+          {contactModalOpen ? (
+            <div
+              onClick={() => closeContactModal()}
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 40,
+                background: "rgba(0,0,0,0.40)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "18px",
+                opacity: contactModalIn ? 1 : 0,
+                transition: "opacity 160ms ease",
+              }}
+              role="presentation"
+            >
+              <div
+                onClick={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-label="Contact"
                 style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: 999,
-                  background: "rgba(255, 95, 86, 0.9)",
+                  width: "min(520px, calc(100% - 24px))",
+                  maxHeight: "min(72vh, 640px)",
+                  overflow: "auto",
+                  borderRadius: 16,
+                  background: isLight
+                    ? "rgba(245, 247, 249, 0.94)"
+                    : "rgba(0, 0, 0, 0.86)",
+                  border: `1px solid ${TERM_BORDER}`,
+                  boxShadow: "0 24px 70px rgba(0,0,0,0.55)",
+                  backdropFilter: "blur(14px)",
+                  WebkitBackdropFilter: "blur(14px)",
+                  transform: contactModalIn
+                    ? "translateY(0)"
+                    : "translateY(10px)",
+                  transition: "transform 160ms ease",
                 }}
-              />
-              <span
-                style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: 999,
-                  background: "rgba(255, 189, 46, 0.9)",
-                }}
-              />
-              <span
-                style={{
-                  width: 12,
-                  height: 12,
-                  borderRadius: 999,
-                  background: "rgba(39, 201, 63, 0.9)",
-                }}
-              />
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: "0.9rem 1rem",
+                    borderBottom: `1px solid ${INSET_LINE}`,
+                    fontFamily: MONO,
+                  }}
+                >
+                  <div style={{ fontSize: "0.95rem", opacity: 0.9 }}>
+                    Contact
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => closeContactModal()}
+                    style={{
+                      width: 40,
+                      height: 36,
+                      borderRadius: 10,
+                      border: "none",
+                      background: isLight
+                        ? "rgba(0,0,0,0.03)"
+                        : "rgba(255,255,255,0.05)",
+                      color: FG,
+                      cursor: "pointer",
+                      fontFamily: MONO,
+                      fontSize: "1.35rem",
+                      lineHeight: 1,
+                      padding: 0,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                    aria-label="Close"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div
+                  style={{
+                    padding: "0.95rem 1.05rem 1.1rem",
+                    fontFamily: MONO,
+                    fontSize: "0.92rem",
+                    lineHeight: 1.55,
+                    color: FG,
+                    display: "grid",
+                    gap: "0.55rem",
+                  }}
+                >
+                  <div style={{ opacity: 0.85 }}>Email</div>
+                  <a
+                    href="mailto:nasir@wustl.edu"
+                    style={{
+                      color:
+                        theme === "light"
+                          ? "rgba(18, 10, 12, 0.85)"
+                          : "rgba(220,220,220,0.92)",
+                      textDecoration: "underline",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    nasir@wustl.edu
+                  </a>
+
+                  <div style={{ height: 8 }} aria-hidden="true" />
+
+                  <div style={{ opacity: 0.85 }}>LinkedIn</div>
+                  <a
+                    href="https://www.linkedin.com/in/nasir-sims"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      color:
+                        theme === "light"
+                          ? "rgba(18, 10, 12, 0.85)"
+                          : "rgba(220,220,220,0.92)",
+                      textDecoration: "underline",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    linkedin.com/in/nasir-sims
+                  </a>
+
+                  <div style={{ height: 8 }} aria-hidden="true" />
+
+                  <div style={{ opacity: 0.85 }}>GitHub</div>
+                  <a
+                    href="https://github.com/NasirStone"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      color:
+                        theme === "light"
+                          ? "rgba(18, 10, 12, 0.85)"
+                          : "rgba(220,220,220,0.92)",
+                      textDecoration: "underline",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    github.com/NasirStone
+                  </a>
+                </div>
+              </div>
             </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {!isTouchUI ? (
+        <div
+          style={{
+            position: "absolute",
+            left: terminalPos.x,
+            top: terminalPos.y,
+            zIndex: 5,
+          }}
+        >
+          {/* terminal window */}
+          <div
+            className="terminalWindow"
+            style={{
+              borderRadius: 14,
+              border: `1px solid ${TERM_BORDER}`,
+              background: TERM_BG,
+              boxShadow: `0 24px 70px rgba(0,0,0,0.55), 0 0 0 1px ${INSET_LINE} inset`,
+              backdropFilter: isCompact ? "none" : "blur(14px)",
+              overflow: "hidden",
+            }}
+          >
+            {/* terminal header */}
             <div
               style={{
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
-                width: "100%",
+                gap: 10,
+                padding: "0.75rem 1rem",
+                borderBottom: `1px solid ${
+                  isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.08)"
+                }`,
+                background: TERM_HDR_BG,
+                cursor: isCompact ? "default" : "grab",
+                userSelect: "none",
+                touchAction: "none",
+              }}
+              onPointerDown={(e) => {
+                if (isCompact) return;
+                // Don't start dragging when clicking interactive controls in the header
+                if (e.target && typeof e.target.closest === "function") {
+                  const btn = e.target.closest("button");
+                  if (btn) return;
+                }
+                if (e.button !== 0) return;
+
+                draggingRef.current.active = true;
+                setIsDragging(true);
+
+                if (settleTimerRef.current) {
+                  clearTimeout(settleTimerRef.current);
+                  settleTimerRef.current = null;
+                }
+
+                draggingRef.current.dx = e.clientX - terminalPos.x;
+                draggingRef.current.dy = e.clientY - terminalPos.y;
+
+                if (e.currentTarget.setPointerCapture) {
+                  try {
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                  } catch {
+                    // ignore
+                  }
+                }
               }}
             >
-              <div
-                style={{
-                  fontFamily: MONO,
-                  fontSize: "0.9rem",
-                  opacity: 0.8,
-                }}
-              >
-                Terminal
-              </div>
-            </div>
-          </div>
-
-          {/* terminal body */}
-          <div
-            className="terminalBody"
-            style={{
-              padding: "1rem 1.1rem",
-              fontFamily: MONO,
-              lineHeight: 1.55,
-              color: FG,
-            }}
-          >
-            {/* history */}
-            <div
-              style={{
-                display: "grid",
-                gap: "0.35rem",
-              }}
-            >
-              {history.map((line, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    opacity: 1,
-                    color: line.type === "system" ? MUTED : undefined,
-                    whiteSpace: "pre",
-                  }}
-                >
-                  {line.type === "error" ? (
-                    <span style={{ color: "rgba(255, 120, 120, 0.95)" }}>
-                      {line.text}
-                    </span>
-                  ) : line.type === "link" ? (
-                    <a
-                      href={line.href}
-                      download={line.download ? "resume" : undefined}
-                      target={line.newTab ? "_blank" : undefined}
-                      rel={line.newTab ? "noreferrer" : undefined}
-                      style={{
-                        color:
-                          theme === "light"
-                            ? "rgba(18, 10, 12, 0.85)"
-                            : "rgba(220,220,220,0.92)",
-                        textDecoration: "underline",
-                      }}
-                    >
-                      {line.text}
-                    </a>
-                  ) : (
-                    <span>{line.text}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {isLoading ? (
-              <div
-                style={{
-                  marginTop: "0.75rem",
-                  color: FG,
-                }}
-              >
-                <span style={{ fontFamily: "inherit" }}>
-                  {`# [${"="
-                    .repeat(Math.round((loadingPct / 100) * 18))
-                    .padEnd(18, " ")}] ${loadingPct}%`}
-                </span>
-              </div>
-            ) : null}
-
-            {/* input */}
-            <form
-              onSubmit={onSubmit}
-              style={{
-                marginTop: history.length || isLoading ? "1.25rem" : "0.25rem",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ display: "flex", gap: 8 }}>
                 <span
                   style={{
-                    color: FG,
+                    width: 12,
+                    height: 12,
+                    borderRadius: 999,
+                    background: "rgba(255, 95, 86, 0.9)",
+                  }}
+                />
+                <span
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 999,
+                    background: "rgba(255, 189, 46, 0.9)",
+                  }}
+                />
+                <span
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 999,
+                    background: "rgba(39, 201, 63, 0.9)",
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  width: "100%",
+                }}
+              >
+                <div
+                  style={{
                     fontFamily: MONO,
                     fontSize: "0.9rem",
-                    lineHeight: 1.55,
+                    opacity: 0.8,
                   }}
                 >
-                  nasir %
-                </span>
+                  Terminal
+                </div>
+              </div>
+            </div>
 
-                <div
-                  style={{ position: "relative", flex: 1, height: "1.3rem" }}
-                >
-                  {/* visible overlay line */}
+            {/* terminal body */}
+            <div
+              className="terminalBody"
+              style={{
+                padding: "1rem 1.1rem",
+                fontFamily: MONO,
+                lineHeight: 1.55,
+                color: FG,
+              }}
+            >
+              {/* history */}
+              <div
+                style={{
+                  display: "grid",
+                  gap: "0.35rem",
+                }}
+              >
+                {history.map((line, idx) => (
                   <div
-                    aria-hidden="true"
+                    key={idx}
                     style={{
-                      position: "absolute",
-                      inset: 0,
-                      display: "flex",
-                      alignItems: "center",
+                      opacity: 1,
+                      color: line.type === "system" ? MUTED : undefined,
+                      whiteSpace: "pre",
+                    }}
+                  >
+                    {line.type === "error" ? (
+                      <span style={{ color: "rgba(255, 120, 120, 0.95)" }}>
+                        {line.text}
+                      </span>
+                    ) : line.type === "link" ? (
+                      <a
+                        href={line.href}
+                        download={line.download ? "resume" : undefined}
+                        target={line.newTab ? "_blank" : undefined}
+                        rel={line.newTab ? "noreferrer" : undefined}
+                        style={{
+                          color:
+                            theme === "light"
+                              ? "rgba(18, 10, 12, 0.85)"
+                              : "rgba(220,220,220,0.92)",
+                          textDecoration: "underline",
+                        }}
+                      >
+                        {line.text}
+                      </a>
+                    ) : (
+                      <span>{line.text}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {isLoading ? (
+                <div
+                  style={{
+                    marginTop: "0.75rem",
+                    color: FG,
+                  }}
+                >
+                  <span style={{ fontFamily: "inherit" }}>
+                    {`# [${"="
+                      .repeat(Math.round((loadingPct / 100) * 18))
+                      .padEnd(18, " ")}] ${loadingPct}%`}
+                  </span>
+                </div>
+              ) : null}
+
+              {/* input */}
+              <form
+                onSubmit={onSubmit}
+                style={{
+                  marginTop:
+                    history.length || isLoading ? "1.25rem" : "0.25rem",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span
+                    style={{
                       color: FG,
                       fontFamily: MONO,
                       fontSize: "0.9rem",
                       lineHeight: 1.55,
-                      whiteSpace: "pre",
-                      pointerEvents: "none",
                     }}
                   >
-                    <span>{input}</span>
-                    <span
+                    nasir %
+                  </span>
+
+                  <div
+                    style={{ position: "relative", flex: 1, height: "1.3rem" }}
+                  >
+                    {/* visible overlay line */}
+                    <div
+                      aria-hidden="true"
                       style={{
-                        display: "inline-block",
-                        width: "0.62em",
-                        height: "1.15em",
-                        marginLeft: "2px",
-                        background: "var(--caret-block)",
-                        animation: "blockBlink 1s steps(1, end) infinite",
+                        position: "absolute",
+                        inset: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        color: FG,
+                        fontFamily: MONO,
+                        fontSize: "0.9rem",
+                        lineHeight: 1.55,
+                        whiteSpace: "pre",
+                        pointerEvents: "none",
+                      }}
+                    >
+                      <span>{input}</span>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          width: "0.62em",
+                          height: "1.15em",
+                          marginLeft: "2px",
+                          background: "var(--caret-block)",
+                          animation: "blockBlink 1s steps(1, end) infinite",
+                        }}
+                      />
+                    </div>
+
+                    {/* real input (captures typing) */}
+                    <input
+                      ref={inputRef}
+                      value={input}
+                      onChange={(e) => {
+                        // typing exits history mode
+                        if (cmdIndexRef.current !== -1) {
+                          cmdIndexRef.current = -1;
+                          cmdDraftRef.current = "";
+                        }
+                        setInput(e.target.value);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key !== "ArrowUp" && e.key !== "ArrowDown")
+                          return;
+
+                        const list = cmdHistoryRef.current;
+                        if (!list.length) return;
+
+                        e.preventDefault();
+
+                        // first time entering history mode: save current draft
+                        if (cmdIndexRef.current === -1) {
+                          cmdDraftRef.current = input;
+                          cmdIndexRef.current = list.length; // cursor after last
+                        }
+
+                        if (e.key === "ArrowUp") {
+                          cmdIndexRef.current = Math.max(
+                            0,
+                            cmdIndexRef.current - 1
+                          );
+                          setInput(list[cmdIndexRef.current] || "");
+                          return;
+                        }
+
+                        // ArrowDown
+                        cmdIndexRef.current = Math.min(
+                          list.length,
+                          cmdIndexRef.current + 1
+                        );
+                        if (cmdIndexRef.current >= list.length) {
+                          cmdIndexRef.current = -1;
+                          setInput(cmdDraftRef.current || "");
+                        } else {
+                          setInput(list[cmdIndexRef.current] || "");
+                        }
+                      }}
+                      autoFocus
+                      spellCheck={false}
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        background: "transparent",
+                        border: "none",
+                        outline: "none",
+                        caretColor: "transparent",
+                        color: "transparent",
+                        textShadow: `0 0 0 ${FG}`,
+                        fontFamily: MONO,
+                        fontSize: "0.9rem",
+                        lineHeight: 1.55,
+                        padding: 0,
                       }}
                     />
                   </div>
-
-                  {/* real input (captures typing) */}
-                  <input
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => {
-                      // typing exits history mode
-                      if (cmdIndexRef.current !== -1) {
-                        cmdIndexRef.current = -1;
-                        cmdDraftRef.current = "";
-                      }
-                      setInput(e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key !== "ArrowUp" && e.key !== "ArrowDown") return;
-
-                      const list = cmdHistoryRef.current;
-                      if (!list.length) return;
-
-                      e.preventDefault();
-
-                      // first time entering history mode: save current draft
-                      if (cmdIndexRef.current === -1) {
-                        cmdDraftRef.current = input;
-                        cmdIndexRef.current = list.length; // cursor after last
-                      }
-
-                      if (e.key === "ArrowUp") {
-                        cmdIndexRef.current = Math.max(
-                          0,
-                          cmdIndexRef.current - 1
-                        );
-                        setInput(list[cmdIndexRef.current] || "");
-                        return;
-                      }
-
-                      // ArrowDown
-                      cmdIndexRef.current = Math.min(
-                        list.length,
-                        cmdIndexRef.current + 1
-                      );
-                      if (cmdIndexRef.current >= list.length) {
-                        cmdIndexRef.current = -1;
-                        setInput(cmdDraftRef.current || "");
-                      } else {
-                        setInput(list[cmdIndexRef.current] || "");
-                      }
-                    }}
-                    autoFocus
-                    spellCheck={false}
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      background: "transparent",
-                      border: "none",
-                      outline: "none",
-                      caretColor: "transparent",
-                      color: "transparent",
-                      textShadow: `0 0 0 ${FG}`,
-                      fontFamily: MONO,
-                      fontSize: "0.9rem",
-                      lineHeight: 1.55,
-                      padding: 0,
-                    }}
-                  />
                 </div>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-      {/* footer */}
-      <div
-        style={{
-          position: "absolute",
-          right: 14,
-          bottom: 12,
-          zIndex: 6,
-          pointerEvents: "none",
-          fontFamily: MONO,
-          fontSize: "0.75rem",
-          color: isLight ? "rgba(18, 10, 12, 0.68)" : "rgba(235,235,235,0.9)",
-          opacity: 0.9,
-          textShadow: isLight
-            ? "0 2px 14px rgba(0,0,0,0.18)"
-            : "0 2px 14px rgba(0,0,0,0.7)",
-        }}
-        aria-hidden="true"
-      >
-        © 2026 Nasir Sims
-      </div>
+      ) : null}
+      {!isTouchUI ? (
+        <div
+          style={{
+            position: "absolute",
+            right: 14,
+            bottom: 12,
+            zIndex: 6,
+            pointerEvents: "none",
+            fontFamily: MONO,
+            fontSize: "0.75rem",
+            color: isLight ? "rgba(18, 10, 12, 0.68)" : "rgba(235,235,235,0.9)",
+            opacity: 0.9,
+            textShadow: isLight
+              ? "0 2px 14px rgba(0,0,0,0.18)"
+              : "0 2px 14px rgba(0,0,0,0.7)",
+          }}
+          aria-hidden="true"
+        >
+          © 2026 Nasir Sims
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -26,11 +26,19 @@ export default function DronesPage() {
       >
         In the summer of 2025, I spent my days flying DJI Drones for WashU's
         Facilities, Planning & Management Department. I primarily flew a DJI
-        Matrice 300 RTK, where I led mapping missions for WashU's campus and
-        other assets to help create a 'digital twin' of WashU. Combining
+        Matrice 300 RTK, leading mapping missions across WashU's campus and
+        other buildings to help create a 'digital twin' of the Campus. Combining
         photogrammetry and LiDAR, I applied SLAM-supported workflows to refine
         ground, building, and vegetation classes for accurate change detection,
         including seasonal foliage variation.
+        <br />
+        <br />
+        In this role, I also helped lead WashU's Internal Space Audit program,
+        which aims to revolutionize and greatly simplify space collection and
+        management across WashU's many assets. Through the combination of
+        collecting 360° imagery, GIS Surveys, and data collection and
+        processing, I learned to optimize this project for scalability and to
+        learn new technologies and hardware as they became available.
       </TextPanel>
     </PageShell>
   );

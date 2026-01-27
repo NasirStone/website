@@ -24,19 +24,20 @@ export default function VintageAudioPage() {
           <span style={{ fontFamily: MONO }}>Vintage Audio Repair Log</span>
         }
       >
-        I have always loved fixing things, but this hobby usually consisted of
-        physical and mechanical items (cars, bikes, computers). As I grew my
-        physical media collection to over 150+ items in all different formats,
-        it was only a matter of time that obtaining the devices to play them
-        would also pique my interest. While electical engineering has never been
-        my forte, I have gained so much knowledge through trial-and-error and
-        self-learning. What I love about fixing vintage technology is that it is
-        generally built with much more care, and servicability in mind. While
-        the parts may be difficult to source at times, there exists a dedicated
-        and passionate community who are always avaialble to ask for help.
+        I have always loved fixing things, but this hobby has usually consisted
+        of mechanical objects (cars, bikes, computers). As I grew my physical
+        music collection to over 150+ items in all different formats, it was
+        only a matter of time before obtaining the devices to play them would
+        pique my interest. Electrical work has never been my forte, but taking
+        on these projects has given me so much knowledge through trial and error
+        and self-learning. What I love most about fixing vintage technology is
+        that it is generally built with much more care and serviceability in
+        mind. While parts may be difficult to source at times, there is often a
+        dedicated and passionate community that is always available to help with
+        any device.
         <br />
         <br />
-        The list below serves as an updating log of the audio projects I own:
+        The list below serves as an updated log of the audio projects I have:
       </TextPanel>
       <TextPanel marginTop="1rem" title="My Repair Projects">
         <div style={{ display: "grid", gap: "1.5rem", maxWidth: "900px" }}>
@@ -48,10 +49,12 @@ export default function VintageAudioPage() {
               </span>
             </div>
             <div style={{ opacity: 0.9 }}>
-              <b>Condition:</b> Power surge; none of the units powered on.
+              <b>Condition:</b> Seller stated was affected by power surge; none
+              of the units power on.
               <br />
-              <b>Work:</b> Visual inspection, capacitor checks against wiring
-              diagram, and first-pass diagnosis.
+              <b>Work:</b> After a visual inspection, no capacitors are blown
+              (verified with multimeter against capacitance values). <br />
+              Checks against wiring diagram in progress.
               <br />
               <b>Status:</b> On hold.
             </div>
@@ -69,11 +72,11 @@ export default function VintageAudioPage() {
               Sony Walkman <span style={{ opacity: 0.75 }}>(WM-4)</span>
             </div>
             <div style={{ opacity: 0.9 }}>
-              <b>Condition:</b> Battery corrosion and tape transport issues
-              resulting in destroyed tape.
+              <b>Condition:</b> Heavy battery corrosion, tape transport issues,
+              high-pitched output. Destroyed my favorite tape.
               <br />
-              <b>Work:</b> Cleaned terminals, powered via DC adapter, teardown
-              for transport diagnosis and cleaning.
+              <b>Work:</b> Removed, cleaned, and reinstalled battery terminals,{" "}
+              teardown for transport diagnosis and cleaning after first test.
               <br />
               <b>Status:</b> Disassembled.
             </div>
@@ -91,10 +94,11 @@ export default function VintageAudioPage() {
               Pioneer Receiver <span style={{ opacity: 0.75 }}>(SX-650)</span>
             </div>
             <div style={{ opacity: 0.9 }}>
-              <b>Condition:</b> Phono channel inoperable, peeling wood veneer.
+              <b>Condition:</b> Phono channel inoperable, peeling wood veneer,
+              rust.
               <br />
-              <b>Work:</b> Internal clean, potentiometer cleaning, recap /
-              rebuild planned.
+              <b>Work:</b> Internals cleaned, potentiometers cleaned, re-cap
+              planned.
               <br />
               <b>Status:</b> On hold.
             </div>

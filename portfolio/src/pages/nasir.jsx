@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import PageShell from "../components/PageShell.jsx";
-import TwoColumnLayout from "../components/layouts/TwoColumnLayout.jsx";
 import FramedImage from "../components/ui/FramedImage.jsx";
 import TextPanel from "../components/ui/TextPanel.jsx";
 
@@ -19,30 +18,46 @@ export default function NasirPage() {
           boxSizing: "border-box",
         }}
       >
-        <TwoColumnLayout>
+        <style>{`
+          .aboutLayout {
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            gap: clamp(16px, 3vw, 28px);
+          }
+          @media (max-width: 820px) {
+            .aboutLayout {
+              flex-direction: column;
+              align-items: center;
+            }
+          }
+        `}</style>
+
+        <div className="aboutLayout">
           <FramedImage
             src={`${base}images/about/Headshot.webp`}
             alt="Nasir headshot"
-            size="420px"
+            size="clamp(260px, 88vw, 420px)"
             aspect="1 / 1"
           />
 
           <TextPanel title="About me">
             Hi, I'm Nasir! I'm a Junior studying Computer Science, with a minor
-            in Film at Washington University in St. Louis.
+            in Film & Media Studies at Washington University in St. Louis.
             <br />
             <br />
             At WashU, I am involved in our High-Powered Rocketry team,
             WURocketry, where I serve as Chief Safety Officer. I also
             participated in an Autonomous Vehicle Research lab that aims to
-            enhance safer agents through rapidly iterative simulations in CARLA,
-            and a 1:8 scale city model. I also serve as an Information Security
-            GRC Analyst for WashU's IT department, and I am a Teaching Assistant
-            for MGT2001 - Introduction to Business Fundamentals.
+            develop safer agents through rapid, iterative simulations in CARLA
+            and a 1:8-scale city model. I also serve as an Information Security
+            GRC Analyst for WashU's IT department, and I am the Head Teaching
+            Assistant for MGT2001 - Introduction to Business Fundamentals.
             <br />
             <br />
             Outside of school, I love fixing things and getting my hands dirty.
-            I repair anything from cars and bikes to vintage audio equipment. I
+            I repair anything from cars and bikes, to vintage audio equipment. I
             love road trips (my longest was 6,000+ miles), I collect all
             different music formats, and I have a pet lizard whom I adore very
             much.
@@ -50,7 +65,7 @@ export default function NasirPage() {
             <br />I built this website not only to showcase my software
             projects, but also to reveal my interests. Thanks for visiting!
           </TextPanel>
-        </TwoColumnLayout>
+        </div>
       </div>
     </PageShell>
   );

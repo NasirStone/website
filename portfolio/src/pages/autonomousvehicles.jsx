@@ -4,7 +4,6 @@ import TextPanel from "../components/ui/TextPanel.jsx";
 import GalleryGrid from "../components/GalleryGrid.jsx";
 import { asset } from "../components/uiConstants.js";
 
-// External references
 const ARTICLE_URL = "https://source.washu.edu/2023/10/model-av-testing/";
 const REPO_URL = "https://github.com/NasirStone/nv-e2e-cl-ad";
 
@@ -15,7 +14,7 @@ const ROS_2 = "images/autonomous/nasir_av.webp";
 
 const PAPER_DOWNLOADS = [
   {
-    label: "End-to-End RL / Closed-Loop AD (PDF)",
+    label: "End-to-End RL / Closed-Loop AD Report (PDF)",
     path: "papers/FL24_NV_E2E_RL_AD-2.pdf",
   },
   {
@@ -74,29 +73,25 @@ export default function AutonomousVehiclesPage() {
           title="Autonomous Driving Research"
           header={
             <span>
-              CARLA Simulations, and F1TENTH testing
-              {" · "}
               <ExtLink href={ARTICLE_URL}>WashU Feature</ExtLink>
               {" · "}
               <ExtLink href={REPO_URL}>Repository</ExtLink>
             </span>
           }
         >
-          My sophomore year at WashU, I worked with a research group focused on
-          making autonomous driving systems safer by stress testing them in
-          simulation and on a 1/8 scale modular city platform. With the goal of
-          building build repeatable scenarios, measure failure modes, then
-          iterating on perception, planning, and control, we could fine-tune the
-          agent behavior consistently across new towns, lighting, weather,
-          traffic, and more.
+          In my sophomore year, I joined a research team focused on making
+          autonomous driving systems safer by stress-testing them in simulation
+          and on a 1:8-scale mini-city platform. With the goal of building
+          repeatable scenarios, measuring failure modes, and then iterating on
+          perception, planning, and control, we fine-tune the agent behavior
+          consistently across new towns, lighting, weather, traffic, and more.
           <br />
           <br />
-          A key part of this workflow was data and labeling. We captured runs in
-          CARLA and on the physical Mini City environment, then annotated frames
-          to support supervised learning tasks (for example: turn intent at an
-          upcoming junction). That made it easier to debug: when the agent
-          failed a left turn, we could trace it back to what the model saw and
-          what the label pipeline expected.
+          A key part of this workflow was data and labeling. We captured
+          simulations in CARLA and on the physical Mini City environment. Then,
+          we annotated frames to support supervised learning tasks. This made it
+          easier to debug, as if the agent failed a left turn, we could trace it
+          back to what the model saw and what the label pipeline expected.
           <br />
           <br />
           {/* Visual comparison embedded in the narrative (CARLA vs Mini City) */}
@@ -114,17 +109,17 @@ export default function AutonomousVehiclesPage() {
                 opacity: 0.85,
               }}
             >
-              Left: CARLA simulation intersection. Right: similar turn geometry
+              Left: CARLA simulation intersection. Right: Similar turn geometry
               recreated in our physical Mini City environment.
             </div>
           </div>
           <br />
-          My work spaned two threads. First, intersection handling in CARLA,
-          where the agent must detect an upcoming junction, choose the correct
-          lane, and execute a clean left or right maneuver. Second, the
-          transition from reinforcement learning based control toward a more
-          modular perception plus decision approach, including a turn classifier
-          trained on labeled images.
+          My work spanned two threads. First, intersection handling in CARLA,
+          where the agent must detect an upcoming intersection, choose the
+          correct lane, and execute a clean left, right, or straight maneuver.
+          Second, the transition from reinforcement learning-based control to a
+          more modular perception-and-decision approach, including a turn
+          classifier trained on labeled images.
         </TextPanel>
 
         {/* Content blocks */}
@@ -137,18 +132,19 @@ export default function AutonomousVehiclesPage() {
           }}
         >
           <div style={{ gridColumn: "span 7" }}>
-            <TextPanel title="F1TENTH Mini City platform">
-              The physical testbed is a small scale vehicle running a ROS 2
-              based stack with a vision first pipeline. The on car computer is a
-              Jetson Xavier NX, and the primary sensor for autonomy is a forward
-              camera, with IMU support available for state estimation. This
-              setup let us validate the same ideas in both simulation and a real
-              environment with repeatable intersections and lane markings.
+            <TextPanel title="F1TENTH / Mini City Platform">
+              The physical testbed is a small-scale vehicle running a ROS
+              2-based stack with a vision-first pipeline. The on-car computer is
+              a Jetson Xavier NX, and the primary sensor for autonomy is a
+              forward camera, with IMU support available for state estimation.
+              This setup lets us validate the same ideas in both simulation and
+              a real environment with repeatable intersections and lane
+              markings.
               <br />
               <br />
-              I focused on keeping the workflow practical: reliable bring up,
-              consistent data capture, and a clear interface between perception
-              outputs and the control layer.
+              Building on this setup, Mini City allows the platform to
+              consistently capture data with lane markings, pedestrians, cars,
+              foliage, and more.
               <br />
               <br />
               <div style={{ marginTop: "0.75rem" }}>
@@ -213,29 +209,29 @@ export default function AutonomousVehiclesPage() {
           </div>
 
           <div style={{ gridColumn: "span 6" }}>
-            <TextPanel title="Intersection handling in CARLA">
-              In CARLA, the failure modes show up quickly: drifting wide on
-              turns, cutting corners, or missing the adjacent lane on curves due
-              to limited field of view. The project work centered on building a
-              pipeline that can recognize an intersection early enough to choose
-              the correct lane, then execute the maneuver smoothly without
-              relying on a single brittle heuristic.
+            <TextPanel title="Intersection Handling in CARLA">
+              In CARLA, failure modes appear quickly. The agent would regularly
+              drift wide on turns, cut corners, or miss the adjacent lane
+              entirely on curves due to limited FOV. The project work centered
+              on building a pipeline that can recognize an intersection early
+              enough to choose the correct lane, then execute the maneuver
+              smoothly without relying on a single (poor) heuristic.
               <br />
-              <br />A key piece of this was route planning logic that uses
+              <br />A key piece of this was the route planning logic that uses
               global map structure to anticipate junctions, instead of reacting
               only when lane markings change under the vehicle.
             </TextPanel>
           </div>
 
           <div style={{ gridColumn: "span 6" }}>
-            <TextPanel title="Classification model for turn intent">
+            <TextPanel title="Classification Model for Turn Intent">
               To make the system more modular, I explored a simple supervised
-              model that classifies a front facing image as a left or right turn
-              context. The classifier can act as a high level policy signal,
-              with a separate control module responsible for steering and speed
-              tracking. This separation makes it easier to debug and iterate,
-              because you can improve perception without rewriting the
-              controller.
+              model that classifies a front-facing image (windshield) as a left,
+              right, or straight turn context. The classifier acts as a high
+              level policy signal, with a separate control module responsible
+              for steering and speed tracking. This separation makes it easier
+              to debug and iterate, because you can improve perception without
+              rewriting the controller.
               <br />
               <br />
               This work builds on earlier reinforcement learning experiments and

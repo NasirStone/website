@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import PageShell from "../components/PageShell.jsx";
 import TextPanel from "../components/ui/TextPanel.jsx";
@@ -7,9 +7,6 @@ import { asset } from "../components/uiConstants.js";
 function isVideoSrc(src) {
   return /\.(mp4|webm|mov)$/i.test(src || "");
 }
-
-const TIMELINE_TRIGGER_Y = 140;
-const JUMP_LOCK_MS = 900;
 
 // -------------------- TRAVEL DATA --------------------
 
@@ -23,9 +20,9 @@ const TRAVEL_ENTRIES = [
       <>
         In the summer of 2023, my dad and I travelled to Füssen, Germany to
         visit my great aunt, Linda. We spent most of our days biking in the tall
-        and beautiful mountians, and even crossed into Austria accidentally. It
-        was my first time travelling in Europe, and I was entralled by the
-        cleanliness, beautiful nature, and healthy food.
+        and beautiful mountians, where we accidentally crossed into Austria. It
+        was my first time in Europe, and I was entralled by the cleanliness,
+        beautiful nature, and healthy food that Germany offered.
       </>
     ),
   },
@@ -36,12 +33,12 @@ const TRAVEL_ENTRIES = [
     images: ["images/travel/F1.mp4", "images/travel/cour.webp"],
     body: (
       <>
-        Right after travelling in Germany, I met up with my best friend Conor,
-        and we flew to Barcelona, Spain on the cheapest Ryanair, and stayed in
-        an even cheaper hostel. The coolest thing we did by far was seeing the
-        Formula 1 AWS Gran Premio de España 2023. We bought tickets for the
-        general field, but with some social engineering, snuck into the only two
-        seats left in the Grand Stands to catch great views of the cars racing.
+        Right after Germany, I met up with my best friend Conor, and we flew to
+        Barcelona, Spain, on the cheapest flight we could find, and stayed in a
+        hostel. The coolest thing we did by far was watching the Formula 1 AWS
+        Gran Premio de España 2023. We bought tickets for the general field, but
+        with some social engineering, snuck into the only two seats left in the
+        Grand Stands to catch amazing views of the race.
       </>
     ),
   },
@@ -52,10 +49,12 @@ const TRAVEL_ENTRIES = [
     images: ["images/travel/beach.webp", "images/travel/hood.webp"],
     body: (
       <>
-        During 2024 Spring Break, my friends Jack, Conor and I stayed with our
+        For my 2024 Spring Break, my friends Jack, Conor, and I stayed with our
         friend Lucas's house in Portland, Oregon. The beauty of Oregon was so
-        unfamiliar from the flatness I experience in Illinois. We had access to
-        a car, so we got to drive around and visit the Japanese Gardens,
+        jarring from the flatness I am familiar with in Illinois. We had access
+        to a car, so we got to drive around and visit the Japanese Gardens,
+        beautiful beaches, and twisty mountain roads. The water is also
+        excellent in Oregon!
       </>
     ),
   },
@@ -66,13 +65,13 @@ const TRAVEL_ENTRIES = [
     images: ["images/travel/hike.webp", "images/travel/shutin.webp"],
     body: (
       <>
-        The weekend before finals, my girlfriend Gabbi, and our other friend
-        couple, Isabella and Andre drove an hour South to the Johnson Shut-Ins
+        The weekend before finals, Gabbi (my girlfriend), and our other friend
+        couple, Isabella and Andre, drove an hour south to the Johnson Shut-Ins
         in Missouri to camp for two nights, hike, and swim in the flowing
-        rivers. When we arrived, it was pouring rain, which resulted in a
-        "red-flag" warning for the shut-in, meaning no one should enter. We did
-        anyways, and learned quickly that we should have heeded the warning
-        after almost immediately being swept away.
+        rivers. When we arrived, it was pouring rain, triggering a "red-flag"
+        warning for the shut-in, meaning no one should enter. We did anyway, and
+        learned quickly that we should have heeded the warning after being swept
+        away almost immediately.
       </>
     ),
   },
@@ -88,13 +87,14 @@ const TRAVEL_ENTRIES = [
     ],
     body: (
       <>
-        This road trip was and likely will be the most intense trip I have ever
-        gone on. For two weeks, 7 friends and I loaded up an entire mini-van,
-        and drove it 6000+ miles throughout the western US. We camped all but
-        one night, and visited numerous national parks including: The Grand
-        Tetons, Yellowstone, Crater Lake, Hoh Rainforest, Olympic, and Redwoods.
-        We started in Lawrence, Kansas, and drove through 12 states. Besides a
-        flat tire on the first day, we encountered very little problems!
+        This road trip was, and likely will be, the most intense trip I have
+        ever been on. For two weeks, 7 friends and I loaded an entire minivan
+        and drove 6,000+ miles across the western US. We camped all but one
+        night and visited numerous national parks, including the Grand Tetons,
+        Yellowstone, Crater Lake, the Hoh Rainforest, Olympic, and Redwoods. We
+        started in Lawrence, Kansas, and drove through 12 states in a big loop.
+        Besides getting a flat tire on our first day, we encountered very few
+        problems!
       </>
     ),
   },
@@ -110,11 +110,10 @@ const TRAVEL_ENTRIES = [
     ],
     body: (
       <>
-        For our Spring Break, Gabbi, Isabella, Andre and I flew to Puerto Rico
-        to spend our vacation. We went to the beach every day, explored many
-        musesums, and went cliff jumping through a rainforest excursion. The
-        food there was also terrific, I am very much looking forward to going
-        back one day!
+        For our next Spring Break, Gabbi, Isabella, Andre, and I flew to Puerto
+        Rico. We went to the beach every day, explored many museums, and went
+        cliff jumping on a rainforest excursion. The food there was also
+        terrific. I am very much looking forward to going back one day!
       </>
     ),
   },
@@ -125,17 +124,17 @@ const TRAVEL_ENTRIES = [
     images: ["images/travel/vermont1.webp", "images/travel/montreal.webp"],
     body: (
       <>
-        In the early summer of 2025, Conor was heading out to Burlington,
-        Vermont to start his internship at BETA Technologies. He of course
-        needed a car there, so what better vehicle to bring down than his 1996
-        Japanese Kei Truck? Only one condition: Do it all using paper maps. With
-        our North America Atlas in hand, we started the 1,000 mile journey from
-        Evanston, IL to Burlington, Vermont. We stopped in Detroit, Michigan,
+        In early summer 2025, Conor was heading to Burlington, Vermont, to start
+        his internship. He, of course, needed a car there, so what better
+        vehicle to bring down than his 1996 Japanese Kei Truck? Only one
+        condition: Do it all using paper maps. With our North America Atlas in
+        hand, we started the 1,000+ mile journey from Evanston, IL, to
+        Burlington, Vermont. Along the way, we stopped in Detroit, Michigan,
         Toronto, Canada, and Montréal, Quebec before reaching our final
-        destination. The truck only broke down once, after we hit a large puddle
-        which sucked water into our air filter, causing the engine to stall.
-        Montréal was our favorite stop, where we spent two nights there, and
-        explored the city and hiked Mount Royale.
+        destination. The truck only broke down once, after we hit a large
+        puddle, which sucked water into our air filter, causing the engine to
+        die. Montréal was our favorite stop, where we spent two nights, explored
+        the city, and hiked Mount Royal.
       </>
     ),
   },
@@ -145,15 +144,15 @@ const TRAVEL_ENTRIES = [
     images: ["images/travel/texas_trip.webp"],
     body: (
       <>
-        In the last week of summer, Conor was gearing up for his Co-Op at NASA
-        in Houston, Texas, but he knew his mini-truck wouldn't be a viable daily
-        driver, so he purchased a 1984 Volkwagen Westfalia camper van. Us plus
-        our best-friend Jack flew to San-Francisco to pick it up, and drive it
-        the 1,500 miles to Houston, Texas in 4 days. Averageing 8-10 hours of
-        driving per day, we travlled the flatlands of Texas in our untested
-        vehicle with no working taillight assembly. We stopped in two Texas
-        state parks, and one hotel, and made it to Houston with barely enough
-        time to catch our flights back home.
+        In the last week of summer, Conor prepared for his Co-Op in Houston,
+        Texas. Since his mini-truck wasn't suitable for daily driving there, he
+        bought a 1984 Volkswagen Westfalia camper van. We, along with our friend
+        Jack, flew to San Francisco to pick it up and drove 1,500 miles to
+        Houston in 4 days. We averaged 8-10 hours of driving each day, crossing
+        Texas in the untested van without a working taillight, AC, or,
+        unbeknownst to us, adequate coolant. We slept at two Texas state parks,
+        stayed one night in a hotel, and arrived in Houston just in time to
+        catch our flights back home.
       </>
     ),
   },
@@ -164,13 +163,13 @@ const TRAVEL_ENTRIES = [
     images: ["images/travel/ozark.webp"],
     body: (
       <>
-        For Fall Break, 8 friends and I packed two sedans for the 3 hour drive
-        from WashU to the Lake of the Ozarks, MO. We rented an AirBNB for 4
-        nights, bought groceries the first night, and felt what it was like to
-        truly unwind after a tough start to our Junior Year. We swam in the
-        water every day, cooked every night, played board games, and told
+        For Fall Break, 8 friends and I packed two sedans for the 3-hour drive
+        from WashU to the Lake of the Ozarks in Missouri. We rented an AirBnB
+        for 4 nights, bought groceries the first night, and felt what it was
+        like to truly unwind after a tough start to our third year. We swam in
+        the water every day, cooked every night, played board games, and told
         stories by the fire. It was nice to know that such a tranquil place
-        exists not too far from our school.{" "}
+        exists not too far from our school.
       </>
     ),
   },
@@ -186,12 +185,12 @@ const TRAVEL_ENTRIES = [
     ],
     body: (
       <>
-        I am currently an exchange studnt at The University of Edinburgh, where
+        I am currently an exchange student at The University of Edinburgh, where
         I am continuing my study of Computer Science. It has been such an
-        amazing experinece to explore a new country. Edinburgh, UK is an amazing
-        city full of vibrant culture, amazing nature, and so much rain. While
-        abroad, I have a few trips planned such as going to Dublin, Paris,
-        Barcelona, London, and more.
+        amazing experience to live in a new continent. Edinburgh, UK, is a
+        wonderful city full of vibrant culture, stunning natural scenery, and a
+        lot of rain. While abroad, I have many trips planned, such as Dublin,
+        Paris, Barcelona, London, and more.
       </>
     ),
   },
@@ -243,68 +242,10 @@ function MediaTile({ src, eager }) {
   );
 }
 
-function TimelineItem({ entry, idx, isActive, onJump, isLast, btnRef }) {
-  return (
-    <button
-      ref={isLast ? btnRef : null}
-      key={entry.id}
-      onClick={() => onJump(idx)}
-      style={{
-        width: "100%",
-        textAlign: "left",
-        background: "transparent",
-        border: "none",
-        padding: "14px 8px 14px 0",
-        cursor: "pointer",
-        color: "var(--fg)",
-      }}
-    >
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "18px 1fr",
-          gap: "10px",
-          alignItems: "start",
-          position: "relative",
-        }}
-      >
-        {/* tick */}
-        <div
-          aria-hidden
-          style={{
-            width: "12px",
-            height: "2px",
-            marginTop: "9px",
-            borderRadius: 2,
-            background: isActive ? "var(--fg)" : "var(--panel-border)",
-            opacity: isActive ? 0.95 : 0.55,
-            boxShadow: isActive ? "0 10px 22px rgba(0,0,0,0.20)" : "none",
-            transition: "background 220ms ease, opacity 220ms ease",
-          }}
-        />
-
-        <div style={{ opacity: isActive ? 1 : 0.78 }}>
-          <div
-            style={{
-              fontSize: "0.85rem",
-              opacity: 0.8,
-              marginBottom: "2px",
-            }}
-          >
-            {entry.date}
-          </div>
-          <div style={{ fontWeight: 700 }}>{entry.title}</div>
-        </div>
-      </div>
-    </button>
-  );
-}
-
-function EntrySection({ entry, idx, sectionRef, markerRef }) {
+function EntrySection({ entry, idx }) {
   return (
     <section
       key={entry.id}
-      ref={sectionRef}
       style={{
         scrollMarginTop: "110px",
         paddingBottom: "clamp(18px, 3vw, 28px)",
@@ -331,7 +272,6 @@ function EntrySection({ entry, idx, sectionRef, markerRef }) {
         {entry.title}
       </div>
 
-      <div ref={markerRef} aria-hidden style={{ height: 1 }} />
       {/* Image grid */}
       <div
         style={{
@@ -359,8 +299,10 @@ function EntrySection({ entry, idx, sectionRef, markerRef }) {
         ))}
       </div>
 
-      {/* Text area */}
-      <TextPanel title="">{entry.body}</TextPanel>
+      {/* Text */}
+      <TextPanel title="">
+        <div style={{ textAlign: "center" }}>{entry.body}</div>
+      </TextPanel>
 
       {/* Small spacer */}
       <div aria-hidden style={{ height: "clamp(18px, 3vw, 28px)" }} />
@@ -368,106 +310,8 @@ function EntrySection({ entry, idx, sectionRef, markerRef }) {
   );
 }
 
-// -------------------- HOOKS --------------------
-
-function useTimelineLineHeight(entries) {
-  const timelineInnerRef = useRef(null);
-  const lastTimelineBtnRef = useRef(null);
-  const [timelineLineHeight, setTimelineLineHeight] = useState(null);
-
-  useLayoutEffect(() => {
-    const measure = () => {
-      const inner = timelineInnerRef.current;
-      const lastBtn = lastTimelineBtnRef.current;
-      if (!inner || !lastBtn) return;
-      const h = lastBtn.offsetTop + lastBtn.offsetHeight;
-      setTimelineLineHeight(h);
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => {
-      window.removeEventListener("resize", measure);
-    };
-  }, [entries]);
-
-  return { timelineInnerRef, lastTimelineBtnRef, timelineLineHeight };
-}
-
-function useTimelineActive(entries, markerRefs) {
-  const [activeIdx, setActiveIdx] = useState(0);
-  const isJumpingRef = useRef(false);
-  const jumpTargetIdxRef = useRef(0);
-  const jumpUntilRef = useRef(0);
-
-  useEffect(() => {
-    let raf = 0;
-    const updateActive = () => {
-      raf = 0;
-      if (isJumpingRef.current && Date.now() < jumpUntilRef.current) {
-        setActiveIdx(jumpTargetIdxRef.current);
-        return;
-      } else if (isJumpingRef.current) {
-        isJumpingRef.current = false;
-      }
-      const triggerY = TIMELINE_TRIGGER_Y;
-      let bestIdx = 0;
-      let bestTop = -Infinity;
-      for (let i = 0; i < entries.length; i++) {
-        const id = entries[i].id;
-        const el = markerRefs.current[id];
-        if (!el) continue;
-        const top = el.getBoundingClientRect().top;
-        if (top <= triggerY && top > bestTop) {
-          bestTop = top;
-          bestIdx = i;
-        }
-      }
-      setActiveIdx(bestIdx);
-    };
-    const onScrollOrResize = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(updateActive);
-    };
-    updateActive();
-    window.addEventListener("scroll", onScrollOrResize, { passive: true });
-    window.addEventListener("resize", onScrollOrResize);
-    return () => {
-      window.removeEventListener("scroll", onScrollOrResize);
-      window.removeEventListener("resize", onScrollOrResize);
-      if (raf) window.cancelAnimationFrame(raf);
-    };
-  }, [entries, markerRefs]);
-
-  const onJump = (idx) => {
-    const e = entries[idx];
-    setActiveIdx(idx);
-    isJumpingRef.current = true;
-    jumpTargetIdxRef.current = idx;
-    jumpUntilRef.current = Date.now() + JUMP_LOCK_MS;
-    const marker = markerRefs.current[e.id];
-    if (!marker) return;
-    const top = marker.getBoundingClientRect().top + window.scrollY;
-    const targetTop = Math.max(0, top - TIMELINE_TRIGGER_Y);
-    window.scrollTo({ top: targetTop, behavior: "smooth" });
-    window.setTimeout(() => {
-      if (Date.now() >= jumpUntilRef.current) {
-        isJumpingRef.current = false;
-      }
-    }, JUMP_LOCK_MS + 50);
-  };
-
-  return { activeIdx, onJump };
-}
-
 export default function TravelPage() {
   const navigate = useNavigate();
-  const sectionRefs = useRef({});
-  const markerRefs = useRef({});
-
-  // Timeline temporarily disabled
-  // const { timelineInnerRef, lastTimelineBtnRef, timelineLineHeight } =
-  //   useTimelineLineHeight(TRAVEL_ENTRIES);
-  // const { activeIdx, onJump } = useTimelineActive(TRAVEL_ENTRIES, markerRefs);
 
   return (
     <PageShell title="Travel" onBack={() => navigate("/")}>
@@ -487,92 +331,6 @@ export default function TravelPage() {
             // alignItems: "flex-start",
           }}
         >
-          {/* 
-          <div
-            style={{
-              flex: "0 0 280px",
-              flexShrink: 0,
-              alignSelf: "flex-start",
-              paddingTop: "6px",
-              position: "relative",
-            }}
-          >
-            <div
-              style={{
-                position: "sticky",
-                top: 24,
-                left: 0,
-              }}
-            >
-              <div
-                ref={timelineInnerRef}
-                style={{
-                  position: "relative",
-                  paddingLeft: "18px",
-                }}
-              >
-                <div
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    left: "7px",
-                    top: 0,
-                    height: timelineLineHeight
-                      ? `${timelineLineHeight}px`
-                      : "100%",
-                    bottom: "auto",
-                    width: "2px",
-                    background: "var(--panel-border)",
-                    opacity: 0.75,
-                    borderRadius: "2px",
-                  }}
-                />
-                <div
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    left: "3px",
-                    top: "-6px",
-                    width: 0,
-                    height: 0,
-                    borderLeft: "5px solid transparent",
-                    borderRight: "5px solid transparent",
-                    borderBottom: "6px solid var(--panel-border)",
-                    opacity: 0.75,
-                  }}
-                />
-                <div
-                  aria-hidden
-                  style={{
-                    position: "absolute",
-                    left: "3px",
-                    top: timelineLineHeight
-                      ? timelineLineHeight - 0
-                      : "calc(100% - 0px)",
-                    transform: "translateY(-0px)",
-                    width: 0,
-                    height: 0,
-                    borderLeft: "5px solid transparent",
-                    borderRight: "5px solid transparent",
-                    borderTop: "6px solid var(--panel-border)",
-                    opacity: 0.75,
-                  }}
-                />
-                {TRAVEL_ENTRIES.map((entry, idx) => (
-                  <TimelineItem
-                    key={entry.id}
-                    entry={entry}
-                    idx={idx}
-                    isActive={idx === activeIdx}
-                    onJump={onJump}
-                    isLast={idx === TRAVEL_ENTRIES.length - 1}
-                    btnRef={lastTimelineBtnRef}
-                  />
-                ))}
-              </div>
-            </div>
-          </div> */}
-
           {/* Content */}
           <div
             style={{
@@ -583,17 +341,7 @@ export default function TravelPage() {
             }}
           >
             {TRAVEL_ENTRIES.map((entry, idx) => (
-              <EntrySection
-                key={entry.id}
-                entry={entry}
-                idx={idx}
-                sectionRef={(node) => {
-                  if (node) sectionRefs.current[entry.id] = node;
-                }}
-                markerRef={(node) => {
-                  if (node) markerRefs.current[entry.id] = node;
-                }}
-              />
+              <EntrySection key={entry.id} entry={entry} idx={idx} />
             ))}
           </div>
         </div>
