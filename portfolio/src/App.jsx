@@ -268,7 +268,15 @@ function Landing({ theme, setTheme }) {
       ),
     };
   });
-  const [terminalSize, setTerminalSize] = useState({ w: 0, h: 0 });
+  const [terminalSize, setTerminalSize] = useState(() => {
+    if (typeof window === "undefined") return { w: 0, h: 0 };
+    const vw = window.innerWidth || 1200;
+    const vh = window.innerHeight || 800;
+    return {
+      w: Math.min(733, vw * 0.8712),
+      h: Math.min(554, vh * 0.693),
+    };
+  });
   const draggingRef = useRef({ active: false, dx: 0, dy: 0 });
   const inputRef = useRef(null);
   const titlePillRef = useRef(null);
@@ -783,7 +791,7 @@ function Landing({ theme, setTheme }) {
 
   function runCommand(raw) {
     const cmd = normalizeKeyword(raw);
-    // Easter egg: allow `cd <keyword>` as an alias for navigating to a keyword
+    // Allow `cd <keyword>` as an alias for navigating to a keyword
     let effectiveCmd = cmd;
     if (cmd.startsWith("cd ")) {
       const target = normalizeKeyword(cmd.slice(3));
@@ -791,6 +799,17 @@ function Landing({ theme, setTheme }) {
     }
 
     if (!effectiveCmd) return;
+
+    // Jacob
+    if (effectiveCmd === "jacob") {
+      setHistory((h) => [
+        ...h,
+        { type: "prompt", text: `nasir % ${raw}` },
+        { type: "output", text: "Look out!!!" },
+      ]);
+      setShowTip(false);
+      return;
+    }
 
     if (effectiveCmd === "lightmode" || effectiveCmd === "darkmode") {
       const next = effectiveCmd === "lightmode" ? "light" : "dark";
@@ -1427,7 +1446,13 @@ function Landing({ theme, setTheme }) {
             <div
               style={{
                 position: "absolute",
-                left: terminalPos.x + terminalSize.w / 2,
+                left:
+                  terminalPos.x +
+                  (terminalSize.w ||
+                    (typeof window !== "undefined"
+                      ? Math.min(733, (window.innerWidth || 1200) * 0.8712)
+                      : 733)) /
+                    2,
                 top: Math.min(
                   (typeof window !== "undefined" ? window.innerHeight : 800) -
                     (titlePillH + 14),
@@ -2130,6 +2155,30 @@ function Landing({ theme, setTheme }) {
                         } else {
                           setInput(list[cmdIndexRef.current] || "");
                         }
+                      }}
+                      onBlur={() => {
+                        // Keep the terminal ready for typing on desktop.
+                        // Do not steal focus while overlays are open or on touch UI.
+                        if (isTouchUI || isSidebarOpen || contactModalOpen)
+                          return;
+
+                        window.setTimeout(() => {
+                          const el = document.activeElement;
+                          const tag = el?.tagName;
+                          const isRealField =
+                            tag === "INPUT" ||
+                            tag === "TEXTAREA" ||
+                            el?.getAttribute?.("contenteditable") === "true";
+                          const isInteractive =
+                            isRealField ||
+                            tag === "BUTTON" ||
+                            tag === "A" ||
+                            tag === "SELECT";
+
+                          // If focus moved to an interactive element, respect it.
+                          // Otherwise, refocus the terminal so typing always works.
+                          if (!isInteractive) focusInput();
+                        }, 0);
                       }}
                       autoFocus
                       spellCheck={false}
