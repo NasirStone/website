@@ -15,6 +15,9 @@ const MONO = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 // but can be overridden via Vite env var VITE_RESUME_URL.
 const RESUME_URL = (import.meta?.env?.VITE_RESUME_URL || "/resume.pdf").trim();
 
+// Mock present working directory for 'pwd' command.
+const MOCK_PWD = "/Users/nasir/portfolio";
+
 // Terminal text for the `contact` keyword.
 const CONTACT_STORY = [
   { type: "output", text: "" },
@@ -807,6 +810,16 @@ function Landing({ theme, setTheme }) {
       return;
     }
 
+    if (effectiveCmd === "pwd") {
+      setHistory((h) => [
+        ...h,
+        { type: "prompt", text: `nasir % ${raw}` },
+        { type: "output", text: MOCK_PWD },
+      ]);
+      setShowTip(false);
+      return;
+    }
+
     if (effectiveCmd === "ls") {
       const list = sortedKeywords;
       const cols = isCompact ? 2 : 4;
@@ -849,6 +862,7 @@ function Landing({ theme, setTheme }) {
         { type: "output", text: "  <keyword>        open a page" },
         { type: "output", text: "  help             show this message" },
         { type: "output", text: "  ls               list available keywords" },
+        { type: "output", text: "  pwd              show current directory" },
         { type: "output", text: "  clear            clear terminal output" },
         { type: "output", text: "  lightmode        switch to light mode" },
         { type: "output", text: "  darkmode         switch to dark mode" },
@@ -1039,7 +1053,7 @@ function Landing({ theme, setTheme }) {
         focusInput();
       }}
     >
-      <ThemeToggle />
+      {isTouchUI ? <ThemeToggle /> : null}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap');
         .sidebarOverlay {
@@ -1076,8 +1090,8 @@ function Landing({ theme, setTheme }) {
         }
         .sidebarTouch {
           position: relative;
-          width: min(520px, calc(100% - 32px));
-          max-height: calc(100vh - 24px);
+          width: min(560px, calc(100% - 24px));
+  max-height: calc(100svh - 220px);
           overflow: auto;
           border-radius: 14px;
           border: 1px solid ${
@@ -1107,11 +1121,11 @@ function Landing({ theme, setTheme }) {
           padding: 0.70rem 0.78rem;
         }
         @media (max-width: 640px) {
-          .sidebarTouch {
-            width: calc(100% - 36px);
-            max-height: calc(100vh - 20px);
-          }
-        }
+  .sidebarTouch {
+    width: calc(100% - 24px);
+    max-height: calc(100svh - 220px);
+  }
+}
         .sidebarIn {
           transform: translateX(0);
           opacity: 1;
@@ -1611,22 +1625,24 @@ function Landing({ theme, setTheme }) {
           style={{
             position: "relative",
             zIndex: 6,
-            minHeight: "100vh",
+            minHeight: "100svh",
+            height: "100svh",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "flex-start",
-            paddingTop: "clamp(28px, 10vh, 90px)",
-            paddingLeft: "18px",
-            paddingRight: "18px",
-            paddingBottom: "24px",
+            justifyContent: "center",
+            paddingTop: "calc(18px + env(safe-area-inset-top))",
+            paddingLeft: "16px",
+            paddingRight: "16px",
+            paddingBottom: "calc(18px + env(safe-area-inset-bottom))",
             gap: 14,
           }}
         >
           <div
             style={{
               fontFamily: SANS,
-              fontSize: "clamp(3.0rem, 9vw, 4.4rem)",
+              fontSize: "clamp(3.4rem, 10.5vw, 5.2rem)",
+              maxWidth: "min(94vw, 620px)",
               fontWeight: 650,
               letterSpacing: "-0.04em",
               lineHeight: 1.05,
@@ -1642,7 +1658,6 @@ function Landing({ theme, setTheme }) {
                   ? "rgba(18, 10, 12, 0.92)"
                   : "rgba(245,245,245,0.96)",
               textAlign: "center",
-              maxWidth: "min(92vw, 520px)",
               marginTop: "0px",
             }}
           >

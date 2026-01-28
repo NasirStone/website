@@ -253,7 +253,8 @@ function EntrySection({ entry, idx }) {
     >
       <div
         style={{
-          fontSize: "0.85rem",
+          fontSize: "clamp(0.95rem, 3.2vw, 1.05rem)",
+          lineHeight: 1.4,
           opacity: 0.75,
           marginBottom: "8px",
         }}
@@ -263,7 +264,7 @@ function EntrySection({ entry, idx }) {
 
       <div
         style={{
-          fontSize: "clamp(1.4rem, 2.2vw, 2.1rem)",
+          fontSize: "clamp(1.65rem, 5.2vw, 2.2rem)",
           fontWeight: 800,
           letterSpacing: "-0.01em",
           marginBottom: "10px",
@@ -273,15 +274,7 @@ function EntrySection({ entry, idx }) {
       </div>
 
       {/* Image grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            entry.images.length >= 2 ? "repeat(2, minmax(0, 1fr))" : "1fr",
-          gap: "14px",
-          marginBottom: "14px",
-        }}
-      >
+      <div className={`travelGrid ${entry.images.length === 1 ? "one" : ""}`}>
         {entry.images.map((src, i) => (
           <div
             key={`${entry.id}-${src}-${i}`}
@@ -301,7 +294,16 @@ function EntrySection({ entry, idx }) {
 
       {/* Text */}
       <TextPanel title="">
-        <div style={{ textAlign: "center" }}>{entry.body}</div>
+        <div
+          style={{
+            textAlign: "center",
+            fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
+            lineHeight: 1.7,
+            wordBreak: "break-word",
+          }}
+        >
+          {entry.body}
+        </div>
       </TextPanel>
 
       {/* Small spacer */}
@@ -315,6 +317,22 @@ export default function TravelPage() {
 
   return (
     <PageShell title="Travel" onBack={() => navigate("/")}>
+      <style>{`
+        .travelGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+          margin-bottom: 14px;
+        }
+        .travelGrid.one {
+          grid-template-columns: 1fr;
+        }
+        @media (max-width: 520px) {
+          .travelGrid {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
       <div
         style={{
           width: "100%",

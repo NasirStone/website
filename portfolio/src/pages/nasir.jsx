@@ -30,6 +30,7 @@ export default function NasirPage() {
             .aboutLayout {
               flex-direction: column;
               align-items: center;
+              gap: clamp(20px, 4vw, 36px);
             }
           }
         `}</style>
@@ -43,27 +44,35 @@ export default function NasirPage() {
           />
 
           <TextPanel title="About me">
-            Hi, I'm Nasir! I'm a Junior studying Computer Science, with a minor
-            in Film & Media Studies at Washington University in St. Louis.
-            <br />
-            <br />
-            At WashU, I am involved in our High-Powered Rocketry team,
-            WURocketry, where I serve as Chief Safety Officer. I also
-            participated in an Autonomous Vehicle Research lab that aims to
-            develop safer agents through rapid, iterative simulations in CARLA
-            and a 1:8-scale city model. I also serve as an Information Security
-            GRC Analyst for WashU's IT department, and I am the Head Teaching
-            Assistant for MGT2001 - Introduction to Business Fundamentals.
-            <br />
-            <br />
-            Outside of school, I love fixing things and getting my hands dirty.
-            I repair anything from cars and bikes, to vintage audio equipment. I
-            love road trips (my longest was 6,000+ miles), I collect all
-            different music formats, and I have a pet lizard whom I adore very
-            much.
-            <br />
-            <br />I built this website not only to showcase my software
-            projects, but also to reveal my interests. Thanks for visiting!
+            <div
+              style={{
+                fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
+                lineHeight: 1.7,
+                wordBreak: "break-word",
+              }}
+            >
+              Hi, I'm Nasir! I'm a Junior studying Computer Science, with a minor
+              in Film & Media Studies at Washington University in St. Louis.
+              <br />
+              <br />
+              At WashU, I am involved in our High-Powered Rocketry team,
+              WURocketry, where I serve as Chief Safety Officer. I also
+              participated in an Autonomous Vehicle Research lab that aims to
+              develop safer agents through rapid, iterative simulations in CARLA
+              and a 1:8-scale city model. I also serve as an Information Security
+              GRC Analyst for WashU's IT department, and I am the Head Teaching
+              Assistant for MGT2001 - Introduction to Business Fundamentals.
+              <br />
+              <br />
+              Outside of school, I love fixing things and getting my hands dirty.
+              I repair anything from cars and bikes, to vintage audio equipment. I
+              love road trips (my longest was 6,000+ miles), I collect all
+              different music formats, and I have a pet lizard whom I adore very
+              much.
+              <br />
+              <br />I built this website not only to showcase my software
+              projects, but also to reveal my interests. Thanks for visiting!
+            </div>
           </TextPanel>
         </div>
       </div>

@@ -54,8 +54,9 @@ const styles = {
     overflowX: "hidden",
     position: "relative",
     touchAction: "pan-y",
-    fontSize: "1.08rem",
+    fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
     lineHeight: 1.7,
+    wordBreak: "break-word",
   },
   centerRow: {
     width: "100%",
@@ -70,14 +71,17 @@ const styles = {
   },
   centeredPanelBody: {
     textAlign: "center",
-    fontSize: "1.08rem",
+    fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
     lineHeight: 1.7,
     opacity: 0.9,
+    wordBreak: "break-word",
   },
   constrainedBody: {
     maxWidth: "820px",
     margin: "0 auto",
     opacity: 0.95,
+    fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
+    lineHeight: 1.7,
   },
 };
 
@@ -90,9 +94,9 @@ function CenteredPanel({ title, children, panelStyle }) {
     <TextPanel
       title={title}
       style={{
-        fontSize: "1.08rem",
         lineHeight: 1.7,
         textAlign: "center",
+        wordBreak: "break-word",
         ...(panelStyle || {}),
       }}
     >
@@ -349,7 +353,14 @@ export default function RocketryPage() {
                   pointerEvents: "auto",
                 }}
               >
-                <TextPanel style={{ textAlign: "center", fontSize: "1.1rem" }}>
+                <TextPanel
+                  style={{
+                    textAlign: "center",
+                    fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
+                    lineHeight: 1.7,
+                    wordBreak: "break-word",
+                  }}
+                >
                   WURocketry is Washington University in St. Louis's
                   High-Powered Rocketry team. In my freshman year, I was a
                   member of the Avionics subteam, where I led the development of
@@ -463,7 +474,14 @@ export default function RocketryPage() {
               <SectionHeading style={{ margin: "0 0 12px" }}>
                 Ursa Major (2024-2025)
               </SectionHeading>
-              <TextPanel style={styles.centeredPanelBody}>
+              <TextPanel
+                style={{
+                  ...styles.centeredPanelBody,
+                  fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
+                  lineHeight: 1.7,
+                  wordBreak: "break-word",
+                }}
+              >
                 Ursa Major is WURocketry's 2024-2025 NASA Student Launch
                 vehicle. Ursa is a reusable, innovative, high-powered rocket
                 designed to fly repeatedly, recover cleanly, and serve as a

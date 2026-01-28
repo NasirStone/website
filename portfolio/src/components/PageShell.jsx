@@ -56,11 +56,17 @@ export default function PageShell({
               background: "var(--panel-bg)",
               border: "1px solid var(--panel-border)",
               color: "var(--fg)",
-              borderRadius: 10,
-              padding: "0.55rem 0.8rem",
+              borderRadius: 12,
+              padding:
+                "clamp(0.63rem, 1.8vw, 0.86rem) clamp(0.86rem, 2.7vw, 1.04rem)",
               cursor: "pointer",
               fontFamily: MONO,
-              fontSize: "0.85rem",
+              fontSize: "clamp(0.88rem, 2.5vw, 0.98rem)",
+              minHeight: "clamp(44px, 6.5vh, 50px)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.45rem",
+              WebkitTapHighlightColor: "transparent",
             }}
           >
             ← Back to terminal

@@ -24,23 +24,40 @@ export default function VintageAudioPage() {
           <span style={{ fontFamily: MONO }}>Vintage Audio Repair Log</span>
         }
       >
-        I have always loved fixing things, but this hobby has usually consisted
-        of mechanical objects (cars, bikes, computers). As I grew my physical
-        music collection to over 150+ items in all different formats, it was
-        only a matter of time before obtaining the devices to play them would
-        pique my interest. Electrical work has never been my forte, but taking
-        on these projects has given me so much knowledge through trial and error
-        and self-learning. What I love most about fixing vintage technology is
-        that it is generally built with much more care and serviceability in
-        mind. While parts may be difficult to source at times, there is often a
-        dedicated and passionate community that is always available to help with
-        any device.
-        <br />
-        <br />
-        The list below serves as an updated log of the audio projects I have:
+        <div
+          style={{
+            fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
+            lineHeight: 1.7,
+            wordBreak: "break-word",
+          }}
+        >
+          I have always loved fixing things, but this hobby has usually
+          consisted of mechanical objects (cars, bikes, computers). As I grew my
+          physical music collection to over 150+ items in all different formats,
+          it was only a matter of time before obtaining the devices to play them
+          would pique my interest. Electrical work has never been my forte, but
+          taking on these projects has given me so much knowledge through trial
+          and error and self-learning. What I love most about fixing vintage
+          technology is that it is generally built with much more care and
+          serviceability in mind. While parts may be difficult to source at
+          times, there is often a dedicated and passionate community that is
+          always available to help with any device.
+          <br />
+          <br />
+          The list below serves as an updated log of the audio projects I have:
+        </div>
       </TextPanel>
       <TextPanel marginTop="1rem" title="My Repair Projects">
-        <div style={{ display: "grid", gap: "1.5rem", maxWidth: "900px" }}>
+        <div
+          style={{
+            display: "grid",
+            gap: "1.75rem",
+            maxWidth: "900px",
+            fontSize: "clamp(1.0rem, 3.4vw, 1.1rem)",
+            lineHeight: 1.65,
+            wordBreak: "break-word",
+          }}
+        >
           <div>
             <div style={{ fontWeight: 700, marginBottom: "0.25rem" }}>
               Sony Separates{" "}
@@ -48,7 +65,7 @@ export default function VintageAudioPage() {
                 (Sony TA AV421, Sony TC WR31, Sony CDP C221, Sony ST S222)
               </span>
             </div>
-            <div style={{ opacity: 0.9 }}>
+            <div style={{ opacity: 0.9, lineHeight: 1.65 }}>
               <b>Condition:</b> Seller stated was affected by power surge; none
               of the units power on.
               <br />
@@ -63,6 +80,7 @@ export default function VintageAudioPage() {
                 images={["images/vintageaudio/sony.webp"]}
                 columns={2}
                 aspect="4 / 3"
+                responsive
               />
             </div>
           </div>
@@ -71,7 +89,7 @@ export default function VintageAudioPage() {
             <div style={{ fontWeight: 700, marginBottom: "0.25rem" }}>
               Sony Walkman <span style={{ opacity: 0.75 }}>(WM-4)</span>
             </div>
-            <div style={{ opacity: 0.9 }}>
+            <div style={{ opacity: 0.9, lineHeight: 1.65 }}>
               <b>Condition:</b> Heavy battery corrosion, tape transport issues,
               high-pitched output. Destroyed my favorite tape.
               <br />
@@ -85,6 +103,7 @@ export default function VintageAudioPage() {
                 images={["images/vintageaudio/walkman.webp"]}
                 columns={2}
                 aspect="4 / 3"
+                responsive
               />
             </div>
           </div>
@@ -93,7 +112,7 @@ export default function VintageAudioPage() {
             <div style={{ fontWeight: 700, marginBottom: "0.25rem" }}>
               Pioneer Receiver <span style={{ opacity: 0.75 }}>(SX-650)</span>
             </div>
-            <div style={{ opacity: 0.9 }}>
+            <div style={{ opacity: 0.9, lineHeight: 1.65 }}>
               <b>Condition:</b> Phono channel inoperable, peeling wood veneer,
               rust.
               <br />
@@ -107,6 +126,7 @@ export default function VintageAudioPage() {
                 images={["images/vintageaudio/pioneer.webp"]}
                 columns={2}
                 aspect="4 / 3"
+                responsive
               />
             </div>
           </div>
@@ -116,7 +136,7 @@ export default function VintageAudioPage() {
               Nakamichi Cassette Deck{" "}
               <span style={{ opacity: 0.75 }}>(CR-1A)</span>
             </div>
-            <div style={{ opacity: 0.9 }}>
+            <div style={{ opacity: 0.9, lineHeight: 1.65 }}>
               <b>Condition:</b> Unknown
               <br />
               <b>Work:</b> Not performed.
@@ -128,6 +148,7 @@ export default function VintageAudioPage() {
                 images={["images/vintageaudio/nakamichi.webp"]}
                 columns={2}
                 aspect="4 / 3"
+                responsive
               />
             </div>
           </div>
@@ -136,7 +157,7 @@ export default function VintageAudioPage() {
       <div
         style={{
           marginTop: "1.25rem",
-          fontSize: "0.9rem",
+          fontSize: "clamp(0.95rem, 3.2vw, 1.05rem)",
           opacity: 0.6,
           maxWidth: "900px",
         }}
