@@ -202,9 +202,15 @@ function Landing({ theme, setTheme }) {
       const parsed = raw ? JSON.parse(raw) : null;
       return Array.isArray(parsed)
         ? parsed
-        : [{ type: "system", text: "Nasir Sims Portfolio [Version Beta]" }];
+        : [
+            { type: "system", text: "Nasir Sims Portfolio [Version Beta]" },
+            { type: "system", text: "Type help to learn more" },
+          ];
     } catch {
-      return [{ type: "system", text: "Nasir Sims Portfolio [Version Beta]" }];
+      return [
+        { type: "system", text: "Nasir Sims Portfolio [Version Beta]" },
+        { type: "system", text: "Type help to learn more" },
+      ];
     }
   });
   const [showTip, setShowTip] = useState(() => {
@@ -262,6 +268,8 @@ function Landing({ theme, setTheme }) {
   const [terminalSize, setTerminalSize] = useState({ w: 0, h: 0 });
   const draggingRef = useRef({ active: false, dx: 0, dy: 0 });
   const inputRef = useRef(null);
+  const titlePillRef = useRef(null);
+  const [titlePillH, setTitlePillH] = useState(76);
 
   const cmdHistoryRef = useRef([]);
   const cmdIndexRef = useRef(-1); // -1 = not browsing history
@@ -293,14 +301,30 @@ function Landing({ theme, setTheme }) {
   const [isDragging, setIsDragging] = useState(false);
   const settleTimerRef = useRef(null);
 
-  const [isCompact, setIsCompact] = useState(() => {
+  function computeIsCompact() {
     if (typeof window === "undefined") return false;
-    return window.innerWidth < 640;
-  });
-  const [isTouchUI, setIsTouchUI] = useState(() => {
+    try {
+      return window.matchMedia("(max-width: 640px)").matches;
+    } catch {
+      return window.innerWidth < 640;
+    }
+  }
+
+  function computeIsTouchUI() {
     if (typeof window === "undefined") return false;
-    return window.innerWidth < 920;
-  });
+    try {
+      // Primary: viewport width. Fallback: coarse pointer devices (phones/tablets).
+      return (
+        window.matchMedia("(max-width: 920px)").matches ||
+        window.matchMedia("(pointer: coarse)").matches
+      );
+    } catch {
+      return window.innerWidth < 920;
+    }
+  }
+
+  const [isCompact, setIsCompact] = useState(() => computeIsCompact());
+  const [isTouchUI, setIsTouchUI] = useState(() => computeIsTouchUI());
 
   useEffect(() => {
     // initialize size immediately
@@ -317,8 +341,8 @@ function Landing({ theme, setTheme }) {
     function onResize() {
       const vw = window.innerWidth || 1200;
       const vh = window.innerHeight || 800;
-      setIsCompact(vw < 640);
-      setIsTouchUI(vw < 920);
+      setIsCompact(computeIsCompact());
+      setIsTouchUI(computeIsTouchUI());
 
       const w = Math.min(733, vw * 0.8712);
       const h = Math.min(554, vh * 0.693);
@@ -334,7 +358,11 @@ function Landing({ theme, setTheme }) {
     }
 
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
+    };
   }, []);
 
   useEffect(() => {
@@ -550,8 +578,8 @@ function Landing({ theme, setTheme }) {
 
   useEffect(() => {
     const top = "Nasir Sims";
-    const bottom =
-      "Type a highlighted word into the terminal to access a page. Type 'help' to learn more.";
+    // const bottom =
+    //   "Type a highlighted word into the terminal to access a page.";
     let cancelled = false;
 
     function typeLine(line, setLine, onDone, speed = 1) {
@@ -583,28 +611,46 @@ function Landing({ theme, setTheme }) {
 
     typeLine(top, setBgTopText, () => {
       if (cancelled) return;
+      setBgStage("done");
 
-      setBgStage("bottom");
+      // setBgStage("bottom");
 
-      setTimeout(() => {
-        if (cancelled) return;
+      // setTimeout(() => {
+      //   if (cancelled) return;
 
-        typeLine(
-          bottom,
-          setBgBottomText,
-          () => {
-            if (cancelled) return;
-            setBgStage("done");
-          },
-          1.6
-        );
-      }, 120);
+      //   typeLine(
+      //     bottom,
+      //     setBgBottomText,
+      //     () => {
+      //       if (cancelled) return;
+      //       setBgStage("done");
+      //     },
+      //     1.6
+      //   );
+      // }, 120);
     });
 
     return () => {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    function measure() {
+      try {
+        const el = titlePillRef.current;
+        if (!el) return;
+        const h = el.getBoundingClientRect().height;
+        if (h && Number.isFinite(h)) setTitlePillH(Math.max(40, Math.round(h)));
+      } catch {
+        // ignore
+      }
+    }
+
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [bgTopText, theme]);
 
   function formatColumns(items, cols) {
     const list = items.slice();
@@ -1030,7 +1076,7 @@ function Landing({ theme, setTheme }) {
         }
         .sidebarTouch {
           position: relative;
-          width: min(420px, calc(100% - 36px));
+          width: min(520px, calc(100% - 32px));
           max-height: calc(100vh - 24px);
           overflow: auto;
           border-radius: 14px;
@@ -1052,6 +1098,13 @@ function Landing({ theme, setTheme }) {
           transition: none;
           box-sizing: border-box;
           margin: 0 auto;
+        }
+        .sidebarTouch .sidebarHeader {
+          font-size: 0.95rem;
+        }
+        .sidebarTouch .keywordBtn {
+          font-size: 1.02rem;
+          padding: 0.70rem 0.78rem;
         }
         @media (max-width: 640px) {
           .sidebarTouch {
@@ -1176,6 +1229,7 @@ function Landing({ theme, setTheme }) {
           padding: 0;
           background: var(--page-bg);
           overflow: hidden;
+          -webkit-text-size-adjust: 100%;
         }
         @keyframes wordFade {
           0% { opacity: var(--min-opacity); filter: blur(0px); }
@@ -1186,6 +1240,30 @@ function Landing({ theme, setTheme }) {
         @keyframes blockBlink {
           0%, 49% { opacity: 1; }
           50%, 100% { opacity: 0; }
+        }
+        /* Terminal traffic-light glyphs (show on hover like macOS) */
+        @media (hover: hover) {
+          .terminalHeader .trafficDot {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .terminalHeader .trafficDot::after {
+            opacity: 0;
+            transition: opacity 140ms ease;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 9px;
+            line-height: 1;
+            color: rgba(0,0,0,0.85);
+            text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+          }
+          .terminalHeader:hover .trafficDot::after {
+            opacity: 0.85;
+          }
+          .terminalHeader .trafficRed::after { content: "×"; }
+          .terminalHeader .trafficYellow::after { content: "–"; }
+          .terminalHeader .trafficGreen::after { content: "+"; }
         }
         .terminalWindow {
   width: min(733px, 87.12vw);
@@ -1331,25 +1409,24 @@ function Landing({ theme, setTheme }) {
             }}
             aria-hidden="true"
           >
-            {/* top line */}
+            {/* top line (anchored to terminal) */}
             <div
               style={{
                 position: "absolute",
-                left: "50%",
-                top:
-                  typeof window !== "undefined"
-                    ? (isTabletLike(window.innerWidth, window.innerHeight)
-                        ? 78
-                        : 110) +
-                      tabletYOffset(window.innerWidth, window.innerHeight)
-                    : 110,
+                left: terminalPos.x + terminalSize.w / 2,
+                top: Math.min(
+                  (typeof window !== "undefined" ? window.innerHeight : 800) -
+                    (titlePillH + 14),
+                  Math.max(14, Math.round(terminalPos.y - titlePillH - 18))
+                ),
                 transform: "translateX(-50%)",
                 width: "fit-content",
                 maxWidth: "min(1100px, calc(100vw - 24px))",
                 textAlign: "left",
-                opacity: 0.92,
+                opacity: isDragging ? 0 : 0.92,
+                transition: `opacity ${isDragging ? 140 : 650}ms ease`,
                 fontFamily: SANS,
-                fontSize: "clamp(2.4rem, 6vw, 4.2rem)",
+                fontSize: "clamp(2.0rem, 5.4vw, 4.2rem)",
                 fontWeight: 600,
                 letterSpacing: "-0.05em",
                 lineHeight: "1.2",
@@ -1360,6 +1437,7 @@ function Landing({ theme, setTheme }) {
               }}
             >
               <span
+                ref={titlePillRef}
                 style={{
                   position: "relative",
                   display: "inline-flex",
@@ -1372,7 +1450,6 @@ function Landing({ theme, setTheme }) {
                   backdropFilter: "blur(14px)",
                   WebkitBackdropFilter: "blur(14px)",
                   boxShadow: FROST_SHADOW,
-                  // Harmonize title text with bottom hint:
                   color:
                     theme === "light"
                       ? "rgba(18, 10, 12, 0.92)"
@@ -1403,7 +1480,8 @@ function Landing({ theme, setTheme }) {
               </span>
             </div>
 
-            {/* bottom line */}
+            {/*
+            bottom line
             <div
               style={{
                 position: "absolute",
@@ -1461,7 +1539,9 @@ function Landing({ theme, setTheme }) {
                     gap: 0,
                   }}
                 >
-                  <span style={{ display: "inline-block" }}>{bgBottomText}</span>
+                  <span style={{ display: "inline-block" }}>
+                    {bgBottomText}
+                  </span>
                   {bgStage === "bottom" ? (
                     <span
                       aria-hidden="true"
@@ -1481,6 +1561,7 @@ function Landing({ theme, setTheme }) {
                 </span>
               </span>
             </div>
+            */}
           </div>
         </>
       ) : null}
@@ -1534,16 +1615,18 @@ function Landing({ theme, setTheme }) {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
+            justifyContent: "flex-start",
+            paddingTop: "clamp(28px, 10vh, 90px)",
             paddingLeft: "18px",
             paddingRight: "18px",
-            gap: 16,
+            paddingBottom: "24px",
+            gap: 14,
           }}
         >
           <div
             style={{
               fontFamily: SANS,
-              fontSize: "clamp(2.4rem, 6.5vw, 3.6rem)",
+              fontSize: "clamp(3.0rem, 9vw, 4.4rem)",
               fontWeight: 650,
               letterSpacing: "-0.04em",
               lineHeight: 1.05,
@@ -1559,9 +1642,8 @@ function Landing({ theme, setTheme }) {
                   ? "rgba(18, 10, 12, 0.92)"
                   : "rgba(245,245,245,0.96)",
               textAlign: "center",
-
-              /* raise the title */
-              marginTop: "-48px",
+              maxWidth: "min(92vw, 520px)",
+              marginTop: "0px",
             }}
           >
             Nasir Sims
@@ -1773,6 +1855,7 @@ function Landing({ theme, setTheme }) {
           >
             {/* terminal header */}
             <div
+              className="terminalHeader"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -1817,25 +1900,28 @@ function Landing({ theme, setTheme }) {
             >
               <div style={{ display: "flex", gap: 8 }}>
                 <span
+                  className="trafficDot trafficRed"
                   style={{
-                    width: 12,
-                    height: 12,
+                    width: 12.6,
+                    height: 12.6,
                     borderRadius: 999,
                     background: "rgba(255, 95, 86, 0.9)",
                   }}
                 />
                 <span
+                  className="trafficDot trafficYellow"
                   style={{
-                    width: 12,
-                    height: 12,
+                    width: 12.6,
+                    height: 12.6,
                     borderRadius: 999,
                     background: "rgba(255, 189, 46, 0.9)",
                   }}
                 />
                 <span
+                  className="trafficDot trafficGreen"
                   style={{
-                    width: 12,
-                    height: 12,
+                    width: 12.6,
+                    height: 12.6,
                     borderRadius: 999,
                     background: "rgba(39, 201, 63, 0.9)",
                   }}
