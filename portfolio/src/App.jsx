@@ -264,7 +264,7 @@ function Landing({ theme, setTheme }) {
       x: Math.max(12, Math.round(vw / 2 - w / 2)),
       y: Math.max(
         minTerminalY(vw, vh),
-        Math.round(vh / 2 - h / 2 + 18 + tabletYOffset(vw, vh))
+        Math.round(vh / 2 - h / 2 + 18 + tabletYOffset(vw, vh)),
       ),
     };
   });
@@ -302,7 +302,7 @@ function Landing({ theme, setTheme }) {
     try {
       sessionStorage.setItem(
         "terminalCmdHistory",
-        JSON.stringify(cmdHistoryRef.current.slice(-200))
+        JSON.stringify(cmdHistoryRef.current.slice(-200)),
       );
     } catch {
       // ignore
@@ -562,7 +562,7 @@ function Landing({ theme, setTheme }) {
             top: `${s.topPct}%`,
             fontSize: `${Math.max(
               0.95,
-              isSmall ? s.fontSizeRem * 0.65 : s.fontSizeRem * 0.85
+              isSmall ? s.fontSizeRem * 0.65 : s.fontSizeRem * 0.85,
             ).toFixed(2)}rem`,
             animationDuration: s.animationDuration,
             animationDelay: s.animationDelay,
@@ -874,7 +874,7 @@ function Landing({ theme, setTheme }) {
         },
         {
           type: "output",
-          text: "Find keywords in the background, the menu button (top-left), or by running 'ls'",
+          text: "Find keywords in the background, the menu button (top-left), or by running ls",
         },
         { type: "output", text: "" },
         { type: "output", text: "Usage:" },
@@ -1065,7 +1065,7 @@ function Landing({ theme, setTheme }) {
         // Don't steal focus from interactive elements
         if (e.target && typeof e.target.closest === "function") {
           const interactive = e.target.closest(
-            "button,a,input,textarea,select,[role='dialog']"
+            "button,a,input,textarea,select,[role='dialog']",
           );
           if (interactive) return;
         }
@@ -1456,7 +1456,7 @@ function Landing({ theme, setTheme }) {
                 top: Math.min(
                   (typeof window !== "undefined" ? window.innerHeight : 800) -
                     (titlePillH + 14),
-                  Math.max(14, Math.round(terminalPos.y - titlePillH - 18))
+                  Math.max(14, Math.round(terminalPos.y - titlePillH - 18)),
                 ),
                 transform: "translateX(-50%)",
                 width: "fit-content",
@@ -2138,7 +2138,7 @@ function Landing({ theme, setTheme }) {
                         if (e.key === "ArrowUp") {
                           cmdIndexRef.current = Math.max(
                             0,
-                            cmdIndexRef.current - 1
+                            cmdIndexRef.current - 1,
                           );
                           setInput(list[cmdIndexRef.current] || "");
                           return;
@@ -2147,7 +2147,7 @@ function Landing({ theme, setTheme }) {
                         // ArrowDown
                         cmdIndexRef.current = Math.min(
                           list.length,
-                          cmdIndexRef.current + 1
+                          cmdIndexRef.current + 1,
                         );
                         if (cmdIndexRef.current >= list.length) {
                           cmdIndexRef.current = -1;
@@ -2247,42 +2247,42 @@ export default function App() {
       "--page-bg",
       isLight
         ? "radial-gradient(1400px 900px at 50% 0%, rgba(0,0,0,0.035), rgba(0,0,0,0.00)), #f4f6f8"
-        : "radial-gradient(1400px 900px at 50% 0%, rgba(255,255,255,0.02), rgba(0,0,0,0.985)), #060607"
+        : "radial-gradient(1400px 900px at 50% 0%, rgba(255,255,255,0.02), rgba(0,0,0,0.985)), #060607",
     );
 
     root.style.setProperty(
       "--fg",
-      isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"
+      isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)",
     );
 
     root.style.setProperty(
       "--muted",
-      isLight ? "rgba(40, 24, 26, 0.62)" : "rgba(170, 170, 170, 0.75)"
+      isLight ? "rgba(40, 24, 26, 0.62)" : "rgba(170, 170, 170, 0.75)",
     );
 
     root.style.setProperty(
       "--panel-bg",
-      isLight ? "rgba(245, 247, 249, 0.92)" : "rgba(0,0,0,0.82)"
+      isLight ? "rgba(245, 247, 249, 0.92)" : "rgba(0,0,0,0.82)",
     );
 
     root.style.setProperty(
       "--panel-border",
-      isLight ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)"
+      isLight ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)",
     );
 
     root.style.setProperty(
       "--shell-bg",
-      isLight ? "rgba(245, 247, 249, 0.72)" : "rgba(0,0,0,0.55)"
+      isLight ? "rgba(245, 247, 249, 0.72)" : "rgba(0,0,0,0.55)",
     );
 
     root.style.setProperty(
       "--shell-border",
-      isLight ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)"
+      isLight ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)",
     );
 
     root.style.setProperty(
       "--caret-block",
-      isLight ? "rgba(18, 10, 12, 0.80)" : "rgba(235,235,235,0.85)"
+      isLight ? "rgba(18, 10, 12, 0.80)" : "rgba(235,235,235,0.85)",
     );
 
     root.style.setProperty("color-scheme", isLight ? "light" : "dark");
