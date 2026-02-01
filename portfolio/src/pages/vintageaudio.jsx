@@ -4,17 +4,26 @@ import TextPanel from "../components/ui/TextPanel.jsx";
 import { MONO } from "../components/uiConstants.js";
 import GalleryGrid from "../components/GalleryGrid.jsx";
 
+const AV_SETUP = "images/vintageaudio/av_setup.webp";
+const SONY_STACK = "images/vintageaudio/sony.webp";
+const WALKMAN = "images/vintageaudio/walkman.webp";
+const PIONEER = "images/vintageaudio/pioneer.webp";
+const NAKAMICHI = "images/vintageaudio/nakamichi.webp";
+
+const PROJECT_BLOCK_STYLE = {
+  marginTop: "0.75rem",
+};
+
 export default function VintageAudioPage() {
   const navigate = useNavigate();
   return (
     <PageShell
       title="Vintage Audio"
       onBack={() => navigate("/")}
-      // Keep this page a bit wider; images breathe more.
       maxWidth="1750px"
     >
       <GalleryGrid
-        images={["images/vintageaudio/av_setup.webp"]}
+        images={[AV_SETUP]}
         columns={1}
         aspect="16 / 9"
       />
@@ -75,9 +84,9 @@ export default function VintageAudioPage() {
               <br />
               <b>Status:</b> On hold.
             </div>
-            <div style={{ marginTop: "0.75rem" }}>
+            <div style={PROJECT_BLOCK_STYLE}>
               <GalleryGrid
-                images={["images/vintageaudio/sony.webp"]}
+                images={[SONY_STACK]}
                 columns={2}
                 aspect="4 / 3"
                 responsive
@@ -98,9 +107,9 @@ export default function VintageAudioPage() {
               <br />
               <b>Status:</b> Disassembled.
             </div>
-            <div style={{ marginTop: "0.75rem" }}>
+            <div style={PROJECT_BLOCK_STYLE}>
               <GalleryGrid
-                images={["images/vintageaudio/walkman.webp"]}
+                images={[WALKMAN]}
                 columns={2}
                 aspect="4 / 3"
                 responsive
@@ -121,9 +130,9 @@ export default function VintageAudioPage() {
               <br />
               <b>Status:</b> On hold.
             </div>
-            <div style={{ marginTop: "0.75rem" }}>
+            <div style={PROJECT_BLOCK_STYLE}>
               <GalleryGrid
-                images={["images/vintageaudio/pioneer.webp"]}
+                images={[PIONEER]}
                 columns={2}
                 aspect="4 / 3"
                 responsive
@@ -143,9 +152,9 @@ export default function VintageAudioPage() {
               <br />
               <b>Status:</b> On Hold.
             </div>
-            <div style={{ marginTop: "0.75rem" }}>
+            <div style={PROJECT_BLOCK_STYLE}>
               <GalleryGrid
-                images={["images/vintageaudio/nakamichi.webp"]}
+                images={[NAKAMICHI]}
                 columns={2}
                 aspect="4 / 3"
                 responsive

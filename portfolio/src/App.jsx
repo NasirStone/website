@@ -216,22 +216,13 @@ function Landing({ theme, setTheme }) {
       ];
     }
   });
-  const [showTip, setShowTip] = useState(() => {
-    try {
-      const raw = sessionStorage.getItem("terminalShowTip");
-      return raw === null ? true : raw === "true";
-    } catch {
-      return true;
-    }
-  });
   useEffect(() => {
     try {
       sessionStorage.setItem("terminalHistory", JSON.stringify(history));
-      sessionStorage.setItem("terminalShowTip", String(showTip));
     } catch {
       // ignore
     }
-  }, [history, showTip]);
+  }, [history]);
 
   const [wordCloudItems, setWordCloudItems] = useState([]);
   // Background typed text (behind terminal, above keywords)
@@ -249,6 +240,12 @@ function Landing({ theme, setTheme }) {
   const sortedKeywords = useMemo(() => Array.from(VALID_KEYWORDS).sort(), []);
 
   // Draggable terminal window position (top-left in px)
+  function calcTerminalSize(vw, vh) {
+    return {
+      w: Math.min(733, vw * 0.8712),
+      h: Math.min(554, vh * 0.693),
+    };
+  }
   const [terminalPos, setTerminalPos] = useState(() => {
     if (typeof window === "undefined") {
       return { x: 0, y: 0 };
@@ -257,8 +254,7 @@ function Landing({ theme, setTheme }) {
     const vw = window.innerWidth;
     const vh = window.innerHeight;
 
-    const w = Math.min(733, vw * 0.8712);
-    const h = Math.min(554, vh * 0.693);
+    const { w, h } = calcTerminalSize(vw, vh);
 
     return {
       x: Math.max(12, Math.round(vw / 2 - w / 2)),
@@ -272,10 +268,7 @@ function Landing({ theme, setTheme }) {
     if (typeof window === "undefined") return { w: 0, h: 0 };
     const vw = window.innerWidth || 1200;
     const vh = window.innerHeight || 800;
-    return {
-      w: Math.min(733, vw * 0.8712),
-      h: Math.min(554, vh * 0.693),
-    };
+    return calcTerminalSize(vw, vh);
   });
   const draggingRef = useRef({ active: false, dx: 0, dy: 0 });
   const inputRef = useRef(null);
@@ -342,9 +335,7 @@ function Landing({ theme, setTheme }) {
     try {
       const vw = window.innerWidth || 1200;
       const vh = window.innerHeight || 800;
-      const w = Math.min(733, vw * 0.8712);
-      const h = Math.min(554, vh * 0.693);
-      setTerminalSize({ w, h });
+      setTerminalSize(calcTerminalSize(vw, vh));
     } catch {
       // ignore
     }
@@ -355,8 +346,7 @@ function Landing({ theme, setTheme }) {
       setIsCompact(computeIsCompact());
       setIsTouchUI(computeIsTouchUI());
 
-      const w = Math.min(733, vw * 0.8712);
-      const h = Math.min(554, vh * 0.693);
+      const { w, h } = calcTerminalSize(vw, vh);
       setTerminalSize({ w, h });
 
       // Clamp terminal into view on resize
@@ -382,8 +372,7 @@ function Landing({ theme, setTheme }) {
 
       const vw = window.innerWidth || 1200;
       const vh = window.innerHeight || 800;
-      const w = Math.min(733, vw * 0.8712);
-      const h = Math.min(554, vh * 0.693);
+      const { w, h } = calcTerminalSize(vw, vh);
 
       const nextX = e.clientX - draggingRef.current.dx;
       const nextY = e.clientY - draggingRef.current.dy;
@@ -617,7 +606,7 @@ function Landing({ theme, setTheme }) {
     }
 
     setBgTopText("");
-    setBgBottomText("");
+    // setBgBottomText("");
     setBgStage("top");
 
     typeLine(top, setBgTopText, () => {
@@ -696,7 +685,6 @@ function Landing({ theme, setTheme }) {
   }
 
   function openSidebar() {
-    setShowTip(false);
     setIsSidebarOpen(true);
     // Next frame so the transition can play
     requestAnimationFrame(() => setSidebarIn(true));
@@ -771,7 +759,6 @@ function Landing({ theme, setTheme }) {
       { type: "prompt", text: `nasir % ${cmd}` },
       { type: "system", text: `loading ${label}…` },
     ]);
-    setShowTip(false);
 
     setIsLoading(true);
     setLoadingPct(0);
@@ -797,6 +784,10 @@ function Landing({ theme, setTheme }) {
       const target = normalizeKeyword(cmd.slice(3));
       if (target) effectiveCmd = target;
     }
+    // ls typo catch
+    if (effectiveCmd === "1s") {
+      effectiveCmd = "ls";
+    }
 
     if (!effectiveCmd) return;
 
@@ -807,7 +798,6 @@ function Landing({ theme, setTheme }) {
         { type: "prompt", text: `nasir % ${raw}` },
         { type: "output", text: "Look out!!!" },
       ]);
-      setShowTip(false);
       return;
     }
 
@@ -825,7 +815,6 @@ function Landing({ theme, setTheme }) {
               : "Switched to dark mode.",
         },
       ]);
-      setShowTip(false);
       return;
     }
 
@@ -835,7 +824,6 @@ function Landing({ theme, setTheme }) {
         { type: "prompt", text: `nasir % ${raw}` },
         { type: "output", text: MOCK_PWD },
       ]);
-      setShowTip(false);
       return;
     }
 
@@ -849,13 +837,11 @@ function Landing({ theme, setTheme }) {
         { type: "prompt", text: `nasir % ${raw}` },
         ...lines.map((t) => ({ type: "output", text: t })),
       ]);
-      setShowTip(false);
       return;
     }
 
     if (effectiveCmd === "clear") {
       setHistory([]);
-      setShowTip(false);
       return;
     }
 
@@ -874,7 +860,7 @@ function Landing({ theme, setTheme }) {
         },
         {
           type: "output",
-          text: "Find keywords in the background, the menu button (top-left), or by running ls",
+          text: "Find keywords in the background, the menu button (top-left), or by typing ls",
         },
         { type: "output", text: "" },
         { type: "output", text: "Usage:" },
@@ -890,7 +876,6 @@ function Landing({ theme, setTheme }) {
         { type: "output", text: "  drones" },
         { type: "output", text: "  ls" },
       ]);
-      setShowTip(false);
       return;
     }
 
@@ -903,7 +888,6 @@ function Landing({ theme, setTheme }) {
           { type: "prompt", text: `nasir % ${raw}` },
           ...CONTACT_STORY,
         ]);
-        setShowTip(false);
         return;
       }
 
@@ -919,7 +903,6 @@ function Landing({ theme, setTheme }) {
             newTab: true,
           },
         ]);
-        setShowTip(false);
         return;
       }
 
@@ -934,7 +917,6 @@ function Landing({ theme, setTheme }) {
             newTab: true,
           },
         ]);
-        setShowTip(false);
         return;
       }
 
@@ -984,7 +966,6 @@ function Landing({ theme, setTheme }) {
           text: "That page is not ready yet. Check back later!",
         },
       ]);
-      setShowTip(false);
       return;
     }
 
@@ -1109,8 +1090,8 @@ function Landing({ theme, setTheme }) {
         }
         .sidebarTouch {
           position: relative;
-          width: min(560px, calc(100% - 24px));
-  max-height: calc(100svh - 220px);
+          width: min(720px, calc(100% - 12px));
+          max-height: calc(100svh - 200px);
           overflow: auto;
           border-radius: 14px;
           border: 1px solid ${
@@ -1124,7 +1105,7 @@ function Landing({ theme, setTheme }) {
           color: ${
             isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"
           };
-          padding: 0.95rem 0.9rem;
+          padding: 1.05rem 1.0rem;
           backdrop-filter: blur(12px);
           transform: none;
           opacity: 1;
@@ -1133,18 +1114,52 @@ function Landing({ theme, setTheme }) {
           margin: 0 auto;
         }
         .sidebarTouch .sidebarHeader {
-          font-size: 0.95rem;
+          font-size: 1.08rem;
         }
         .sidebarTouch .keywordBtn {
-          font-size: 1.02rem;
-          padding: 0.70rem 0.78rem;
+          font-size: 1.22rem;
+          padding: 0.98rem 1.02rem;
         }
         @media (max-width: 640px) {
-  .sidebarTouch {
-    width: calc(100% - 24px);
-    max-height: calc(100svh - 220px);
-  }
-}
+        .sidebarTouch {
+          width: calc(100% - 12px);
+          max-height: calc(100svh - 200px);
+        }
+      }
+        /* Mobile-only bottom marquee */
+        @keyframes mobileMarquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .mobileMarqueeWrap {
+          position: fixed;
+          left: 12px;
+          right: 12px;
+          bottom: calc(10px + env(safe-area-inset-bottom));
+          z-index: 35;
+          pointer-events: none;
+        }
+        .mobileMarquee {
+          width: 100%;
+          overflow: hidden;
+          border-radius: 14px;
+          background: rgba(0,0,0,0.38);
+          border: 1px solid rgba(255,255,255,0.14);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          box-shadow: 0 18px 55px rgba(0,0,0,0.45);
+          padding: 0.55rem 0.75rem;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 0.95rem;
+          color: rgba(235,235,235,0.92);
+          opacity: 0.92;
+        }
+        .mobileMarqueeInner {
+          display: inline-block;
+          white-space: nowrap;
+          padding-left: 100%;
+          animation: mobileMarquee 14s linear infinite;
+        }
         .sidebarIn {
           transform: translateX(0);
           opacity: 1;
@@ -1646,230 +1661,241 @@ function Landing({ theme, setTheme }) {
 
       {/* Touch UI: Centered name card and always-visible Pages panel */}
       {isTouchUI ? (
-        <div
-          style={{
-            position: "relative",
-            zIndex: 6,
-            minHeight: "100svh",
-            height: "100svh",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            paddingTop: "calc(18px + env(safe-area-inset-top))",
-            paddingLeft: "16px",
-            paddingRight: "16px",
-            paddingBottom: "calc(18px + env(safe-area-inset-bottom))",
-            gap: 14,
-          }}
-        >
+        <>
           <div
             style={{
-              fontFamily: SANS,
-              fontSize: "clamp(3.4rem, 10.5vw, 5.2rem)",
-              maxWidth: "min(94vw, 620px)",
-              fontWeight: 650,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.05,
-              padding: "0.18em 0.42em",
-              borderRadius: 18,
-              background: FROST_BG,
-              border: `1px solid ${FROST_BORDER}`,
-              backdropFilter: "blur(14px)",
-              WebkitBackdropFilter: "blur(14px)",
-              boxShadow: FROST_SHADOW,
-              color:
-                theme === "light"
-                  ? "rgba(18, 10, 12, 0.92)"
-                  : "rgba(245,245,245,0.96)",
-              textAlign: "center",
-              marginTop: "0px",
+              position: "relative",
+              zIndex: 6,
+              minHeight: "100svh",
+              height: "100svh",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingTop: "calc(18px + env(safe-area-inset-top))",
+              paddingLeft: "16px",
+              paddingRight: "16px",
+              paddingBottom: "calc(18px + env(safe-area-inset-bottom))",
+              gap: 14,
             }}
           >
-            Nasir Sims
-          </div>
-
-          <PagesPanel
-            onPick={(k) => {
-              const cmd = normalizeKeyword(k);
-
-              // On touch UI, some "terminal output" entries should behave like direct links.
-              if (cmd === "resume") {
-                try {
-                  window.open(RESUME_URL, "_blank", "noreferrer");
-                } catch {
-                  window.location.href = RESUME_URL;
-                }
-                return;
-              }
-
-              if (cmd === "music") {
-                const url =
-                  "https://www.discogs.com/user/nasedition/collection?header=1";
-                try {
-                  window.open(url, "_blank", "noreferrer");
-                } catch {
-                  window.location.href = url;
-                }
-                return;
-              }
-
-              if (cmd === "contact") {
-                openContactModal();
-                return;
-              }
-              // Default: use the same command routing as desktop
-              runCommand(k);
-            }}
-          />
-          {contactModalOpen ? (
             <div
-              onClick={() => closeContactModal()}
               style={{
-                position: "fixed",
-                inset: 0,
-                zIndex: 40,
-                background: "rgba(0,0,0,0.40)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "18px",
-                opacity: contactModalIn ? 1 : 0,
-                transition: "opacity 160ms ease",
+                fontFamily: SANS,
+                fontSize: "clamp(4.2rem, 13.5vw, 6.8rem)",
+                maxWidth: "min(98vw, 760px)",
+                padding: "0.20em 0.48em",
+                fontWeight: 650,
+                letterSpacing: "-0.04em",
+                lineHeight: 1.05,
+                borderRadius: 18,
+                background: FROST_BG,
+                border: `1px solid ${FROST_BORDER}`,
+                backdropFilter: "blur(14px)",
+                WebkitBackdropFilter: "blur(14px)",
+                boxShadow: FROST_SHADOW,
+                color:
+                  theme === "light"
+                    ? "rgba(18, 10, 12, 0.92)"
+                    : "rgba(245,245,245,0.96)",
+                textAlign: "center",
+                marginTop: "0px",
               }}
-              role="presentation"
             >
+              Nasir Sims
+            </div>
+
+            <PagesPanel
+              onPick={(k) => {
+                const cmd = normalizeKeyword(k);
+
+                // On touch UI, some "terminal output" entries should behave like direct links.
+                if (cmd === "resume") {
+                  try {
+                    window.open(RESUME_URL, "_blank", "noreferrer");
+                  } catch {
+                    window.location.href = RESUME_URL;
+                  }
+                  return;
+                }
+
+                if (cmd === "music") {
+                  const url =
+                    "https://www.discogs.com/user/nasedition/collection?header=1";
+                  try {
+                    window.open(url, "_blank", "noreferrer");
+                  } catch {
+                    window.location.href = url;
+                  }
+                  return;
+                }
+
+                if (cmd === "contact") {
+                  openContactModal();
+                  return;
+                }
+                // Default: use the same command routing as desktop
+                runCommand(k);
+              }}
+            />
+            {contactModalOpen ? (
               <div
-                onClick={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-label="Contact"
+                onClick={() => closeContactModal()}
                 style={{
-                  width: "min(520px, calc(100% - 24px))",
-                  maxHeight: "min(72vh, 640px)",
-                  overflow: "auto",
-                  borderRadius: 16,
-                  background: isLight
-                    ? "rgba(245, 247, 249, 0.94)"
-                    : "rgba(0, 0, 0, 0.86)",
-                  border: `1px solid ${TERM_BORDER}`,
-                  boxShadow: "0 24px 70px rgba(0,0,0,0.55)",
-                  backdropFilter: "blur(14px)",
-                  WebkitBackdropFilter: "blur(14px)",
-                  transform: contactModalIn
-                    ? "translateY(0)"
-                    : "translateY(10px)",
-                  transition: "transform 160ms ease",
+                  position: "fixed",
+                  inset: 0,
+                  zIndex: 40,
+                  background: "rgba(0,0,0,0.40)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "18px",
+                  opacity: contactModalIn ? 1 : 0,
+                  transition: "opacity 160ms ease",
                 }}
+                role="presentation"
               >
                 <div
+                  onClick={(e) => e.stopPropagation()}
+                  role="dialog"
+                  aria-label="Contact"
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    padding: "0.9rem 1rem",
-                    borderBottom: `1px solid ${INSET_LINE}`,
-                    fontFamily: MONO,
+                    width: "min(520px, calc(100% - 24px))",
+                    maxHeight: "min(72vh, 640px)",
+                    overflow: "auto",
+                    borderRadius: 16,
+                    background: isLight
+                      ? "rgba(245, 247, 249, 0.94)"
+                      : "rgba(0, 0, 0, 0.86)",
+                    border: `1px solid ${TERM_BORDER}`,
+                    boxShadow: "0 24px 70px rgba(0,0,0,0.55)",
+                    backdropFilter: "blur(14px)",
+                    WebkitBackdropFilter: "blur(14px)",
+                    transform: contactModalIn
+                      ? "translateY(0)"
+                      : "translateY(10px)",
+                    transition: "transform 160ms ease",
                   }}
                 >
-                  <div style={{ fontSize: "0.95rem", opacity: 0.9 }}>
-                    Contact
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => closeContactModal()}
+                  <div
                     style={{
-                      width: 40,
-                      height: 36,
-                      borderRadius: 10,
-                      border: "none",
-                      background: isLight
-                        ? "rgba(0,0,0,0.03)"
-                        : "rgba(255,255,255,0.05)",
-                      color: FG,
-                      cursor: "pointer",
-                      fontFamily: MONO,
-                      fontSize: "1.35rem",
-                      lineHeight: 1,
-                      padding: 0,
-                      display: "inline-flex",
+                      display: "flex",
                       alignItems: "center",
-                      justifyContent: "center",
+                      justifyContent: "space-between",
+                      gap: 12,
+                      padding: "0.9rem 1rem",
+                      borderBottom: `1px solid ${INSET_LINE}`,
+                      fontFamily: MONO,
                     }}
-                    aria-label="Close"
                   >
-                    ×
-                  </button>
-                </div>
+                    <div style={{ fontSize: "0.95rem", opacity: 0.9 }}>
+                      Contact
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => closeContactModal()}
+                      style={{
+                        width: 40,
+                        height: 36,
+                        borderRadius: 10,
+                        border: "none",
+                        background: isLight
+                          ? "rgba(0,0,0,0.03)"
+                          : "rgba(255,255,255,0.05)",
+                        color: FG,
+                        cursor: "pointer",
+                        fontFamily: MONO,
+                        fontSize: "1.35rem",
+                        lineHeight: 1,
+                        padding: 0,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                      aria-label="Close"
+                    >
+                      ×
+                    </button>
+                  </div>
 
-                <div
-                  style={{
-                    padding: "0.95rem 1.05rem 1.1rem",
-                    fontFamily: MONO,
-                    fontSize: "0.92rem",
-                    lineHeight: 1.55,
-                    color: FG,
-                    display: "grid",
-                    gap: "0.55rem",
-                  }}
-                >
-                  <div style={{ opacity: 0.85 }}>Email</div>
-                  <a
-                    href="mailto:nasir@wustl.edu"
+                  <div
                     style={{
-                      color:
-                        theme === "light"
-                          ? "rgba(18, 10, 12, 0.85)"
-                          : "rgba(220,220,220,0.92)",
-                      textDecoration: "underline",
-                      wordBreak: "break-word",
+                      padding: "0.95rem 1.05rem 1.1rem",
+                      fontFamily: MONO,
+                      fontSize: "0.92rem",
+                      lineHeight: 1.55,
+                      color: FG,
+                      display: "grid",
+                      gap: "0.55rem",
                     }}
                   >
-                    nasir@wustl.edu
-                  </a>
+                    <div style={{ opacity: 0.85 }}>Email</div>
+                    <a
+                      href="mailto:nasir@wustl.edu"
+                      style={{
+                        color:
+                          theme === "light"
+                            ? "rgba(18, 10, 12, 0.85)"
+                            : "rgba(220,220,220,0.92)",
+                        textDecoration: "underline",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      nasir@wustl.edu
+                    </a>
 
-                  <div style={{ height: 8 }} aria-hidden="true" />
+                    <div style={{ height: 8 }} aria-hidden="true" />
 
-                  <div style={{ opacity: 0.85 }}>LinkedIn</div>
-                  <a
-                    href="https://www.linkedin.com/in/nasir-sims"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      color:
-                        theme === "light"
-                          ? "rgba(18, 10, 12, 0.85)"
-                          : "rgba(220,220,220,0.92)",
-                      textDecoration: "underline",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    linkedin.com/in/nasir-sims
-                  </a>
+                    <div style={{ opacity: 0.85 }}>LinkedIn</div>
+                    <a
+                      href="https://www.linkedin.com/in/nasir-sims"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        color:
+                          theme === "light"
+                            ? "rgba(18, 10, 12, 0.85)"
+                            : "rgba(220,220,220,0.92)",
+                        textDecoration: "underline",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      linkedin.com/in/nasir-sims
+                    </a>
 
-                  <div style={{ height: 8 }} aria-hidden="true" />
+                    <div style={{ height: 8 }} aria-hidden="true" />
 
-                  <div style={{ opacity: 0.85 }}>GitHub</div>
-                  <a
-                    href="https://github.com/NasirStone"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      color:
-                        theme === "light"
-                          ? "rgba(18, 10, 12, 0.85)"
-                          : "rgba(220,220,220,0.92)",
-                      textDecoration: "underline",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    github.com/NasirStone
-                  </a>
+                    <div style={{ opacity: 0.85 }}>GitHub</div>
+                    <a
+                      href="https://github.com/NasirStone"
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        color:
+                          theme === "light"
+                            ? "rgba(18, 10, 12, 0.85)"
+                            : "rgba(220,220,220,0.92)",
+                        textDecoration: "underline",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      github.com/NasirStone
+                    </a>
+                  </div>
                 </div>
               </div>
+            ) : null}
+          </div>
+          {/* Mobile-only bottom scrolling note */}
+          <div className="mobileMarqueeWrap" aria-hidden="true">
+            <div className="mobileMarquee">
+              <div className="mobileMarqueeInner">
+                Best experienced on a computer — try the terminal on desktop for
+                the full vibe.
+              </div>
             </div>
-          ) : null}
-        </div>
+          </div>
+        </>
       ) : null}
 
       {!isTouchUI ? (

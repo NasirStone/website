@@ -7,10 +7,11 @@ import { asset } from "../components/uiConstants.js";
 const ARTICLE_URL = "https://source.washu.edu/2023/10/model-av-testing/";
 const REPO_URL = "https://github.com/NasirStone/nv-e2e-cl-ad";
 
-const CARLA_LEFT_TURN = "images/autonomous/right_carla.webp";
-const MINICITY_LEFT_TURN = "images/autonomous/right_mc.webp";
-
-const ROS_2 = "images/autonomous/nasir_av.webp";
+const AV_MEDIA = {
+  CARLA_LEFT_TURN: "images/autonomous/right_carla.webp",
+  MINICITY_LEFT_TURN: "images/autonomous/right_mc.webp",
+  ROS_2: "images/autonomous/nasir_av.webp",
+};
 
 const PAPER_DOWNLOADS = [
   {
@@ -40,18 +41,15 @@ const BULLET_STYLE = {
   lineHeight: 1.7,
 };
 
+const LINK_STYLE = {
+  color: "var(--link)",
+  textDecoration: "underline",
+  textUnderlineOffset: "2px",
+};
+
 function ExtLink({ href, children }) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      style={{
-        color: "var(--link)",
-        textDecoration: "underline",
-        textUnderlineOffset: "2px",
-      }}
-    >
+    <a href={href} target="_blank" rel="noreferrer" style={LINK_STYLE}>
       {children}
     </a>
   );
@@ -59,16 +57,7 @@ function ExtLink({ href, children }) {
 
 function DownloadLink({ href, children }) {
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      style={{
-        color: "var(--link)",
-        textDecoration: "underline",
-        textUnderlineOffset: "2px",
-      }}
-    >
+    <a href={href} target="_blank" rel="noreferrer" style={LINK_STYLE}>
       {children}
     </a>
   );
@@ -97,7 +86,7 @@ export default function AutonomousVehiclesPage() {
         {/* Summary */}
         <TextPanel
           marginTop="1rem"
-          title="Autonomous Driving Research"
+          title="Autonomous Vehicle Research"
           header={
             <span>
               <ExtLink href={ARTICLE_URL}>WashU Feature</ExtLink>
@@ -127,7 +116,7 @@ export default function AutonomousVehiclesPage() {
             {/* Visual comparison embedded in the narrative (CARLA vs Mini City) */}
             <div style={{ marginTop: "1rem" }}>
               <GalleryGrid
-                images={[CARLA_LEFT_TURN, MINICITY_LEFT_TURN]}
+                images={[AV_MEDIA.CARLA_LEFT_TURN, AV_MEDIA.MINICITY_LEFT_TURN]}
                 columns={2}
                 aspect="16 / 9"
                 gap="1rem"
@@ -147,7 +136,6 @@ export default function AutonomousVehiclesPage() {
           </div>
         </TextPanel>
 
-        {/* Content blocks */}
         <div
           className="avGrid"
           style={{
@@ -192,7 +180,7 @@ export default function AutonomousVehiclesPage() {
                     }}
                   >
                     <img
-                      src={asset(ROS_2)}
+                      src={asset(AV_MEDIA.ROS_2)}
                       alt="Annotation example"
                       loading="lazy"
                       decoding="async"

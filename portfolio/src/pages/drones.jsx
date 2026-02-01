@@ -4,25 +4,25 @@ import GalleryGrid from "../components/GalleryGrid.jsx";
 import TextPanel from "../components/ui/TextPanel.jsx";
 import { MONO } from "../components/uiConstants.js";
 
+const DRONE_IMAGES = [
+  "images/drones/b_entr.webp",
+  "images/drones/camp.webp",
+  "images/drones/chap.webp",
+  "images/drones/fp.webp",
+];
+
+const SECTION_HEADER = "WashU Drone Pilot Internship";
+
 export default function DronesPage() {
   const navigate = useNavigate();
 
-  const images = [
-    "images/drones/b_entr.webp",
-    "images/drones/camp.webp",
-    "images/drones/chap.webp",
-    "images/drones/fp.webp",
-  ];
-
   return (
-    <PageShell title="Drones" onBack={() => navigate("/")}>
-      <GalleryGrid images={images} columns={2} aspect="16 / 9" />
+    <PageShell title={"Drones"} onBack={() => navigate("/")}>
+      <GalleryGrid images={DRONE_IMAGES} columns={2} aspect="16 / 9" />
 
       <TextPanel
         marginTop="1rem"
-        header={
-          <span style={{ fontFamily: MONO }}>WashU Drone Pilot Internship</span>
-        }
+        header={<span style={{ fontFamily: MONO }}>{SECTION_HEADER}</span>}
       >
         In the summer of 2025, I spent my days flying DJI Drones for WashU's
         Facilities, Planning & Management Department. I primarily flew a DJI

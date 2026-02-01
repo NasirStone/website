@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import PageShell from "../components/PageShell.jsx";
 import TextPanel from "../components/ui/TextPanel.jsx";
@@ -10,12 +9,39 @@ function isVideoSrc(src) {
 
 // -------------------- TRAVEL DATA --------------------
 
+const TRAVEL_MEDIA = {
+  CASTLE: "images/travel/castle.webp",
+  LAKE: "images/travel/lake.webp",
+  F1_VIDEO: "images/travel/F1.mp4",
+  COUR: "images/travel/cour.webp",
+  BEACH: "images/travel/beach.webp",
+  HOOD: "images/travel/hood.webp",
+  HIKE: "images/travel/hike.webp",
+  SHUTIN: "images/travel/shutin.webp",
+  TETON: "images/travel/teton.webp",
+  DRIVE: "images/travel/drive.webp",
+  CALI_WATER: "images/travel/cali_water.webp",
+  UTAH: "images/travel/utah.webp",
+  PR_GABBI: "images/travel/prgabbi.webp",
+  FLAGS: "images/travel/flags.webp",
+  POSE: "images/travel/pose.webp",
+  PR_TOGETHER: "images/travel/prtogether.webp",
+  VERMONT_1: "images/travel/vermont1.webp",
+  MONTREAL: "images/travel/montreal.webp",
+  TEXAS_TRIP: "images/travel/texas_trip.webp",
+  OZARK: "images/travel/ozark.webp",
+  JAN: "images/travel/jan.webp",
+  ARTHUR_1: "images/travel/arthur1.webp",
+  ARTHUR_2: "images/travel/arthur2.webp",
+  ARTHUR_3: "images/travel/arthur3.webp",
+};
+
 const TRAVEL_ENTRIES = [
   {
     id: "Europe-2023",
     date: "Summer 2023",
     title: "Füssen, Germany",
-    images: ["images/travel/castle.webp", "images/travel/lake.webp"],
+    images: [TRAVEL_MEDIA.CASTLE, TRAVEL_MEDIA.LAKE],
     body: (
       <>
         In the summer of 2023, my dad and I travelled to Füssen, Germany to
@@ -30,7 +56,7 @@ const TRAVEL_ENTRIES = [
     id: "barcelona-paris",
     date: "Summer 2023",
     title: "Barcelona, Spain & Paris, France",
-    images: ["images/travel/F1.mp4", "images/travel/cour.webp"],
+    images: [TRAVEL_MEDIA.F1_VIDEO, TRAVEL_MEDIA.COUR],
     body: (
       <>
         Right after Germany, I met up with my best friend Conor, and we flew to
@@ -46,7 +72,7 @@ const TRAVEL_ENTRIES = [
     id: "portland",
     date: "Spring 2024",
     title: "Portland, OR",
-    images: ["images/travel/beach.webp", "images/travel/hood.webp"],
+    images: [TRAVEL_MEDIA.BEACH, TRAVEL_MEDIA.HOOD],
     body: (
       <>
         For my 2024 Spring Break, my friends Jack, Conor, and I stayed with our
@@ -62,7 +88,7 @@ const TRAVEL_ENTRIES = [
     id: "johnson",
     date: "Spring 2024",
     title: "Johnson Shut-Ins, MO",
-    images: ["images/travel/hike.webp", "images/travel/shutin.webp"],
+    images: [TRAVEL_MEDIA.HIKE, TRAVEL_MEDIA.SHUTIN],
     body: (
       <>
         The weekend before finals, Gabbi (my girlfriend), and our other friend
@@ -80,10 +106,10 @@ const TRAVEL_ENTRIES = [
     date: "Summer 2024",
     title: "Western US Road Trip",
     images: [
-      "images/travel/teton.webp",
-      "images/travel/drive.webp",
-      "images/travel/cali_water.webp",
-      "images/travel/utah.webp",
+      TRAVEL_MEDIA.TETON,
+      TRAVEL_MEDIA.DRIVE,
+      TRAVEL_MEDIA.CALI_WATER,
+      TRAVEL_MEDIA.UTAH,
     ],
     body: (
       <>
@@ -103,10 +129,10 @@ const TRAVEL_ENTRIES = [
     date: "Spring 2025",
     title: "Puerto Rico",
     images: [
-      "images/travel/prgabbi.webp",
-      "images/travel/flags.webp",
-      "images/travel/pose.webp",
-      "images/travel/prtogether.webp",
+      TRAVEL_MEDIA.PR_GABBI,
+      TRAVEL_MEDIA.FLAGS,
+      TRAVEL_MEDIA.POSE,
+      TRAVEL_MEDIA.PR_TOGETHER,
     ],
     body: (
       <>
@@ -121,7 +147,7 @@ const TRAVEL_ENTRIES = [
     id: "vermont-road-trip",
     date: "Summer 2025",
     title: "Chicago → Canada → Vermont",
-    images: ["images/travel/vermont1.webp", "images/travel/montreal.webp"],
+    images: [TRAVEL_MEDIA.VERMONT_1, TRAVEL_MEDIA.MONTREAL],
     body: (
       <>
         In early summer 2025, Conor was heading to Burlington, Vermont, to start
@@ -141,7 +167,7 @@ const TRAVEL_ENTRIES = [
   {
     id: "texas",
     title: "San Francisco, CA → Houston, TX",
-    images: ["images/travel/texas_trip.webp"],
+    images: [TRAVEL_MEDIA.TEXAS_TRIP],
     body: (
       <>
         In the last week of summer, Conor prepared for his Co-Op in Houston,
@@ -160,7 +186,7 @@ const TRAVEL_ENTRIES = [
     id: "ozarks",
     date: "Fall 2025",
     title: "Lake of the Ozarks, MO",
-    images: ["images/travel/ozark.webp"],
+    images: [TRAVEL_MEDIA.OZARK],
     body: (
       <>
         For Fall Break, 8 friends and I packed two sedans for the 3-hour drive
@@ -178,10 +204,10 @@ const TRAVEL_ENTRIES = [
     date: "Today",
     title: "Study Abroad at The University of Edinburgh",
     images: [
-      "images/travel/jan.webp",
-      "images/travel/arthur2.webp",
-      "images/travel/arthur3.webp",
-      "images/travel/arthur1.webp",
+      TRAVEL_MEDIA.JAN,
+      TRAVEL_MEDIA.ARTHUR_2,
+      TRAVEL_MEDIA.ARTHUR_3,
+      TRAVEL_MEDIA.ARTHUR_1,
     ],
     body: (
       <>
@@ -196,16 +222,11 @@ const TRAVEL_ENTRIES = [
   },
 ];
 
-// -------------------- HELPERS --------------------
-
 function resolveSrc(src) {
   return asset(src);
 }
 
-// -------------------- COMPONENTS --------------------
-
 function MediaTile({ src, eager }) {
-  // eager: boolean, for first image/video only
   if (isVideoSrc(src)) {
     return (
       <video
@@ -305,8 +326,6 @@ function EntrySection({ entry, idx }) {
           {entry.body}
         </div>
       </TextPanel>
-
-      {/* Small spacer */}
       <div aria-hidden style={{ height: "clamp(18px, 3vw, 28px)" }} />
     </section>
   );

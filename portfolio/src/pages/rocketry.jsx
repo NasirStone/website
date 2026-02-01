@@ -5,20 +5,33 @@ import TextPanel from "../components/ui/TextPanel.jsx";
 import { asset } from "../components/uiConstants.js";
 import GalleryGrid from "../components/GalleryGrid.jsx";
 
-const VIDEO_SRC = asset("videos/rocketry.mp4");
-const LOGO_WHITE = asset("images/rocketry/logo.png");
+const ROCKETRY_MEDIA = {
+  VIDEO: "videos/rocketry.mp4",
+  LOGO_WHITE: "images/rocketry/logo.png",
 
-const airbrakeImages = [
-  "images/rocketry/Airbrakes Assembly Solo Retracted Top.webp", // 3
-  "images/rocketry/Airbrakes Assembly Solo Extended Top.webp", // 1
-  "images/rocketry/Airbrakes Assembly Solo Iso.webp", // 2
-  "images/rocketry/FS_Assembled_Paddle.webp", // 4
-];
+  FULL_ASSEMBLY: "images/rocketry/Full_Assembly.webp",
+  FULL_ASSEMBLY_EXPLODED: "images/rocketry/Full_Assembly_Exploded.webp",
 
-const fullAssemblyImg = asset("images/rocketry/Full_Assembly.webp");
-const fullAssemblyExplodedImg = asset(
-  "images/rocketry/Full_Assembly_Exploded.webp"
-);
+  AIRBRAKES: [
+    "images/rocketry/Airbrakes Assembly Solo Retracted Top.webp", // 3
+    "images/rocketry/Airbrakes Assembly Solo Extended Top.webp", // 1
+    "images/rocketry/Airbrakes Assembly Solo Iso.webp", // 2
+    "images/rocketry/FS_Assembled_Paddle.webp", // 4
+  ],
+
+  CAMERA: [
+    "images/rocketry/FS_Camera_Inserts.webp",
+    "images/rocketry/Zero_Spy_Camera.webp",
+  ],
+};
+
+const VIDEO_SRC = asset(ROCKETRY_MEDIA.VIDEO);
+const LOGO_WHITE = asset(ROCKETRY_MEDIA.LOGO_WHITE);
+const fullAssemblyImg = asset(ROCKETRY_MEDIA.FULL_ASSEMBLY);
+const fullAssemblyExplodedImg = asset(ROCKETRY_MEDIA.FULL_ASSEMBLY_EXPLODED);
+
+const airbrakeImages = ROCKETRY_MEDIA.AIRBRAKES;
+const cameraImages = ROCKETRY_MEDIA.CAMERA;
 
 function clamp01(x) {
   return Math.max(0, Math.min(1, x));
@@ -111,8 +124,8 @@ export default function RocketryPage() {
   const stickyRegionRef = useRef(null);
   const assemblyRegionRef = useRef(null);
 
-  const [p, setP] = useState(0); // 0..1 progress through sticky region
-  const [a, setA] = useState(0); // 0..1 progress through assembly graphic region
+  const [p, setP] = useState(0);
+  const [a, setA] = useState(0);
 
   useEffect(() => {
     let raf = 0;
@@ -194,7 +207,7 @@ export default function RocketryPage() {
             .airbrakeRow .projectHero { display: none; }
           }
         `}</style>
-        {/* Sticky video region: video does not move, content scrolls over it */}
+        {/* Sticky video region */}
         <section
           ref={stickyRegionRef}
           style={{ position: "relative", width: "100%", height: "110vh" }}
@@ -228,7 +241,7 @@ export default function RocketryPage() {
               }}
             />
 
-            {/* Scroll dimmer overlay */}
+            {/* Scroll dimmer */}
             <div
               style={{
                 position: "absolute",
@@ -239,7 +252,7 @@ export default function RocketryPage() {
               }}
             />
 
-            {/* Top fade so title reads cleanly */}
+            {/* Top fade */}
             <div
               style={{
                 position: "absolute",
@@ -254,7 +267,7 @@ export default function RocketryPage() {
               }}
             />
 
-            {/* Title overlay (top-left) */}
+            {/* Title */}
             <div
               style={{
                 position: "absolute",
@@ -272,7 +285,7 @@ export default function RocketryPage() {
               Rocketry
             </div>
 
-            {/* Top-right logo */}
+            {/* Logo */}
             <img
               src={LOGO_WHITE}
               alt="WURocketry logo"
@@ -289,7 +302,7 @@ export default function RocketryPage() {
               }}
             />
 
-            {/* Bottom fade (keeps the transition inside the frame) */}
+            {/* Bottom fade */}
             <div
               style={{
                 position: "absolute",
@@ -304,7 +317,7 @@ export default function RocketryPage() {
               }}
             />
 
-            {/* Scroll hint arrow */}
+            {/* Hint arrow */}
             <div
               style={{
                 position: "absolute",
@@ -572,10 +585,7 @@ export default function RocketryPage() {
             <div className="projectsRow">
               <div className="projectMedia">
                 <GalleryGrid
-                  images={[
-                    "images/rocketry/FS_Camera_Inserts.webp",
-                    "images/rocketry/Zero_Spy_Camera.webp",
-                  ]}
+                  images={cameraImages}
                   columns={1}
                   aspect="4 / 3"
                   gap="14px"
