@@ -114,7 +114,7 @@ function Landing({ theme, setTheme }) {
   // Theme toggle button for landing page only
   function ThemeToggle() {
     const isLightMode = theme === "light";
-
+    // Use isTouchUI from outer scope
     return (
       <button
         type="button"
@@ -127,8 +127,8 @@ function Landing({ theme, setTheme }) {
           left: 14,
           bottom: 14,
           zIndex: 50,
-          width: 44,
-          height: 38,
+          width: isTouchUI ? 56 : 44,
+          height: isTouchUI ? 48 : 38,
           borderRadius: 10,
           border: `1px solid ${
             isLightMode ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)"
@@ -148,7 +148,7 @@ function Landing({ theme, setTheme }) {
           justifyContent: "center",
           fontFamily:
             "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-          fontSize: "1.05rem",
+          fontSize: isTouchUI ? "1.35rem" : "1.05rem",
           lineHeight: 1,
           padding: 0,
           WebkitTapHighlightColor: "transparent",
@@ -1126,40 +1126,6 @@ function Landing({ theme, setTheme }) {
           max-height: calc(100svh - 200px);
         }
       }
-        /* Mobile-only bottom marquee */
-        @keyframes mobileMarquee {
-          0% { transform: translateX(100%); }
-          100% { transform: translateX(-100%); }
-        }
-        .mobileMarqueeWrap {
-          position: fixed;
-          left: 12px;
-          right: 12px;
-          bottom: calc(10px + env(safe-area-inset-bottom));
-          z-index: 35;
-          pointer-events: none;
-        }
-        .mobileMarquee {
-          width: 100%;
-          overflow: hidden;
-          border-radius: 14px;
-          background: rgba(0,0,0,0.38);
-          border: 1px solid rgba(255,255,255,0.14);
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          box-shadow: 0 18px 55px rgba(0,0,0,0.45);
-          padding: 0.55rem 0.75rem;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: 0.95rem;
-          color: rgba(235,235,235,0.92);
-          opacity: 0.92;
-        }
-        .mobileMarqueeInner {
-          display: inline-block;
-          white-space: nowrap;
-          padding-left: 100%;
-          animation: mobileMarquee 14s linear infinite;
-        }
         .sidebarIn {
           transform: translateX(0);
           opacity: 1;
@@ -1885,15 +1851,6 @@ function Landing({ theme, setTheme }) {
                 </div>
               </div>
             ) : null}
-          </div>
-          {/* Mobile-only bottom scrolling note */}
-          <div className="mobileMarqueeWrap" aria-hidden="true">
-            <div className="mobileMarquee">
-              <div className="mobileMarqueeInner">
-                Best experienced on a computer — try the terminal on desktop for
-                the full vibe.
-              </div>
-            </div>
           </div>
         </>
       ) : null}
