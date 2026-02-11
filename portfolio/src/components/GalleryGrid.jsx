@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Image } from "@unpic/react";
 import { asset } from "./uiConstants.js";
 
 function isAbsoluteUrl(src) {
@@ -12,6 +13,8 @@ export default function GalleryGrid({
   columns = 2,
   gap = "1.0rem",
   aspect = "16 / 9",
+  width = 1200,
+  height = 675,
 }) {
   const resolved = useMemo(() => {
     return (images || []).map((src) => {
@@ -32,26 +35,32 @@ export default function GalleryGrid({
         <div
           key={`${src}-${i}`}
           style={{
-            borderRadius: 12,
+            borderRadius: 0,
             overflow: "hidden",
-            border: "1px solid rgba(255,255,255,0.10)",
-            background: "rgba(255,255,255,0.03)",
+            border: "3px solid var(--panel-border)",
+            background: "var(--panel-bg)",
             aspectRatio: aspect,
           }}
         >
-          <img
+          <Image
             src={src}
             alt={`Gallery image ${i + 1}`}
-            decoding="async"
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
+            layout="constrained"
+            width={width}
+            height={height}
+            priority={i === 0}
+            sizes={
+              columns === 1
+                ? "100vw"
+                : `(max-width: 720px) 100vw, ${Math.round(100 / columns)}vw`
+            }
             style={{
               width: "100%",
               height: "100%",
               objectFit: "cover",
               display: "block",
             }}
-          />t
+          />
         </div>
       ))}
     </div>

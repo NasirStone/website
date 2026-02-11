@@ -1,5 +1,42 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+function GlobalShortcuts() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    function isEditableTarget(target) {
+      if (!target) return false;
+      const el = target;
+      const tag = el.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT")
+        return true;
+      if (el.getAttribute && el.getAttribute("contenteditable") === "true")
+        return true;
+      return false;
+    }
+
+    function onKeyDown(e) {
+      // Cmd/Ctrl + C => back to landing
+      if (!(e.metaKey || e.ctrlKey)) return;
+      if (e.shiftKey || e.altKey) return;
+      if (String(e.key).toLowerCase() !== "c") return;
+
+      // Don't steal the shortcut while typing in a real field
+      if (isEditableTarget(e.target)) return;
+
+      if (location.pathname !== "/") {
+        e.preventDefault();
+        navigate("/");
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [navigate, location.pathname]);
+
+  return null;
+}
 import DronesPage from "./pages/drones.jsx";
 import NasirPage from "./pages/nasir.jsx";
 import AutonomousVehiclesPage from "./pages/autonomousvehicles.jsx";
@@ -129,19 +166,17 @@ function Landing({ theme, setTheme }) {
           zIndex: 50,
           width: isTouchUI ? 56 : 44,
           height: isTouchUI ? 48 : 38,
-          borderRadius: 10,
-          border: `1px solid ${
-            isLightMode ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)"
-          }`,
-          background: isLightMode
-            ? "rgba(245, 247, 249, 0.78)"
-            : "rgba(0,0,0,0.58)",
+          borderRadius: 0,
+          border: `3px solid ${isLightMode ? "#111" : "#f2f2f2"}`,
+          background: isLightMode ? "#ffffff" : "#0b0b0c",
           color: isLightMode
             ? "rgba(18, 10, 12, 0.92)"
             : "rgba(235,235,235,0.92)",
-          boxShadow: "0 18px 55px rgba(0,0,0,0.28)",
-          backdropFilter: "blur(10px)",
-          WebkitBackdropFilter: "blur(10px)",
+          boxShadow: isLightMode
+            ? "10px 10px 0 rgba(0,0,0,0.85)"
+            : "10px 10px 0 rgba(255,255,255,0.35)",
+          backdropFilter: "none",
+          WebkitBackdropFilter: "none",
           cursor: "pointer",
           display: "inline-flex",
           alignItems: "center",
@@ -179,22 +214,20 @@ function Landing({ theme, setTheme }) {
   const MUTED = "var(--muted)";
   const PAGE_BG = "var(--page-bg)";
 
-  // Terminal surface
-  const TERM_BG = isLight ? "rgba(245, 247, 249, 0.88)" : "rgba(12,12,13,0.90)";
-  const TERM_HDR_BG = isLight ? "rgba(0,0,0,0.035)" : "rgba(255,255,255,0.06)";
-  const TERM_BORDER = isLight ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)";
-  const INSET_LINE = isLight ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.06)";
+  // Terminal surface (brutalist)
+  const TERM_BG = isLight ? "#ffffff" : "#121214";
+  const TERM_BORDER = isLight ? "#111111" : "rgba(255,255,255,0.7)";
+  const INSET_LINE = isLight ? "#111111" : "#f2f2f2";
+  const TERM_HDR_BG = isLight ? "#e9ecef" : "#1a1a1d";
   // Word cloud (darker/inkier, less “glowy”)
   const CLOUD_COLOR = isLight ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.55)";
 
-  // Frosted glass backing for the hero title + bottom hint
-  const FROST_BG = isLight
-    ? "rgba(255,255,255,0.55)"
-    : "rgba(255,255,255,0.11)";
-  const FROST_BORDER = isLight ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.14)";
+  // Frosted glass backing for the hero title + bottom hint (brutalist)
+  const FROST_BG = isLight ? "#ffffff" : "#0b0b0c";
+  const FROST_BORDER = isLight ? "#111111" : "#f2f2f2";
   const FROST_SHADOW = isLight
-    ? "0 10px 28px rgba(0,0,0,0.10)"
-    : "0 16px 44px rgba(0,0,0,0.55)";
+    ? "10px 10px 0 rgba(0,0,0,0.85)"
+    : "6px 6px 0 rgba(255,255,255,0.14)";
 
   // Menu button
   const MENU_BG = "var(--shell-bg)";
@@ -206,12 +239,12 @@ function Landing({ theme, setTheme }) {
       return Array.isArray(parsed)
         ? parsed
         : [
-            { type: "system", text: "Nasir Sims Portfolio [Version Beta]" },
+            { type: "system", text: "Nasir Sims Portfolio [Version Alpha]" },
             { type: "system", text: "Type help to learn more" },
           ];
     } catch {
       return [
-        { type: "system", text: "Nasir Sims Portfolio [Version Beta]" },
+        { type: "system", text: "Nasir Sims Portfolio [Version Alpha]" },
         { type: "system", text: "Type help to learn more" },
       ];
     }
@@ -236,6 +269,8 @@ function Landing({ theme, setTheme }) {
   const [sidebarIn, setSidebarIn] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [contactModalIn, setContactModalIn] = useState(false);
+  const [openTerminalNotice, setOpenTerminalNotice] = useState("");
+  const [terminalVisible, setTerminalVisible] = useState(true);
   const sidebarKeywords = KEYWORDS_NORMALIZED;
   const sortedKeywords = useMemo(() => Array.from(VALID_KEYWORDS).sort(), []);
 
@@ -274,6 +309,129 @@ function Landing({ theme, setTheme }) {
   const inputRef = useRef(null);
   const titlePillRef = useRef(null);
   const [titlePillH, setTitlePillH] = useState(76);
+
+  // Terminal fullscreen state and geometry memory
+  const [isTerminalFullscreen, setIsTerminalFullscreen] = useState(false);
+  const prevTerminalPosRef = useRef(null);
+  const prevTerminalSizeRef = useRef(null);
+
+  // Terminal minimized state and geometry memory
+  const [isTerminalMinimized, setIsTerminalMinimized] = useState(false);
+  const prevMinPosRef = useRef(null);
+  const prevMinSizeRef = useRef(null);
+
+  function getTerminalHeaderHeightPx() {
+    // Header padding + text line; keep simple/stable.
+    // (Matches the current header styling: 0.85rem top/bottom padding)
+    return 62;
+  }
+
+  function enterTerminalMinimized() {
+    if (typeof window === "undefined") return;
+
+    // If fullscreen, exit fullscreen first (so geometry is sane)
+    if (isTerminalFullscreen) exitTerminalFullscreen();
+
+    // Save current geometry once
+    prevMinPosRef.current = terminalPos;
+    prevMinSizeRef.current = terminalSize;
+
+    const vw = window.innerWidth || 1200;
+    const vh = window.innerHeight || 800;
+
+    const headerH = getTerminalHeaderHeightPx();
+
+    // Keep current width, but clamp to viewport
+    const w = Math.min(terminalSize.w || 733, vw - 24);
+
+    // Random horizontal position with padding
+    const minX = 12;
+    const maxX = Math.max(12, vw - w - 12);
+    const x = Math.round(minX + Math.random() * (maxX - minX));
+
+    const y = Math.round(vh - headerH - 12);
+
+    setIsTerminalMinimized(true);
+    setTerminalPos({ x, y });
+    setTerminalSize({ w, h: headerH });
+  }
+
+  function exitTerminalMinimized() {
+    setIsTerminalMinimized(false);
+
+    if (prevMinPosRef.current) setTerminalPos(prevMinPosRef.current);
+    if (prevMinSizeRef.current) setTerminalSize(prevMinSizeRef.current);
+  }
+
+  function toggleTerminalMinimized() {
+    if (isTerminalMinimized) exitTerminalMinimized();
+    else enterTerminalMinimized();
+  }
+
+  function enterTerminalFullscreen() {
+    if (typeof window === "undefined") return;
+    // Save current windowed geometry once
+    prevTerminalPosRef.current = terminalPos;
+    prevTerminalSizeRef.current = terminalSize;
+
+    setIsTerminalFullscreen(true);
+
+    // Snap to viewport
+    setTerminalPos({ x: 0, y: 0 });
+    setTerminalSize({
+      w: window.innerWidth || 1200,
+      h: window.innerHeight || 800,
+    });
+  }
+
+  function exitTerminalFullscreen() {
+    setIsTerminalFullscreen(false);
+
+    // Restore previous geometry when available
+    if (prevTerminalPosRef.current) setTerminalPos(prevTerminalPosRef.current);
+    if (prevTerminalSizeRef.current)
+      setTerminalSize(prevTerminalSizeRef.current);
+  }
+
+  function toggleTerminalFullscreen() {
+    if (isTerminalFullscreen) exitTerminalFullscreen();
+    else enterTerminalFullscreen();
+  }
+
+  function openNewTerminal() {
+    if (typeof window === "undefined") return;
+
+    const vw = window.innerWidth || 1200;
+    const vh = window.innerHeight || 800;
+
+    // If terminal is already visible, do nothing and show notice
+    if (terminalVisible) {
+      setOpenTerminalNotice("Only when a terminal is closed, will one open");
+
+      // Clear notice after short delay
+      setTimeout(() => {
+        setOpenTerminalNotice("");
+      }, 2200);
+
+      return;
+    }
+
+    // Reopen centered
+    const { w, h } = calcTerminalSize(vw, vh);
+
+    setTerminalVisible(true);
+    setIsTerminalFullscreen(false);
+    setIsTerminalMinimized(false);
+
+    setTerminalSize({ w, h });
+    setTerminalPos({
+      x: Math.max(12, Math.round(vw / 2 - w / 2)),
+      y: Math.max(
+        minTerminalY(vw, vh),
+        Math.round(vh / 2 - h / 2 + 18 + tabletYOffset(vw, vh)),
+      ),
+    });
+  }
 
   const cmdHistoryRef = useRef([]);
   const cmdIndexRef = useRef(-1); // -1 = not browsing history
@@ -346,6 +504,25 @@ function Landing({ theme, setTheme }) {
       setIsCompact(computeIsCompact());
       setIsTouchUI(computeIsTouchUI());
 
+      if (isTerminalMinimized) {
+        const headerH = getTerminalHeaderHeightPx();
+        const w = Math.min(terminalSize.w || 733, vw - 24);
+        const x = Math.min(
+          Math.max(12, terminalPos.x),
+          Math.max(12, vw - w - 12),
+        );
+        const y = Math.round(vh - headerH - 12);
+        setTerminalSize({ w, h: headerH });
+        setTerminalPos({ x, y });
+        return;
+      }
+
+      if (isTerminalFullscreen) {
+        setTerminalSize({ w: vw, h: vh });
+        setTerminalPos({ x: 0, y: 0 });
+        return;
+      }
+
       const { w, h } = calcTerminalSize(vw, vh);
       setTerminalSize({ w, h });
 
@@ -364,7 +541,13 @@ function Landing({ theme, setTheme }) {
       window.removeEventListener("resize", onResize);
       window.removeEventListener("orientationchange", onResize);
     };
-  }, []);
+  }, [
+    isTerminalFullscreen,
+    isTerminalMinimized,
+    terminalPos.x,
+    terminalPos.y,
+    terminalSize.w,
+  ]);
 
   useEffect(() => {
     function onMove(e) {
@@ -801,6 +984,61 @@ function Landing({ theme, setTheme }) {
       return;
     }
 
+    // whoami
+    if (effectiveCmd === "whoami") {
+      setHistory((h) => [
+        ...h,
+        { type: "prompt", text: `nasir % ${raw}` },
+        { type: "output", text: "nasir" },
+      ]);
+      return;
+    }
+
+    // date
+    if (effectiveCmd === "date") {
+      const now = new Date();
+      setHistory((h) => [
+        ...h,
+        { type: "prompt", text: `nasir % ${raw}` },
+        { type: "output", text: now.toString() },
+      ]);
+      return;
+    }
+
+    // echo
+    if (effectiveCmd === "echo" || effectiveCmd.startsWith("echo ")) {
+      const echoed = effectiveCmd === "echo" ? "" : raw.slice(5);
+      const resolved = echoed.trim() === "$PWD" ? MOCK_PWD : echoed;
+      setHistory((h) => [
+        ...h,
+        { type: "prompt", text: `nasir % ${raw}` },
+        { type: "output", text: resolved },
+      ]);
+      return;
+    }
+
+    // uptime (session-based)
+    if (effectiveCmd === "uptime") {
+      const startedAt =
+        window.__terminalStartedAt || (window.__terminalStartedAt = Date.now());
+      const seconds = Math.floor((Date.now() - startedAt) / 1000);
+      const mins = Math.floor(seconds / 60);
+      const hrs = Math.floor(mins / 60);
+      const display =
+        hrs > 0
+          ? `up ${hrs}h ${mins % 60}m`
+          : mins > 0
+            ? `up ${mins}m ${seconds % 60}s`
+            : `up ${seconds}s`;
+
+      setHistory((h) => [
+        ...h,
+        { type: "prompt", text: `nasir % ${raw}` },
+        { type: "output", text: display },
+      ]);
+      return;
+    }
+
     if (effectiveCmd === "lightmode" || effectiveCmd === "darkmode") {
       const next = effectiveCmd === "lightmode" ? "light" : "dark";
       setTheme(next);
@@ -867,14 +1105,15 @@ function Landing({ theme, setTheme }) {
         { type: "output", text: "  <keyword>        open a page" },
         { type: "output", text: "  help             show this message" },
         { type: "output", text: "  ls               list available keywords" },
-        { type: "output", text: "  pwd              show current directory" },
         { type: "output", text: "  clear            clear terminal output" },
         { type: "output", text: "  lightmode        switch to light mode" },
         { type: "output", text: "  darkmode         switch to dark mode" },
         { type: "output", text: "" },
-        { type: "output", text: "Examples:" },
-        { type: "output", text: "  drones" },
-        { type: "output", text: "  ls" },
+        { type: "output", text: "" },
+        {
+          type: "output",
+          text: "cThere are many secrets in the terminal...try and find them all!",
+        },
       ]);
       return;
     }
@@ -1069,20 +1308,20 @@ function Landing({ theme, setTheme }) {
           width: 272px;
           max-height: calc(100vh - 24px);
           overflow: auto;
-          border-radius: 14px;
-          border: 1px solid ${
-            isLight ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)"
+          border-radius: 0;
+          border: 3px solid ${isLight ? "#111111" : "#f2f2f2"};
+          background: ${isLight ? "#ffffff" : "#0b0b0c"};
+          box-shadow: ${
+            isLight
+              ? "10px 10px 0 rgba(0,0,0,0.85)"
+              : "10px 10px 0 rgba(255,255,255,0.35)"
           };
-          background: ${
-            isLight ? "rgba(245, 247, 249, 0.92)" : "rgba(0, 0, 0, 0.86)"
-          };
-          box-shadow: 0 18px 55px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset;
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
           color: ${
             isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"
           };
           padding: 0.95rem 0.9rem;
-          backdrop-filter: blur(12px);
+          backdrop-filter: none;
           transform: translateX(-110%);
           transition: transform 180ms ease, opacity 180ms ease;
           opacity: 0;
@@ -1093,20 +1332,20 @@ function Landing({ theme, setTheme }) {
           width: min(720px, calc(100% - 12px));
           max-height: calc(100svh - 200px);
           overflow: auto;
-          border-radius: 14px;
-          border: 1px solid ${
-            isLight ? "rgba(0,0,0,0.14)" : "rgba(255,255,255,0.14)"
+          border-radius: 0;
+          border: 3px solid ${isLight ? "#111111" : "#f2f2f2"};
+          background: ${isLight ? "#ffffff" : "#0b0b0c"};
+          box-shadow: ${
+            isLight
+              ? "10px 10px 0 rgba(0,0,0,0.85)"
+              : "10px 10px 0 rgba(255,255,255,0.35)"
           };
-          background: ${
-            isLight ? "rgba(245, 247, 249, 0.92)" : "rgba(0, 0, 0, 0.86)"
-          };
-          box-shadow: 0 18px 55px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.06) inset;
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
           color: ${
             isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"
           };
           padding: 1.05rem 1.0rem;
-          backdrop-filter: blur(12px);
+          backdrop-filter: none;
           transform: none;
           opacity: 1;
           transition: none;
@@ -1195,47 +1434,47 @@ function Landing({ theme, setTheme }) {
             isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"
           };
         }
-        .keywordBtn {
-          width: 100%;
-          text-align: left;
-          background: ${
-            isLight ? "rgba(0,0,0,0.03)" : "rgba(255,255,255,0.03)"
-          };
-          border: 1px solid ${
-            isLight ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.10)"
-          };
-          color: ${
-            isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"
-          };
-          border-radius: 10px;
-          padding: 0.56rem 0.68rem;
-          cursor: pointer;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: 0.90rem;
-          line-height: 1.25;
-        }
-        .keywordBtn:hover {
-          background: rgba(255,255,255,0.06);
-        }
-        .keywordGrid {
-          display: grid;
-          gap: 0.55rem;
-        }
-        .menuBtn {
-          -webkit-tap-highlight-color: transparent;
-          outline: none;
-        }
-        .menuBtn:focus {
-          outline: none;
-        }
-        .menuBtn:focus-visible {
-          outline: 2px solid rgba(235,235,235,0.22);
-          outline-offset: 4px;
-          border-radius: 12px;
-        }
-        .menuBtn:hover {
-          outline: none;
-        }
+       .keywordBtn {
+  width: 100%;
+  text-align: left;
+  background: ${isLight ? "rgba(0,0,0,0.03)" : "rgba(255,255,255,0.03)"};
+  border: 1px solid ${isLight ? "rgba(0,0,0,0.10)" : "rgba(255,255,255,0.10)"};
+  color: ${isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)"};
+  border-radius: 0; /* brutalist: no rounding */
+  padding: 0.56rem 0.68rem;
+  cursor: pointer;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.90rem;
+  line-height: 1.25;
+}
+
+.keywordBtn:hover {
+  background: rgba(255,255,255,0.06);
+}
+
+.keywordGrid {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.menuBtn {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.menuBtn:focus {
+  outline: none;
+}
+
+.menuBtn:focus-visible {
+  outline: 2px solid rgba(235,235,235,0.22);
+  outline-offset: 4px;
+  border-radius: 0; /* match the rest of the UI */
+}
+
+.menuBtn:hover {
+  outline: none;
+}
         html, body, #root {
           height: 100%;
           width: 100%;
@@ -1342,12 +1581,43 @@ function Landing({ theme, setTheme }) {
                   {titleCaseWords(k)}
                 </button>
               ))}
+
+              {/* Divider (desktop sidebar only) */}
+              <div
+                style={{
+                  borderTop: `2px solid ${isLight ? "#111111" : "#f2f2f2"}`,
+                  opacity: 0.6,
+                  marginTop: "0.65rem",
+                }}
+              />
+
+              <button
+                type="button"
+                className="keywordBtn"
+                style={{ marginTop: "0.65rem" }}
+                onClick={() => openNewTerminal()}
+              >
+                Open Terminal
+              </button>
+              {openTerminalNotice ? (
+                <div
+                  style={{
+                    marginTop: "0.5rem",
+                    fontSize: "0.78rem",
+                    opacity: 0.8,
+                    fontFamily:
+                      "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+                  }}
+                >
+                  {openTerminalNotice}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
       ) : null}
 
-      {!isTouchUI ? (
+      {!isTouchUI && (!isTerminalFullscreen || !terminalVisible) ? (
         <>
           {/* global nav */}
           <button
@@ -1366,13 +1636,15 @@ function Landing({ theme, setTheme }) {
               justifyContent: "center",
               width: 56,
               height: 48,
-              background: MENU_BG,
-              border: "none",
-              borderRadius: 12,
+              background: isLight ? "#ffffff" : "#0b0b0c",
+              border: `3px solid ${isLight ? "#111" : "#cac8c8"}`,
+              borderRadius: 0,
               cursor: "pointer",
               padding: 0,
-              backdropFilter: "blur(10px)",
-              boxShadow: "0 18px 55px rgba(0,0,0,0.35)",
+              backdropFilter: "none",
+              boxShadow: isLight
+                ? "10px 10px 0 rgba(0,0,0,0.85)"
+                : "6px 6px 0 rgba(255,255,255,0.16)",
               opacity: isSidebarOpen ? 0 : 1,
               transform: isSidebarOpen ? "scale(0.92)" : "scale(1)",
               transition: "opacity 140ms ease, transform 140ms ease",
@@ -1409,7 +1681,7 @@ function Landing({ theme, setTheme }) {
         </>
       ) : null}
 
-      {!isTouchUI ? (
+      {!isTouchUI && !isTerminalFullscreen ? (
         <>
           {/* background typed text (behind terminal, above keywords) */}
           <div
@@ -1595,7 +1867,7 @@ function Landing({ theme, setTheme }) {
             left: item.left,
             top: item.top,
             fontFamily: MONO,
-            letterSpacing: "0.06em",
+            letterSpacing: "0.02em",
             mixBlendMode: isLight ? "multiply" : "screen",
             transform: "translateZ(0)",
             fontSize: item.fontSize,
@@ -1855,25 +2127,59 @@ function Landing({ theme, setTheme }) {
         </>
       ) : null}
 
-      {!isTouchUI ? (
+      {!isTouchUI && terminalVisible ? (
         <div
-          style={{
-            position: "absolute",
-            left: terminalPos.x,
-            top: terminalPos.y,
-            zIndex: 5,
-          }}
+          style={
+            isTerminalFullscreen
+              ? {
+                  position: "fixed",
+                  inset: 0,
+                  zIndex: 80,
+                }
+              : isTerminalMinimized
+                ? {
+                    position: "fixed",
+                    left: terminalPos.x,
+                    top: terminalPos.y,
+                    zIndex: 80,
+                  }
+                : {
+                    position: "absolute",
+                    left: terminalPos.x,
+                    top: terminalPos.y,
+                    zIndex: 5,
+                  }
+          }
         >
           {/* terminal window */}
           <div
             className="terminalWindow"
             style={{
-              borderRadius: 14,
-              border: `1px solid ${TERM_BORDER}`,
+              borderRadius: 0,
+              border: `3px solid ${TERM_BORDER}`,
               background: TERM_BG,
-              boxShadow: `0 24px 70px rgba(0,0,0,0.55), 0 0 0 1px ${INSET_LINE} inset`,
-              backdropFilter: isCompact ? "none" : "blur(14px)",
+              boxShadow: isTerminalFullscreen
+                ? "none"
+                : isLight
+                  ? `12px 12px 0 rgba(0,0,0,0.85)`
+                  : `6px 6px 0 rgba(255,255,255,0.14)`,
+              backdropFilter: "none",
               overflow: "hidden",
+              width: isTerminalMinimized
+                ? terminalSize.w
+                : isTerminalFullscreen
+                  ? "100vw"
+                  : undefined,
+              height: isTerminalMinimized
+                ? terminalSize.h
+                : isTerminalFullscreen
+                  ? "100vh"
+                  : undefined,
+              maxHeight: isTerminalMinimized
+                ? terminalSize.h
+                : isTerminalFullscreen
+                  ? "100vh"
+                  : undefined,
             }}
           >
             {/* terminal header */}
@@ -1883,17 +2189,19 @@ function Landing({ theme, setTheme }) {
                 display: "flex",
                 alignItems: "center",
                 gap: 10,
-                padding: "0.75rem 1rem",
-                borderBottom: `1px solid ${
-                  isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.08)"
-                }`,
+                padding: "0.85rem 1rem",
+                borderBottom: `3px solid ${TERM_BORDER}`,
                 background: TERM_HDR_BG,
-                cursor: isCompact ? "default" : "grab",
+                cursor:
+                  isCompact || isTerminalFullscreen || isTerminalMinimized
+                    ? "default"
+                    : "grab",
                 userSelect: "none",
                 touchAction: "none",
               }}
               onPointerDown={(e) => {
-                if (isCompact) return;
+                if (isCompact || isTerminalFullscreen || isTerminalMinimized)
+                  return;
                 // Don't start dragging when clicking interactive controls in the header
                 if (e.target && typeof e.target.closest === "function") {
                   const btn = e.target.closest("button");
@@ -1922,31 +2230,68 @@ function Landing({ theme, setTheme }) {
               }}
             >
               <div style={{ display: "flex", gap: 8 }}>
-                <span
+                <button
+                  type="button"
+                  aria-label="Close terminal"
+                  onClick={() => {
+                    // If the terminal is fullscreen, exit fullscreen so global UI (menu) is reachable.
+                    if (isTerminalMinimized) exitTerminalMinimized();
+                    if (isTerminalFullscreen) exitTerminalFullscreen();
+                    setTerminalVisible(false);
+                  }}
                   className="trafficDot trafficRed"
                   style={{
-                    width: 12.6,
-                    height: 12.6,
-                    borderRadius: 999,
+                    width: 15,
+                    height: 15,
+                    padding: 0,
+                    borderRadius: 0,
                     background: "rgba(255, 95, 86, 0.9)",
+                    border: isLight
+                      ? "1.5px solid #111"
+                      : "1.5px solid #f2f2f2",
+                    cursor: "pointer",
                   }}
                 />
-                <span
+                <button
+                  type="button"
+                  aria-label={
+                    isTerminalMinimized
+                      ? "Restore terminal"
+                      : "Minimize terminal"
+                  }
+                  onClick={toggleTerminalMinimized}
                   className="trafficDot trafficYellow"
                   style={{
-                    width: 12.6,
-                    height: 12.6,
-                    borderRadius: 999,
+                    width: 15,
+                    height: 15,
+                    padding: 0,
+                    borderRadius: 0,
                     background: "rgba(255, 189, 46, 0.9)",
+                    border: isLight
+                      ? "1.5px solid #111"
+                      : "1.5px solid #f2f2f2",
+                    cursor: "pointer",
                   }}
                 />
-                <span
+                <button
+                  type="button"
+                  aria-label={
+                    isTerminalFullscreen
+                      ? "Exit fullscreen"
+                      : "Enter fullscreen"
+                  }
+                  onClick={toggleTerminalFullscreen}
                   className="trafficDot trafficGreen"
                   style={{
-                    width: 12.6,
-                    height: 12.6,
-                    borderRadius: 999,
+                    width: 15,
+                    height: 15,
+                    padding: 0,
+                    borderRadius: 0,
                     background: "rgba(39, 201, 63, 0.9)",
+                    border: isLight
+                      ? "1.5px solid #111"
+                      : "1.5px solid #f2f2f2",
+                    cursor: "pointer",
                   }}
                 />
               </div>
@@ -1979,49 +2324,59 @@ function Landing({ theme, setTheme }) {
                 fontFamily: MONO,
                 lineHeight: 1.55,
                 color: FG,
+                display: isTerminalMinimized ? "none" : "block",
               }}
             >
               {/* history */}
               <div
                 style={{
                   display: "grid",
-                  gap: "0.35rem",
+                  gap: 0,
                 }}
               >
-                {history.map((line, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      opacity: 1,
-                      color: line.type === "system" ? MUTED : undefined,
-                      whiteSpace: "pre",
-                    }}
-                  >
-                    {line.type === "error" ? (
-                      <span style={{ color: "rgba(255, 120, 120, 0.95)" }}>
-                        {line.text}
-                      </span>
-                    ) : line.type === "link" ? (
-                      <a
-                        href={line.href}
-                        download={line.download ? "resume" : undefined}
-                        target={line.newTab ? "_blank" : undefined}
-                        rel={line.newTab ? "noreferrer" : undefined}
-                        style={{
-                          color:
-                            theme === "light"
-                              ? "rgba(18, 10, 12, 0.85)"
-                              : "rgba(220,220,220,0.92)",
-                          textDecoration: "underline",
-                        }}
-                      >
-                        {line.text}
-                      </a>
-                    ) : (
-                      <span>{line.text}</span>
-                    )}
-                  </div>
-                ))}
+                {history
+                  .filter(
+                    (line) =>
+                      !(
+                        line &&
+                        typeof line.text === "string" &&
+                        line.text === ""
+                      ),
+                  )
+                  .map((line, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        opacity: 1,
+                        color: line.type === "system" ? MUTED : undefined,
+                        whiteSpace: "pre",
+                      }}
+                    >
+                      {line.type === "error" ? (
+                        <span style={{ color: "rgba(255, 120, 120, 0.95)" }}>
+                          {line.text}
+                        </span>
+                      ) : line.type === "link" ? (
+                        <a
+                          href={line.href}
+                          download={line.download ? "resume" : undefined}
+                          target={line.newTab ? "_blank" : undefined}
+                          rel={line.newTab ? "noreferrer" : undefined}
+                          style={{
+                            color:
+                              theme === "light"
+                                ? "rgba(18, 10, 12, 0.85)"
+                                : "rgba(220,220,220,0.92)",
+                            textDecoration: "underline",
+                          }}
+                        >
+                          {line.text}
+                        </a>
+                      ) : (
+                        <span>{line.text}</span>
+                      )}
+                    </div>
+                  ))}
               </div>
 
               {isLoading ? (
@@ -2043,8 +2398,7 @@ function Landing({ theme, setTheme }) {
               <form
                 onSubmit={onSubmit}
                 style={{
-                  marginTop:
-                    history.length || isLoading ? "1.25rem" : "0.25rem",
+                  marginTop: "0.35rem",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -2187,7 +2541,7 @@ function Landing({ theme, setTheme }) {
           </div>
         </div>
       ) : null}
-      {!isTouchUI ? (
+      {!isTouchUI && !isTerminalFullscreen && terminalVisible ? (
         <div
           style={{
             position: "absolute",
@@ -2280,14 +2634,23 @@ export default function App() {
   }, [theme]);
 
   return (
-    <Routes>
-      <Route path="/" element={<Landing theme={theme} setTheme={setTheme} />} />
-      <Route path="/drones" element={<DronesPage />} />
-      <Route path="/nasir" element={<NasirPage />} />
-      <Route path="/autonomous-vehicles" element={<AutonomousVehiclesPage />} />
-      <Route path="/rocketry" element={<RocketryPage />} />
-      <Route path="/travel" element={<TravelPage />} />
-      <Route path="/vintage-audio" element={<VintageAudioPage />} />
-    </Routes>
+    <>
+      <GlobalShortcuts />
+      <Routes>
+        <Route
+          path="/"
+          element={<Landing theme={theme} setTheme={setTheme} />}
+        />
+        <Route path="/drones" element={<DronesPage />} />
+        <Route path="/nasir" element={<NasirPage />} />
+        <Route
+          path="/autonomous-vehicles"
+          element={<AutonomousVehiclesPage />}
+        />
+        <Route path="/rocketry" element={<RocketryPage />} />
+        <Route path="/travel" element={<TravelPage />} />
+        <Route path="/vintage-audio" element={<VintageAudioPage />} />
+      </Routes>
+    </>
   );
 }

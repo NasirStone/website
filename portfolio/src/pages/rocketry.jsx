@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageShell from "../components/PageShell.jsx";
 import TextPanel from "../components/ui/TextPanel.jsx";
-import { asset } from "../components/uiConstants.js";
+import { asset, MONO } from "../components/uiConstants.js";
 import GalleryGrid from "../components/GalleryGrid.jsx";
 
 const ROCKETRY_MEDIA = {
@@ -13,10 +13,10 @@ const ROCKETRY_MEDIA = {
   FULL_ASSEMBLY_EXPLODED: "images/rocketry/Full_Assembly_Exploded.webp",
 
   AIRBRAKES: [
-    "images/rocketry/Airbrakes Assembly Solo Retracted Top.webp", // 3
-    "images/rocketry/Airbrakes Assembly Solo Extended Top.webp", // 1
-    "images/rocketry/Airbrakes Assembly Solo Iso.webp", // 2
-    "images/rocketry/FS_Assembled_Paddle.webp", // 4
+    "images/rocketry/Airbrakes Assembly Solo Retracted Top.webp",
+    "images/rocketry/Airbrakes Assembly Solo Extended Top.webp", 
+    "images/rocketry/Airbrakes Assembly Solo Iso.webp",
+    "images/rocketry/FS_Assembled_Paddle.webp",
   ],
 
   CAMERA: [
@@ -26,12 +26,17 @@ const ROCKETRY_MEDIA = {
 };
 
 const VIDEO_SRC = asset(ROCKETRY_MEDIA.VIDEO);
+const VIDEO_POSTER = asset("images/rocketry/rocketry_poster.webp");
 const LOGO_WHITE = asset(ROCKETRY_MEDIA.LOGO_WHITE);
+const CAMERA_DOC_PDF = asset("papers/WURocketry_Camera_Documentation.pdf");
 const fullAssemblyImg = asset(ROCKETRY_MEDIA.FULL_ASSEMBLY);
 const fullAssemblyExplodedImg = asset(ROCKETRY_MEDIA.FULL_ASSEMBLY_EXPLODED);
 
 const airbrakeImages = ROCKETRY_MEDIA.AIRBRAKES;
 const cameraImages = ROCKETRY_MEDIA.CAMERA;
+
+const BODY_FONT_SIZE = "clamp(1.02rem, 3.6vw, 1.12rem)";
+const BODY_LINE_HEIGHT = 1.7;
 
 function clamp01(x) {
   return Math.max(0, Math.min(1, x));
@@ -67,8 +72,8 @@ const styles = {
     overflowX: "hidden",
     position: "relative",
     touchAction: "pan-y",
-    fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
-    lineHeight: 1.7,
+    fontSize: BODY_FONT_SIZE,
+    lineHeight: BODY_LINE_HEIGHT,
     wordBreak: "break-word",
   },
   centerRow: {
@@ -78,14 +83,15 @@ const styles = {
   },
   sectionHeading: {
     textAlign: "center",
+    fontFamily: MONO,
     fontSize: "clamp(1.6rem, 3vw, 2.2rem)",
     fontWeight: 700,
     letterSpacing: "-0.01em",
   },
   centeredPanelBody: {
     textAlign: "center",
-    fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
-    lineHeight: 1.7,
+    fontSize: BODY_FONT_SIZE,
+    lineHeight: BODY_LINE_HEIGHT,
     opacity: 0.9,
     wordBreak: "break-word",
   },
@@ -93,8 +99,8 @@ const styles = {
     maxWidth: "820px",
     margin: "0 auto",
     opacity: 0.95,
-    fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
-    lineHeight: 1.7,
+    fontSize: BODY_FONT_SIZE,
+    lineHeight: BODY_LINE_HEIGHT,
   },
 };
 
@@ -107,7 +113,7 @@ function CenteredPanel({ title, children, panelStyle }) {
     <TextPanel
       title={title}
       style={{
-        lineHeight: 1.7,
+        lineHeight: BODY_LINE_HEIGHT,
         textAlign: "center",
         wordBreak: "break-word",
         ...(panelStyle || {}),
@@ -123,6 +129,7 @@ export default function RocketryPage() {
 
   const stickyRegionRef = useRef(null);
   const assemblyRegionRef = useRef(null);
+  const heroVideoRef = useRef(null);
 
   const [p, setP] = useState(0);
   const [a, setA] = useState(0);
@@ -157,6 +164,56 @@ export default function RocketryPage() {
     };
   }, []);
 
+  useEffect(() => {
+    const v = heroVideoRef.current;
+    if (!v) return;
+
+    let cancelled = false;
+
+    const tryPlay = async () => {
+      if (cancelled) return;
+      try {
+        // iOS Safari can be flaky: a gentle kick on mount/canplay helps.
+        await v.play();
+      } catch {
+        // Autoplay may still be blocked; poster will show until user interacts.
+      }
+    };
+
+    // Kick once immediately and once when the browser says it's ready.
+    const onCanPlay = () => {
+      tryPlay();
+    };
+    v.addEventListener("canplay", onCanPlay);
+    tryPlay();
+
+    // Pause when offscreen to reduce decode/network churn; resume when visible.
+    const io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          tryPlay();
+        } else {
+          try {
+            v.pause();
+          } catch {
+            // ignore
+          }
+        }
+      },
+      { threshold: 0.2 },
+    );
+
+    io.observe(v);
+
+    return () => {
+      cancelled = true;
+      v.removeEventListener("canplay", onCanPlay);
+      io.disconnect();
+    };
+  }, []);
+
   // Darken video as you scroll (smooth, non abrupt)
   const dim = 0.08 + p * 0.62; // ~0.08 -> ~0.70
 
@@ -186,7 +243,6 @@ export default function RocketryPage() {
             grid-template-columns: 1.1fr 0.9fr;
             gap: 32px;
             align-items: start;
-            position: relative;
           }
           .projectText {
             position: relative;
@@ -197,6 +253,23 @@ export default function RocketryPage() {
             position: relative;
             z-index: 1;
           }
+          .cameraRow {
+            align-items: stretch;
+          }
+          .cameraRow .projectMedia {
+            display: flex;
+            align-items: stretch;
+          }
+          .cameraRow .projectMedia > * {
+            flex: 1;
+          }
+          .cameraRow .projectText {
+            display: flex;
+            align-items: stretch;
+          }
+          .cameraRow .projectText > * {
+            flex: 1;
+          }
           @media (max-width: 720px) {
             .projectsRow {
               grid-template-columns: 1fr;
@@ -204,7 +277,6 @@ export default function RocketryPage() {
             }
             .projectMedia { order: 1; }
             .projectText { order: 2; }
-            .airbrakeRow .projectHero { display: none; }
           }
         `}</style>
         {/* Sticky video region */}
@@ -224,12 +296,14 @@ export default function RocketryPage() {
             <style>{KEYFRAMES}</style>
 
             <video
+              ref={heroVideoRef}
               src={VIDEO_SRC}
+              poster={VIDEO_POSTER}
               autoPlay
               muted
               loop
               playsInline
-              preload="auto"
+              preload="metadata"
               style={{
                 position: "absolute",
                 inset: 0,
@@ -273,6 +347,7 @@ export default function RocketryPage() {
                 position: "absolute",
                 top: "20px",
                 left: "22px",
+                fontFamily: MONO,
                 fontSize: "0.95rem",
                 letterSpacing: "0.02em",
                 opacity: titleOpacity,
@@ -369,23 +444,20 @@ export default function RocketryPage() {
                 <TextPanel
                   style={{
                     textAlign: "center",
-                    fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
-                    lineHeight: 1.7,
+                    fontFamily: MONO,
+                    fontSize: BODY_FONT_SIZE,
+                    lineHeight: BODY_LINE_HEIGHT,
                     wordBreak: "break-word",
                   }}
                 >
                   WURocketry is Washington University in St. Louis's
-                  High-Powered Rocketry team. In my freshman year, I was a
-                  member of the Avionics subteam, where I led the development of
-                  a LoRa Telemetry Base Station to track flight parameters
-                  during launch. In my sophomore year, I was a Co-Lead of the
-                  Avionics subteam, where I helped develop our Airbrake Control
-                  System and a full redesign of our camera system.
-                  <br />
-                  Now, as a junior, I serve as the team's Chief Safety Officer,
-                  acting as the primary liaison between WURocketry and NASA
-                  safety officials and ensuring compliance with NASA Student
-                  Launch safety requirements.
+                  high-powered rocketry team, focused on designing, building,
+                  and flying student-developed launch vehicles for NASA's USLI
+                  competition. My involvement has spanned research,
+                  implementation, and testing of avionics systems, and now
+                  centers on my role as Chief Safety Officer, coordinating
+                  directly with NASA safety officials and ensuring the team
+                  meets all NASA Student Launch safety requirements.
                 </TextPanel>
               </div>
             </div>
@@ -490,8 +562,8 @@ export default function RocketryPage() {
               <TextPanel
                 style={{
                   ...styles.centeredPanelBody,
-                  fontSize: "clamp(1.02rem, 3.6vw, 1.12rem)",
-                  lineHeight: 1.7,
+                  fontSize: BODY_FONT_SIZE,
+                  lineHeight: BODY_LINE_HEIGHT,
                   wordBreak: "break-word",
                 }}
               >
@@ -503,15 +575,13 @@ export default function RocketryPage() {
                 and a total length of 9.5ft. The vehicle's wet mass is ~48lbs.
                 <br />
                 <br />
-                Inside, Ursa Major is built around instrumentation and
-                recoverability. A dual-deploy recovery profile brings the rocket
-                down in three tethered sections, with a drogue event near apogee
-                and a main deployment around 550 ft AGL. The recovery
-                electronics are redundant: a primary flight computer (TeleMega)
-                handles the nominal sequence, while a secondary computer
-                (EasyMini) fires backup events on offset timing to protect
-                against single-point failures. The result is a vehicle that
-                prioritises clean data, reliable deployment, and fast iteration.
+                A dual-deploy recovery profile brings the rocket down in three
+                tethered sections, with a drogue event near apogee and a main
+                deployment around 550 ft AGL. The recovery electronics are
+                redundant: a primary flight computer (TeleMega) handles the
+                nominal sequence, while a secondary computer (EasyMini) fires
+                backup events on offset timing to protect against single-point
+                failures.
                 <br />
                 <br />
                 Ursa Major is also built around creative design challenges. The
@@ -561,28 +631,20 @@ export default function RocketryPage() {
                 <CenteredPanel title="Airbrake Control System">
                   Our Airbrake Control System is a mechanism that dynamically
                   increases aerodynamic drag after motor burnout to control
-                  rocket apogee. The system uses four radially mounted paddles
-                  that extend into the airflow, allowing the vehicle to
-                  compensate for motor performance, wind conditions, and mass.
+                  rocket apogee.
                   <br />
-                  <br />
-                  As project lead, I directed the development of the system's
-                  embedded control software. I spearheaded the implementation of
-                  a feedforward control strategy using state estimation and
-                  Kalman filtering to predict apogee in real time, complemented
-                  by PID motor control for precise paddle positioning. Under my
-                  leadership, the system underwent extensive bench tests,
-                  elevator tests, and telemetry-driven validation to ensure
-                  reliable deployment and retraction.
-                  <br />
-                  <br />
+                  <br />I directed the development of the system's embedded
+                  control software. I spearheaded the implementation of sensor
+                  fusion to be used in the feedforward system. Under my
+                  leadership, the airbrake system underwent extensive testing to
+                  ensure reliable and accurate deployment.
                 </CenteredPanel>
               </div>
             </div>
 
             <div aria-hidden style={{ height: "clamp(12px, 2vw, 18px)" }} />
 
-            <div className="projectsRow">
+            <div className="projectsRow cameraRow">
               <div className="projectMedia">
                 <GalleryGrid
                   images={cameraImages}
@@ -599,7 +661,6 @@ export default function RocketryPage() {
                   }}
                 />
               </div>
-
               <div className="projectText">
                 <CenteredPanel
                   title="Bi-Directional Camera System"
@@ -614,30 +675,43 @@ export default function RocketryPage() {
                     backgroundClip: "padding-box",
                   }}
                 >
-                  Another project I took on was rebuilding our onboard camera
-                  system. This redesign was necessary to more reliably capture
-                  both forward and aft flight footage for post-flight analysis
-                  and airbrake verification.
-                  <br />
-                  <br />
-                  Our previous setup used off-the-shelf spy cameras mounted
-                  externally, and they were a constant source of frustration. On
-                  landing, they could shift or pop loose, and we would lose
-                  footage necessary to validate deployment. I worked with
-                  various subteams to redesign the system around Raspberry Pi
-                  Zero modules with compact camera attachments, so everything
-                  could be cleanly housed inside the rocket. Each unit boots
-                  directly into recording using a lightweight startup script.
-                  <br />
-                  <br />
-                  The biggest challenge was power and durability. We moved from
-                  bulky power banks to the rocket's existing LiPo batteries,
-                  then iterated on the connector design after we saw strain and
-                  broken solder joints after flight. Once the hardware was
-                  dependable, I focused on making the footage easy to retrieve.
-                  By combining SSH access via hotspot with local encoding and
-                  simple conversion scripts, we cut post-flight recovery from
-                  hours down to seconds.
+                  <div style={{ display: "grid", gap: "1.1rem" }}>
+                    <div>
+                      I led a redesign of WURocketry's onboard camera system to
+                      improve reliability and post-flight data recovery. The
+                      previous setup was loosely integrated and prone to
+                      dislodging during flight, often resulting in lost footage.
+                    </div>
+
+                    <div>
+                      Working across subteams, we rebuilt the system around
+                      Raspberry Pi Zero modules with compact camera attachements
+                      that were cleanly housed in the rocket. Each unit boots
+                      directly into recording via a lightweight startup script.
+                    </div>
+
+                    <div>
+                      We integrated the cameras with the rocket's existing LiPo
+                      power system and further iterated on connector and
+                      mounting designs. Then, I improved data retrieval using
+                      SSH over a local hotspot with onboard encoding, cutting
+                      post-flight recovery from hours to seconds.
+                    </div>
+                    <a
+                      href={CAMERA_DOC_PDF}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        fontFamily: MONO,
+                        fontSize: "0.95rem",
+                        color: "var(--fg)",
+                        textDecoration: "underline",
+                        opacity: 0.9,
+                      }}
+                    >
+                      WURocketry Camera Documentation (PDF)
+                    </a>
+                  </div>
                 </CenteredPanel>
               </div>
             </div>

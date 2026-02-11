@@ -11,6 +11,7 @@ const AV_MEDIA = {
   CARLA_LEFT_TURN: "images/autonomous/right_carla.webp",
   MINICITY_LEFT_TURN: "images/autonomous/right_mc.webp",
   ROS_2: "images/autonomous/nasir_av.webp",
+  F1TENTH_PLATFORM: "images/autonomous/F1Tenth.webp",
 };
 
 const PAPER_DOWNLOADS = [
@@ -82,6 +83,49 @@ export default function AutonomousVehiclesPage() {
               grid-column: 1 / -1 !important;
             }
           }
+          .miniCityRow {
+            display: grid;
+            gap: 1rem;
+          }
+
+          /* Two small images (thumbnail size) with a shared body paragraph underneath */
+          .miniCityMediaRow {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 0.9rem;
+            align-items: start;
+            justify-content: end;
+          }
+
+          .miniCityMediaItem {
+            min-width: 0;
+            width: clamp(170px, 18vw, 230px);
+          }
+
+          .miniCitySplit {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1.25rem;
+            align-items: start;
+          }
+
+          .miniCityText {
+            min-width: 0;
+          }
+
+          @media (max-width: 720px) {
+            .miniCityMediaRow {
+              grid-template-columns: 1fr;
+              justify-content: stretch;
+            }
+            .miniCityMediaItem {
+              width: min(320px, 92vw);
+              margin-inline: auto;
+            }
+            .miniCitySplit {
+              grid-template-columns: 1fr;
+            }
+          }
         `}</style>
         {/* Summary */}
         <TextPanel
@@ -105,14 +149,6 @@ export default function AutonomousVehiclesPage() {
             traffic, and more.
             <br />
             <br />
-            A key part of this workflow was data and labeling. We captured
-            simulations in CARLA and on the physical Mini City environment.
-            Then, we annotated frames to support supervised learning tasks. This
-            made it easier to debug, as if the agent failed a left turn, we
-            could trace it back to what the model saw and what the label
-            pipeline expected.
-            <br />
-            <br />
             {/* Visual comparison embedded in the narrative (CARLA vs Mini City) */}
             <div style={{ marginTop: "1rem" }}>
               <GalleryGrid
@@ -127,7 +163,7 @@ export default function AutonomousVehiclesPage() {
               </div>
             </div>
             <br />
-            My work spanned two threads. First, intersection handling in CARLA,
+            My work spanned two threads: First, intersection handling in CARLA,
             where the agent must detect an upcoming intersection, choose the
             correct lane, and execute a clean left, right, or straight maneuver.
             Second, the transition from reinforcement learning-based control to
@@ -145,87 +181,105 @@ export default function AutonomousVehiclesPage() {
             marginTop: "1rem",
           }}
         >
-          <div style={{ gridColumn: "span 7" }}>
+          <div style={{ gridColumn: "1 / -1" }}>
             <TextPanel title="F1TENTH / Mini City Platform">
-              <div style={BODY_TEXT_STYLE}>
-                The physical testbed is a small-scale vehicle running a ROS
-                2-based stack with a vision-first pipeline. The on-car computer
-                is a Jetson Xavier NX, and the primary sensor for autonomy is a
-                forward camera, with IMU support available for state estimation.
-                This setup lets us validate the same ideas in both simulation
-                and a real environment with repeatable intersections and lane
-                markings.
-                <br />
-                <br />
-                Building on this setup, Mini City allows the platform to
-                consistently capture data with lane markings, pedestrians, cars,
-                foliage, and more.
-                <br />
-                <br />
-                <div style={{ marginTop: "0.75rem" }}>
-                  <div
-                    style={{
-                      fontSize: "0.9rem",
-                      opacity: 0.85,
-                      marginBottom: "0.5rem",
-                    }}
-                  ></div>
-                  <div
-                    style={{
-                      borderRadius: 12,
-                      overflow: "hidden",
-                      border: "1px solid var(--panel-border)",
-                      background: "var(--panel-bg)",
-                      aspectRatio: "16 / 9",
-                    }}
-                  >
-                    <img
-                      src={asset(AV_MEDIA.ROS_2)}
-                      alt="Annotation example"
-                      loading="lazy"
-                      decoding="async"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                        display: "block",
-                      }}
-                    />
+              <div className="miniCityRow" style={{ marginTop: "0.75rem" }}>
+                <div className="miniCitySplit">
+                  <div className="miniCityText" style={BODY_TEXT_STYLE}>
+                    Mini City let us repeatedly capture structured driving data
+                    with lane markings, pedestrians, cars, foliage, and
+                    controlled intersection geometry.
+                    <br />
+                    <br />
+                    The platform is built on a Traxxas Rally 4WD chassis, with a
+                    VESC-based electronic speed controller for the drive stack
+                    and a Jetson Xavier NX onboard computer for perception and
+                    autonomy. The primary sensor is a Logitech C920 USB camera,
+                    and a SparkFun IMU provides acceleration and orientation
+                    estimates for speed.
+                    <br />
+                    <br />
+                    The software pipeline is ROS 2 end-to-end. The
+                    camera node publishes frames, image transport
+                    republishes a compressed stream for faster intra-ROS
+                    messaging, and the LaneNet-based image processor turns each
+                    frame into lane geometry and a trajectory to follow. An IMU
+                    driver node and a complementary filter node refine inertial
+                    measurements, and the driver stack consumes the perception
+                    outputs to generate continuous steering and throttle
+                    commands.
                   </div>
-                </div>
-              </div>
-            </TextPanel>
-          </div>
+                  <div className="miniCityMediaRow">
+                    <div className="miniCityMediaItem">
+                      <div
+                        style={{
+                          borderRadius: 0,
+                          overflow: "hidden",
+                          border: "2px solid var(--panel-border)",
+                          background: "var(--panel-bg)",
+                          aspectRatio: "1 / 1",
+                        }}
+                      >
+                        <img
+                          src={asset(AV_MEDIA.F1TENTH_PLATFORM)}
+                          alt="F1TENTH platform hardware stack"
+                          loading="lazy"
+                          decoding="async"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            display: "block",
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          marginTop: "0.5rem",
+                          fontSize: "0.9rem",
+                          opacity: 0.85,
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        F1TENTH drive stack with onboard compute and sensors.
+                      </div>
+                    </div>
 
-          <div style={{ gridColumn: "span 5" }}>
-            <TextPanel title="What I Built and Improved">
-              <div
-                style={{
-                  marginTop: "0.25rem",
-                  ...BULLET_STYLE,
-                  display: "grid",
-                  gap: "0.55rem",
-                }}
-              >
-                <div>
-                  • Built a repeatable CARLA intersection testing suite across
-                  towns and conditions
-                </div>
-                <div>
-                  • Collected and labeled simulation and Mini City data for
-                  supervised learning
-                </div>
-                <div>
-                  • Defined and benchmarked intersection failure modes to guide
-                  iteration
-                </div>
-                <div>
-                  • Implemented a modular intersection handling pipeline
-                  (perception → decision → control)
-                </div>
-                <div>
-                  • Trained and evaluated a turn intent image classifier from
-                  annotated frames
+                    <div className="miniCityMediaItem">
+                      <div
+                        style={{
+                          borderRadius: 0,
+                          overflow: "hidden",
+                          border: "2px solid var(--panel-border)",
+                          background: "var(--panel-bg)",
+                          aspectRatio: "1 / 1",
+                        }}
+                      >
+                        <img
+                          src={asset(AV_MEDIA.ROS_2)}
+                          alt="F1TENTH platform running a ROS 2 vision pipeline"
+                          loading="lazy"
+                          decoding="async"
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            display: "block",
+                          }}
+                        />
+                      </div>
+                      <div
+                        style={{
+                          marginTop: "0.5rem",
+                          fontSize: "0.9rem",
+                          opacity: 0.85,
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        ROS 2 vision-first pipeline on the F1TENTH platform.
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </TextPanel>
@@ -252,8 +306,8 @@ export default function AutonomousVehiclesPage() {
           <div style={{ gridColumn: "span 6" }}>
             <TextPanel title="Classification Model for Turn Intent">
               <div style={BODY_TEXT_STYLE}>
-                To make the system more modular, I explored a simple supervised
-                model that classifies a front-facing image (windshield) as a
+                To make the system modular, I explored a simple supervised
+                model that classifies a front-facing image as a
                 left, right, or straight turn context. The classifier acts as a
                 high level policy signal, with a separate control module
                 responsible for steering and speed tracking. This separation

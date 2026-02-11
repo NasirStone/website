@@ -22,11 +22,7 @@ export default function VintageAudioPage() {
       onBack={() => navigate("/")}
       maxWidth="1750px"
     >
-      <GalleryGrid
-        images={[AV_SETUP]}
-        columns={1}
-        aspect="16 / 9"
-      />
+      <GalleryGrid images={[AV_SETUP]} columns={1} aspect="16 / 9" />
       <TextPanel
         marginTop="1rem"
         header={
@@ -40,17 +36,13 @@ export default function VintageAudioPage() {
             wordBreak: "break-word",
           }}
         >
-          I have always loved fixing things, but this hobby has usually
-          consisted of mechanical objects (cars, bikes, computers). As I grew my
-          physical music collection to over 150+ items in all different formats,
-          it was only a matter of time before obtaining the devices to play them
-          would pique my interest. Electrical work has never been my forte, but
-          taking on these projects has given me so much knowledge through trial
-          and error and self-learning. What I love most about fixing vintage
-          technology is that it is generally built with much more care and
-          serviceability in mind. While parts may be difficult to source at
-          times, there is often a dedicated and passionate community that is
-          always available to help with any device.
+          I have always enjoyed fixing mechanical systems like cars, bikes, and
+          computers. As my physical music collection grew, my interest expanded
+          to restoring the equipment used to play it. Electrical work has never
+          been my forte, but these projects pushed me to learn through
+          experimentation and self-teaching. What I love most about vintage
+          technology is its high-quality components and serviceable design
+          compared to modern systems.
           <br />
           <br />
           The list below serves as an updated log of the audio projects I have:
@@ -79,8 +71,8 @@ export default function VintageAudioPage() {
               of the units power on.
               <br />
               <b>Work:</b> After a visual inspection, no capacitors are blown
-              (verified with multimeter against capacitance values). <br />
-              Checks against wiring diagram in progress.
+              (verified with multimeter against capacitance values). Checks
+              against wiring diagram in progress.
               <br />
               <b>Status:</b> On hold.
             </div>

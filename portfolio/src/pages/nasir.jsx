@@ -63,8 +63,8 @@ export default function NasirPage() {
               <br />
               <br />
               At WashU, I am involved in our High Powered Rocketry team,
-              WURocketry, where I serve as Chief Safety Officer. I also
-              participated in an Autonomous Vehicle Research lab that aims to
+              WURocketry, where I serve as Chief Safety Officer. I was also
+              involved in an Autonomous Vehicle Research lab that aims to
               develop safer agents through rapid, iterative simulations in CARLA
               and a 1:8 scale city model. I also serve as an Information
               Security GRC Analyst for WashU's IT department, and I am the Head
@@ -74,9 +74,8 @@ export default function NasirPage() {
               <br />
               Outside of school, I love fixing things and getting my hands
               dirty. I repair anything from cars and bikes, to vintage audio
-              equipment. I love road trips (my longest was 6,000 plus miles), I
-              collect all different music formats, and I have a pet lizard whom
-              I adore very much.
+              equipment. I love road trips (my longest was 6,000+ miles), I
+              collect all different music formats, and I have a pet lizard.
               <br />
               <br />I built this website not only to showcase my software
               projects, but also to reveal my interests. Thanks for visiting!
