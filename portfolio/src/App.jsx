@@ -17,12 +17,10 @@ function GlobalShortcuts() {
     }
 
     function onKeyDown(e) {
-      // Cmd/Ctrl + C => back to landing
       if (!(e.metaKey || e.ctrlKey)) return;
       if (e.shiftKey || e.altKey) return;
       if (String(e.key).toLowerCase() !== "c") return;
 
-      // Don't steal the shortcut while typing in a real field
       if (isEditableTarget(e.target)) return;
 
       if (location.pathname !== "/") {
@@ -48,8 +46,6 @@ const SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif';
 const MONO = "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace";
 
-// Resume link: defaults to /resume.pdf (place the PDF in /public),
-// but can be overridden via Vite env var VITE_RESUME_URL.
 const RESUME_URL = (import.meta?.env?.VITE_RESUME_URL || "/resume.pdf").trim();
 
 // Mock present working directory for 'pwd' command.
@@ -130,7 +126,6 @@ function wordCloudStyle(seed) {
   const topPct = Math.floor(seeded01(seed + 2) * 96) + 2; // 2%..98%
 
   const size = 1.3 + seeded01(seed + 3) * 2.2; // rem ~1.3..3.5
-  // Slower, calmer motion; start mid-animation so returning to the page doesn't "ramp" everything at once.
   const duration = (9 + seeded01(seed + 5) * 10).toFixed(2) + "s"; // 9..19s
   const delay = "-" + (seeded01(seed + 6) * 18).toFixed(2) + "s"; // negative delay = random phase
   const maxOpacity = (0.1 + seeded01(seed + 7) * 0.22).toFixed(2); // ~0.10..0.32
@@ -151,7 +146,6 @@ function Landing({ theme, setTheme }) {
   // Theme toggle button for landing page only
   function ThemeToggle() {
     const isLightMode = theme === "light";
-    // Use isTouchUI from outer scope
     return (
       <button
         type="button"
@@ -205,24 +199,20 @@ function Landing({ theme, setTheme }) {
   }
 
   function tabletYOffset(vw, vh) {
-    // Nudge the whole hero composition upward on iPad-mini/tablet-like viewports.
     return isTabletLike(vw, vh) ? -42 : 0;
   }
 
-  // Theme tokens (source of truth lives in App via CSS variables)
   const FG = "var(--fg)";
   const MUTED = "var(--muted)";
   const PAGE_BG = "var(--page-bg)";
 
-  // Terminal surface (brutalist)
+  // Terminal
   const TERM_BG = isLight ? "#ffffff" : "#121214";
-  const TERM_BORDER = isLight ? "#111111" : "rgba(255,255,255,0.7)";
+  const TERM_BORDER = isLight ? "#111111" : "rgb(211, 209, 209)";
   const INSET_LINE = isLight ? "#111111" : "#f2f2f2";
   const TERM_HDR_BG = isLight ? "#e9ecef" : "#1a1a1d";
-  // Word cloud (darker/inkier, less “glowy”)
   const CLOUD_COLOR = isLight ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.55)";
 
-  // Frosted glass backing for the hero title + bottom hint (brutalist)
   const FROST_BG = isLight ? "#ffffff" : "#0b0b0c";
   const FROST_BORDER = isLight ? "#111111" : "#f2f2f2";
   const FROST_SHADOW = isLight
@@ -989,7 +979,7 @@ function Landing({ theme, setTheme }) {
       setHistory((h) => [
         ...h,
         { type: "prompt", text: `nasir % ${raw}` },
-        { type: "output", text: "nasir" },
+        { type: "output", text: "Nasir Sims" },
       ]);
       return;
     }
@@ -1112,7 +1102,7 @@ function Landing({ theme, setTheme }) {
         { type: "output", text: "" },
         {
           type: "output",
-          text: "cThere are many secrets in the terminal...try and find them all!",
+          text: "There are many secrets in the terminal...try and find them all!",
         },
       ]);
       return;

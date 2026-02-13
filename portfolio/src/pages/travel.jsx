@@ -30,9 +30,9 @@ const TRAVEL_MEDIA = {
   MONTREAL: "images/travel/montreal.webp",
   TEXAS_TRIP: "images/travel/texas_trip.webp",
   OZARK: "images/travel/ozark.webp",
-  JAN: "images/travel/jan.webp",
+  LONDON: "images/travel/london.webp",
   ARTHUR_1: "images/travel/arthur1.webp",
-  ARTHUR_2: "images/travel/arthur2.webp",
+  PENTLANDS: "images/travel/pentlands.webp",
   ARTHUR_3: "images/travel/arthur3.webp",
 };
 
@@ -45,10 +45,9 @@ const TRAVEL_ENTRIES = [
     body: (
       <>
         In the summer of 2023, my dad and I travelled to Füssen, Germany to
-        visit my great aunt, Linda. We spent most of our days biking in the tall
-        and beautiful mountians, where we accidentally crossed into Austria. It
-        was my first time in Europe, and I was entralled by the cleanliness,
-        beautiful nature, and healthy food that Germany offered.
+        visit my great aunt, Linda. It was my first time in Europe, and we spent
+        our days biking in the ttall and beautiful mountians, and accidentally
+        crossed into Austria.
       </>
     ),
   },
@@ -59,12 +58,11 @@ const TRAVEL_ENTRIES = [
     images: [TRAVEL_MEDIA.F1_VIDEO, TRAVEL_MEDIA.COUR],
     body: (
       <>
-        Right after Germany, I met up with my best friend Conor, and we flew to
-        Barcelona, Spain, on the cheapest flight we could find, and stayed in a
-        hostel. The coolest thing we did by far was watching the Formula 1 AWS
-        Gran Premio de España 2023. We bought tickets for the general field, but
-        with some social engineering, snuck into the only two seats left in the
-        Grand Stands to catch amazing views of the race.
+        After Germany, I met up with my friend Conor, and we flew to Barcelona,
+        Spain. The coolest thing we did was see the Formula 1 AWS Gran Premio de
+        España 2023. We bought tickets for the general field, but with some
+        social engineering, snuck into the only two seats left in the Grand
+        Stands to catch amazing views of the race.
       </>
     ),
   },
@@ -76,11 +74,11 @@ const TRAVEL_ENTRIES = [
     body: (
       <>
         For my 2024 Spring Break, my friends Jack, Conor, and I stayed with our
-        friend Lucas's house in Portland, Oregon. The beauty of Oregon was so
-        jarring from the flatness I am familiar with in Illinois. We had access
-        to a car, so we got to drive around and visit the Japanese Gardens,
-        beautiful beaches, and twisty mountain roads. The water is also
-        excellent in Oregon!
+        friend Lucas in Portland, Oregon. The beauty of Oregon was so jarring
+        from the flatness I am familiar with in Illinois. We had a car, so we
+        got to drive around the twisty mountian roads, visit the Japanese
+        Gardens, and beautiful beaches. The drinking water is also excellent in
+        Oregon!
       </>
     ),
   },
@@ -91,13 +89,13 @@ const TRAVEL_ENTRIES = [
     images: [TRAVEL_MEDIA.HIKE, TRAVEL_MEDIA.SHUTIN],
     body: (
       <>
-        The weekend before finals, Gabbi (my girlfriend), and our other friend
-        couple, Isabella and Andre, drove an hour south to the Johnson Shut-Ins
-        in Missouri to camp for two nights, hike, and swim in the flowing
-        rivers. When we arrived, it was pouring rain, triggering a "red-flag"
-        warning for the shut-in, meaning no one should enter. We did anyway, and
-        learned quickly that we should have heeded the warning after being swept
-        away almost immediately.
+        The weekend before finals, my girlfrind Gabbi, and our other friend
+        couple, Isabella and Andre, drove to the Johnson Shut-Ins in Missouri to
+        camp for two nights, hike, and swim in the flowing river. When we
+        arrived, it was pouring rain, triggering a "red-flag" warning for the
+        shut-in, meaning no one should enter. We did anyway, and learned quickly
+        that we should have heeded the warning after being swept away almost
+        immediately.
       </>
     ),
   },
@@ -115,10 +113,10 @@ const TRAVEL_ENTRIES = [
       <>
         This road trip was, and likely will be, the most intense trip I have
         ever been on. For two weeks, 7 friends and I loaded an entire minivan
-        and drove 6,000+ miles across the western US. We camped all but one
+        and drove 6,000+ miles across the Western US. We camped all but one
         night and visited numerous national parks, including the Grand Tetons,
         Yellowstone, Crater Lake, the Hoh Rainforest, Olympic, and Redwoods. We
-        started in Lawrence, Kansas, and drove through 12 states in a big loop.
+        started in Lawrence, Kansas, and drove through 12 states in a loop.
         Besides getting a flat tire on our first day, we encountered very few
         problems!
       </>
@@ -137,9 +135,8 @@ const TRAVEL_ENTRIES = [
     body: (
       <>
         For our next Spring Break, Gabbi, Isabella, Andre, and I flew to Puerto
-        Rico. We went to the beach every day, explored many museums, and went
-        cliff jumping on a rainforest excursion. The food there was also
-        terrific. I am very much looking forward to going back one day!
+        Rico. We went to the beach every day, saw many museums, and went cliff
+        jumping on a rainforest excursion. The food there was also terrific.
       </>
     ),
   },
@@ -153,14 +150,13 @@ const TRAVEL_ENTRIES = [
         In early summer 2025, Conor was heading to Burlington, Vermont, to start
         his internship. He, of course, needed a car there, so what better
         vehicle to bring down than his 1996 Japanese Kei Truck? Only one
-        condition: Do it all using paper maps. With our North America Atlas in
-        hand, we started the 1,000+ mile journey from Evanston, IL, to
-        Burlington, Vermont. Along the way, we stopped in Detroit, Michigan,
-        Toronto, Canada, and Montréal, Quebec before reaching our final
-        destination. The truck only broke down once, after we hit a large
-        puddle, which sucked water into our air filter, causing the engine to
-        die. Montréal was our favorite stop, where we spent two nights, explored
-        the city, and hiked Mount Royal.
+        condition: Do it all using paper maps. We started the 1,000+ mile
+        journey from Evanston, IL, to Burlington, Vermont. Along the way, we
+        stopped in Detroit, Michigan, Toronto, Canada, and Montréal, Quebec
+        before reaching Vermont. The truck only broke down once, after hitting a
+        large puddle on the highway, water sucked into our air filter, causing
+        it to die. Montréal was our favorite stop, where we spent two nights,
+        explored the city, and hiked Mount Royal.
       </>
     ),
   },
@@ -172,13 +168,13 @@ const TRAVEL_ENTRIES = [
       <>
         In the last week of summer, Conor prepared for his Co-Op in Houston,
         Texas. Since his mini-truck wasn't suitable for daily driving there, he
-        bought a 1984 Volkswagen Westfalia camper van. We, along with our friend
-        Jack, flew to San Francisco to pick it up and drove 1,500 miles to
-        Houston in 4 days. We averaged 8-10 hours of driving each day, crossing
-        Texas in the untested van without a working taillight, AC, or,
-        unbeknownst to us, adequate coolant. We slept at two Texas state parks,
-        stayed one night in a hotel, and arrived in Houston just in time to
-        catch our flights back home.
+        bought a 1984 Volkswagen Westfalia camper van. We, along with Jack, flew
+        to San Francisco to pick it up and drove 1,500 miles to Houston in 4
+        days. We averaged 8-10 hours of driving each day, getting to Texas
+        without a working taillight assembly, AC, or, unbeknownst to us,
+        adequate coolant. We slept at two Texas state parks, stayed one night in
+        a hotel, and arrived in Houston just in time to catch our flights back
+        home.
       </>
     ),
   },
@@ -189,23 +185,20 @@ const TRAVEL_ENTRIES = [
     images: [TRAVEL_MEDIA.OZARK],
     body: (
       <>
-        For Fall Break, 8 friends and I packed two sedans for the 3-hour drive
-        from WashU to the Lake of the Ozarks in Missouri. We rented an AirBnB
-        for 4 nights, bought groceries the first night, and felt what it was
-        like to truly unwind after a tough start to our third year. We swam in
-        the water every day, cooked every night, played board games, and told
-        stories by the fire. It was nice to know that such a tranquil place
-        exists not too far from our school.
+        For Fall Break, 8 friends and I drove to the Lake of the Ozarks in
+        Missouri. We swam in the water every day, cooked every night, played
+        board games, and told stories by the fire. It was nice to know that such
+        a tranquil place exists not too far from our school.
       </>
     ),
   },
   {
     id: "edinburgh",
     date: "Today",
-    title: "Study Abroad at The University of Edinburgh",
+    title: "The University of Edinburgh",
     images: [
-      TRAVEL_MEDIA.JAN,
-      TRAVEL_MEDIA.ARTHUR_2,
+      TRAVEL_MEDIA.LONDON,
+      TRAVEL_MEDIA.PENTLANDS,
       TRAVEL_MEDIA.ARTHUR_3,
       TRAVEL_MEDIA.ARTHUR_1,
     ],
