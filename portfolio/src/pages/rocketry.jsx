@@ -6,7 +6,7 @@ import { asset, MONO } from "../components/uiConstants.js";
 import GalleryGrid from "../components/GalleryGrid.jsx";
 
 const ROCKETRY_MEDIA = {
-  VIDEO: "videos/rocketry.mp4",
+  VIDEO: "videos/rocketry_720p.mp4",
   LOGO_WHITE: "images/rocketry/logo.png",
 
   FULL_ASSEMBLY: "images/rocketry/Full_Assembly.webp",
@@ -14,7 +14,7 @@ const ROCKETRY_MEDIA = {
 
   AIRBRAKES: [
     "images/rocketry/Airbrakes Assembly Solo Retracted Top.webp",
-    "images/rocketry/Airbrakes Assembly Solo Extended Top.webp", 
+    "images/rocketry/Airbrakes Assembly Solo Extended Top.webp",
     "images/rocketry/Airbrakes Assembly Solo Iso.webp",
     "images/rocketry/FS_Assembled_Paddle.webp",
   ],
@@ -585,16 +585,15 @@ export default function RocketryPage() {
                 <br />
                 <br />
                 Ursa Major is also built around creative design challenges. The
-                NASA Student Launch payload challenge is treated like a
-                first-class subsystem, with dedicated space, interfaces, and
-                wiring paths so integration does not feel like an afterthought.
-                To ensure an accurate target altitude, the rocket also employs a
-                feedforward airbrake control system that introduces controllable
-                drag after burnout, letting us correct for motor variability and
-                changing conditions. Finally, the onboard bi-directional camera
-                system captures forward and aft footage, so we can validate
-                deployment events and airbrake behaviour with visual evidence
-                outside of datalogs.
+                NASA Student Launch payload challenge centers on a deployable
+                STEMnaut capsule that activates after landing and transmits
+                required flight data to NASA. To ensure an accurate target
+                altitude, the rocket also employs a feedforward airbrake control
+                system that introduces controllable drag after burnout, letting
+                us correct for motor variability and changing conditions.
+                Finally, the onboard bi-directional camera system captures
+                forward and aft footage, so we can validate deployment events
+                and airbrake behaviour with visual evidence outside of datalogs.
                 <br />
                 <br />
               </TextPanel>

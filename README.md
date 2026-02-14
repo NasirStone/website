@@ -1,25 +1,17 @@
 # Nasir Sims
 
-Personal portfolio via interactive terminal-style window
+This is my personal portfolio that (on desktop) is navigated via an interactive terminal-style window.
 
-Live at: www.nasirsims.dev
+Live at: nasirsims.dev
 
 # Overview
 
-This site is a lightweight React + Vite portfolio designed around a terminal motif.
-Navigation is command-driven (`ls`, `cd`, keywords), with each section representing a
-different area of work or interest.
-
-The goal is clarity, speed, and personality.
+This site utilzies React + Vite and is designed around a terminal motif.
+Navigation is command-driven with traditional bash inputs (`ls`, `cd`, keywords), with each section representing a
+different area of work/interest.
 
 # Tech Stack
 
 - React
 - Vite
-
-# Tech Stack
-
-- React
-- Vite
-- React Router
 - GitHub Pages

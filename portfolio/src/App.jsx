@@ -41,6 +41,9 @@ import AutonomousVehiclesPage from "./pages/autonomousvehicles.jsx";
 import RocketryPage from "./pages/rocketry.jsx";
 import TravelPage from "./pages/travel.jsx";
 import VintageAudioPage from "./pages/vintageaudio.jsx";
+import { Suspense, lazy } from "react";
+
+const ValentinesPage = lazy(() => import("./pages/valentines.jsx"));
 
 const SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif';
@@ -187,6 +190,47 @@ function Landing({ theme, setTheme }) {
       </button>
     );
   }
+
+  // Mobile-only shortcut to the Valentines page
+  function ValentinesShortcut() {
+    return (
+      <button
+        type="button"
+        aria-label="Open Valentines Day page"
+        onClick={() => navigate("/valentines")}
+        style={{
+          position: "fixed",
+          left: 14,
+          top: 14,
+          zIndex: 50,
+          width: isTouchUI ? 56 : 44,
+          height: isTouchUI ? 48 : 38,
+          borderRadius: 0,
+          border: `3px solid ${isLight ? "#111" : "#f2f2f2"}`,
+          background: isLight ? "#ffffff" : "#0b0b0c",
+          color: isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)",
+          boxShadow: isLight
+            ? "10px 10px 0 rgba(0,0,0,0.85)"
+            : "10px 10px 0 rgba(255,255,255,0.35)",
+          backdropFilter: "none",
+          WebkitBackdropFilter: "none",
+          cursor: "pointer",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily:
+            "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+          fontSize: isTouchUI ? "1.25rem" : "1.0rem",
+          lineHeight: 1,
+          padding: 0,
+          WebkitTapHighlightColor: "transparent",
+        }}
+      >
+        <span aria-hidden="true">&lt;3</span>
+      </button>
+    );
+  }
+
   const navigate = useNavigate();
 
   const isLight = theme === "light";
@@ -300,6 +344,8 @@ function Landing({ theme, setTheme }) {
   const titlePillRef = useRef(null);
   const [titlePillH, setTitlePillH] = useState(76);
 
+  const titleAnchorRef = useRef(null); // { pos: {x,y}, size: {w,h} }
+
   // Terminal fullscreen state and geometry memory
   const [isTerminalFullscreen, setIsTerminalFullscreen] = useState(false);
   const prevTerminalPosRef = useRef(null);
@@ -326,6 +372,8 @@ function Landing({ theme, setTheme }) {
     prevMinPosRef.current = terminalPos;
     prevMinSizeRef.current = terminalSize;
 
+    titleAnchorRef.current = { pos: terminalPos, size: terminalSize };
+
     const vw = window.innerWidth || 1200;
     const vh = window.innerHeight || 800;
 
@@ -349,6 +397,8 @@ function Landing({ theme, setTheme }) {
   function exitTerminalMinimized() {
     setIsTerminalMinimized(false);
 
+    titleAnchorRef.current = null;
+
     if (prevMinPosRef.current) setTerminalPos(prevMinPosRef.current);
     if (prevMinSizeRef.current) setTerminalSize(prevMinSizeRef.current);
   }
@@ -360,18 +410,29 @@ function Landing({ theme, setTheme }) {
 
   function enterTerminalFullscreen() {
     if (typeof window === "undefined") return;
-    // Save current windowed geometry once
-    prevTerminalPosRef.current = terminalPos;
-    prevTerminalSizeRef.current = terminalSize;
 
+    const vw = window.innerWidth || 1200;
+    const vh = window.innerHeight || 800;
+
+    // If minimized, restore target should be the pre minimized geometry
+    const basePos =
+      isTerminalMinimized && prevMinPosRef.current
+        ? prevMinPosRef.current
+        : terminalPos;
+
+    const baseSize =
+      isTerminalMinimized && prevMinSizeRef.current
+        ? prevMinSizeRef.current
+        : terminalSize;
+
+    prevTerminalPosRef.current = basePos;
+    prevTerminalSizeRef.current = baseSize;
+
+    setIsTerminalMinimized(false);
     setIsTerminalFullscreen(true);
 
-    // Snap to viewport
     setTerminalPos({ x: 0, y: 0 });
-    setTerminalSize({
-      w: window.innerWidth || 1200,
-      h: window.innerHeight || 800,
-    });
+    setTerminalSize({ w: vw, h: vh });
   }
 
   function exitTerminalFullscreen() {
@@ -962,8 +1023,19 @@ function Landing({ theme, setTheme }) {
       effectiveCmd = "ls";
     }
 
+    if (effectiveCmd === "valentines day") {
+      effectiveCmd = "valentine's day";
+    }
     if (!effectiveCmd) return;
 
+    if (effectiveCmd === "valentine's day") {
+      navigateWithLoading({
+        cmd: raw,
+        path: "/valentines",
+        label: "valentine's day",
+      });
+      return;
+    }
     // Jacob
     if (effectiveCmd === "jacob") {
       setHistory((h) => [
@@ -1282,6 +1354,7 @@ function Landing({ theme, setTheme }) {
         focusInput();
       }}
     >
+      {isTouchUI ? <ValentinesShortcut /> : null}
       {isTouchUI ? <ThemeToggle /> : null}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap');
@@ -1670,183 +1743,117 @@ function Landing({ theme, setTheme }) {
           </button>
         </>
       ) : null}
-
-      {!isTouchUI && !isTerminalFullscreen ? (
-        <>
-          {/* background typed text (behind terminal, above keywords) */}
-          <div
-            style={{
-              position: "absolute",
-              inset: 0,
-              zIndex: 2,
-              pointerEvents: "none",
-              fontFamily: MONO,
-              color: FG,
-            }}
-            aria-hidden="true"
-          >
-            {/* top line (anchored to terminal) */}
+      <>
+        {!isTouchUI && !isTerminalFullscreen ? (
+          <>
+            {/* background typed text (behind terminal, above keywords) */}
             <div
               style={{
                 position: "absolute",
-                left:
-                  terminalPos.x +
-                  (terminalSize.w ||
-                    (typeof window !== "undefined"
-                      ? Math.min(733, (window.innerWidth || 1200) * 0.8712)
-                      : 733)) /
-                    2,
-                top: Math.min(
-                  (typeof window !== "undefined" ? window.innerHeight : 800) -
-                    (titlePillH + 14),
-                  Math.max(14, Math.round(terminalPos.y - titlePillH - 18)),
-                ),
-                transform: "translateX(-50%)",
-                width: "fit-content",
-                maxWidth: "min(1100px, calc(100vw - 24px))",
-                textAlign: "left",
-                opacity: isDragging ? 0 : 0.92,
-                transition: `opacity ${isDragging ? 140 : 650}ms ease`,
-                fontFamily: SANS,
-                fontSize: "clamp(2.0rem, 5.4vw, 4.2rem)",
-                fontWeight: 600,
-                letterSpacing: "-0.05em",
-                lineHeight: "1.2",
-                whiteSpace: "pre-wrap",
-                textShadow: isLight
-                  ? "0 2px 18px rgba(0,0,0,0.35)"
-                  : "0 2px 18px rgba(0,0,0,0.75)",
+                inset: 0,
+                zIndex: 2,
+                pointerEvents: "none",
+                fontFamily: MONO,
+                color: FG,
               }}
+              aria-hidden="true"
             >
-              <span
-                ref={titlePillRef}
-                style={{
-                  position: "relative",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0.14em 0.32em",
-                  borderRadius: 16,
-                  background: FROST_BG,
-                  border: `1px solid ${FROST_BORDER}`,
-                  backdropFilter: "blur(14px)",
-                  WebkitBackdropFilter: "blur(14px)",
-                  boxShadow: FROST_SHADOW,
-                  color:
-                    theme === "light"
-                      ? "rgba(18, 10, 12, 0.92)"
-                      : "rgba(245,245,245,0.96)",
-                  opacity: 0.94,
-                  textShadow: isLight
-                    ? "0 2px 14px rgba(0,0,0,0.30)"
-                    : "0 2px 14px rgba(0,0,0,0.65)",
-                }}
-              >
-                <span>{bgTopText}</span>
-                {bgStage === "top" ? (
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      display: "inline-block",
-                      width: "0.55em",
-                      height: "0.85em",
-                      marginLeft: "10px",
-                      background: "var(--caret-block)",
-                      animation: "blockBlink 1s steps(1, end) infinite",
-                      opacity: 1,
-                      transform: "translateY(0.02em)",
-                      pointerEvents: "none",
-                    }}
-                  />
-                ) : null}
-              </span>
-            </div>
+              {(() => {
+                const titleAnchor =
+                  isTerminalMinimized && titleAnchorRef.current
+                    ? titleAnchorRef.current
+                    : { pos: terminalPos, size: terminalSize };
 
-            {/*
-            bottom line
-            <div
-              style={{
-                position: "absolute",
-                left: terminalPos.x + terminalSize.w / 2,
-                top: Math.min(
+                const anchorW =
+                  titleAnchor.size.w ||
                   (typeof window !== "undefined"
-                    ? window.innerHeight
-                    : terminalPos.y + terminalSize.h) - 96,
-                  terminalPos.y + terminalSize.h + 18
-                ),
-                transform: "translateX(-50%)",
-                width: Math.min(
-                  terminalSize.w,
-                  (typeof window !== "undefined"
-                    ? window.innerWidth
-                    : terminalSize.w) - 24
-                ),
-                textAlign: "center",
-                opacity: isDragging ? 0 : 0.92,
-                transition: `opacity ${isDragging ? 140 : 650}ms ease`,
-                fontSize: "1.05rem",
-                lineHeight: 1.35,
-                whiteSpace: "pre-wrap",
-                textShadow: isLight
-                  ? "0 2px 18px rgba(0,0,0,0.35)"
-                  : "0 2px 18px rgba(0,0,0,0.75)",
-                color:
-                  theme === "light"
-                    ? "rgba(18, 10, 12, 0.92)"
-                    : "rgba(245,245,245,0.96)",
-              }}
-            >
-              <span
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  maxWidth: "100%",
-                }}
-              >
-                <span
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    maxWidth: "100%",
-                    padding: "0.34em 0.70em",
-                    borderRadius: 14,
-                    lineHeight: 1.55,
-                    whiteSpace: "pre-wrap",
-                    background: FROST_BG,
-                    border: `1px solid ${FROST_BORDER}`,
-                    backdropFilter: "blur(12px)",
-                    WebkitBackdropFilter: "blur(12px)",
-                    boxShadow: FROST_SHADOW,
-                    gap: 0,
-                  }}
-                >
-                  <span style={{ display: "inline-block" }}>
-                    {bgBottomText}
-                  </span>
-                  {bgStage === "bottom" ? (
-                    <span
-                      aria-hidden="true"
+                    ? Math.min(733, (window.innerWidth || 1200) * 0.8712)
+                    : 733);
+
+                return (
+                  <div>
+                    {/* top line (anchored to terminal) */}
+                    <div
                       style={{
-                        display: "inline-block",
-                        width: "0.62em",
-                        height: "1.15em",
-                        marginLeft: "10px",
-                        background: "var(--caret-block)",
-                        animation: "blockBlink 1s steps(1, end) infinite",
-                        opacity: isDragging ? 0 : 1,
-                        transition: "opacity 220ms ease",
-                        transform: "translateY(0.02em)",
+                        position: "absolute",
+                        left: titleAnchor.pos.x + anchorW / 2,
+                        top: Math.min(
+                          (typeof window !== "undefined"
+                            ? window.innerHeight
+                            : 800) -
+                            (titlePillH + 14),
+                          Math.max(
+                            14,
+                            Math.round(titleAnchor.pos.y - titlePillH - 18),
+                          ),
+                        ),
+                        transform: "translateX(-50%)",
+                        width: "fit-content",
+                        maxWidth: "min(1100px, calc(100vw - 24px))",
+                        textAlign: "left",
+                        opacity: isDragging ? 0 : 0.92,
+                        transition: `opacity ${isDragging ? 140 : 650}ms ease`,
+                        fontFamily: SANS,
+                        fontSize: "clamp(2.0rem, 5.4vw, 4.2rem)",
+                        fontWeight: 600,
+                        letterSpacing: "-0.05em",
+                        lineHeight: "1.2",
+                        whiteSpace: "pre-wrap",
+                        textShadow: isLight
+                          ? "0 2px 18px rgba(0,0,0,0.35)"
+                          : "0 2px 18px rgba(0,0,0,0.75)",
                       }}
-                    />
-                  ) : null}
-                </span>
-              </span>
+                    >
+                      <span
+                        ref={titlePillRef}
+                        style={{
+                          position: "relative",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          padding: "0.14em 0.32em",
+                          borderRadius: 16,
+                          background: FROST_BG,
+                          border: `1px solid ${FROST_BORDER}`,
+                          backdropFilter: "blur(14px)",
+                          WebkitBackdropFilter: "blur(14px)",
+                          boxShadow: FROST_SHADOW,
+                          color:
+                            theme === "light"
+                              ? "rgba(18, 10, 12, 0.92)"
+                              : "rgba(245,245,245,0.96)",
+                          opacity: 0.94,
+                          textShadow: isLight
+                            ? "0 2px 14px rgba(0,0,0,0.30)"
+                            : "0 2px 14px rgba(0,0,0,0.65)",
+                        }}
+                      >
+                        <span>{bgTopText}</span>
+                        {bgStage === "top" ? (
+                          <span
+                            aria-hidden="true"
+                            style={{
+                              display: "inline-block",
+                              width: "0.55em",
+                              height: "0.85em",
+                              marginLeft: "10px",
+                              background: "var(--caret-block)",
+                              animation: "blockBlink 1s steps(1, end) infinite",
+                              opacity: 1,
+                              transform: "translateY(0.02em)",
+                              pointerEvents: "none",
+                            }}
+                          />
+                        ) : null}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
-            */}
-          </div>
-        </>
-      ) : null}
+          </>
+        ) : null}
+      </>
 
       {wordCloudItems.map((item, i) => (
         <span
@@ -2155,20 +2162,22 @@ function Landing({ theme, setTheme }) {
                   : `6px 6px 0 rgba(255,255,255,0.14)`,
               backdropFilter: "none",
               overflow: "hidden",
-              width: isTerminalMinimized
-                ? terminalSize.w
-                : isTerminalFullscreen
-                  ? "100vw"
+              width: isTerminalFullscreen
+                ? "100vw"
+                : isTerminalMinimized
+                  ? terminalSize.w
                   : undefined,
-              height: isTerminalMinimized
-                ? terminalSize.h
-                : isTerminalFullscreen
-                  ? "100vh"
+
+              height: isTerminalFullscreen
+                ? "100vh"
+                : isTerminalMinimized
+                  ? terminalSize.h
                   : undefined,
-              maxHeight: isTerminalMinimized
-                ? terminalSize.h
-                : isTerminalFullscreen
-                  ? "100vh"
+
+              maxHeight: isTerminalFullscreen
+                ? "100vh"
+                : isTerminalMinimized
+                  ? terminalSize.h
                   : undefined,
             }}
           >
@@ -2391,35 +2400,47 @@ function Landing({ theme, setTheme }) {
                   marginTop: "0.35rem",
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "max-content 1fr",
+                    columnGap: 10,
+                    alignItems: "start",
+                    width: "100%",
+                  }}
+                >
                   <span
                     style={{
                       color: FG,
                       fontFamily: MONO,
                       fontSize: "0.9rem",
                       lineHeight: 1.55,
+                      alignSelf: "start",
+                      whiteSpace: "nowrap",
                     }}
                   >
                     nasir %
                   </span>
 
                   <div
-                    style={{ position: "relative", flex: 1, height: "1.3rem" }}
+                    style={{ position: "relative", width: "100%", minWidth: 0 }}
                   >
-                    {/* visible overlay line */}
+                    {/* visible overlay (drives height + wraps like a real terminal) */}
                     <div
                       aria-hidden="true"
                       style={{
-                        position: "absolute",
-                        inset: 0,
-                        display: "flex",
-                        alignItems: "center",
                         color: FG,
                         fontFamily: MONO,
                         fontSize: "0.9rem",
                         lineHeight: 1.55,
-                        whiteSpace: "pre",
+                        whiteSpace: "pre-wrap",
+                        overflowWrap: "break-word",
+                        wordBreak: "break-word",
                         pointerEvents: "none",
+                        minHeight: "1.3rem",
+                        paddingRight: "0rem",
+                        maxWidth: "100%",
+                        boxSizing: "border-box",
                       }}
                     >
                       <span>{input}</span>
@@ -2431,6 +2452,7 @@ function Landing({ theme, setTheme }) {
                           marginLeft: "2px",
                           background: "var(--caret-block)",
                           animation: "blockBlink 1s steps(1, end) infinite",
+                          verticalAlign: "text-bottom",
                         }}
                       />
                     </div>
@@ -2440,7 +2462,6 @@ function Landing({ theme, setTheme }) {
                       ref={inputRef}
                       value={input}
                       onChange={(e) => {
-                        // typing exits history mode
                         if (cmdIndexRef.current !== -1) {
                           cmdIndexRef.current = -1;
                           cmdDraftRef.current = "";
@@ -2484,8 +2505,6 @@ function Landing({ theme, setTheme }) {
                         }
                       }}
                       onBlur={() => {
-                        // Keep the terminal ready for typing on desktop.
-                        // Do not steal focus while overlays are open or on touch UI.
                         if (isTouchUI || isSidebarOpen || contactModalOpen)
                           return;
 
@@ -2502,8 +2521,6 @@ function Landing({ theme, setTheme }) {
                             tag === "A" ||
                             tag === "SELECT";
 
-                          // If focus moved to an interactive element, respect it.
-                          // Otherwise, refocus the terminal so typing always works.
                           if (!isInteractive) focusInput();
                         }, 0);
                       }}
@@ -2512,16 +2529,13 @@ function Landing({ theme, setTheme }) {
                       style={{
                         position: "absolute",
                         inset: 0,
+                        width: "100%",
+                        height: "100%",
                         background: "transparent",
                         border: "none",
                         outline: "none",
                         caretColor: "transparent",
                         color: "transparent",
-                        textShadow: `0 0 0 ${FG}`,
-                        fontFamily: MONO,
-                        fontSize: "0.9rem",
-                        lineHeight: 1.55,
-                        padding: 0,
                       }}
                     />
                   </div>
@@ -2640,6 +2654,14 @@ export default function App() {
         <Route path="/rocketry" element={<RocketryPage />} />
         <Route path="/travel" element={<TravelPage />} />
         <Route path="/vintage-audio" element={<VintageAudioPage />} />
+        <Route
+          path="/valentines"
+          element={
+            <Suspense fallback={null}>
+              <ValentinesPage />
+            </Suspense>
+          }
+        />
       </Routes>
     </>
   );

@@ -52,7 +52,9 @@ export default function GalleryGrid({
             sizes={
               columns === 1
                 ? "100vw"
-                : `(max-width: 720px) 100vw, ${Math.round(100 / columns)}vw`
+                : `(max-width: 720px) 100vw, (max-width: 1200px) ${Math.round(
+                    100 / columns,
+                  )}vw, ${Math.round(100 / columns)}vw`
             }
             style={{
               width: "100%",
