@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-function GlobalShortcuts() {
+import DronesPage from "./pages/drones.jsx";
+import NasirPage from "./pages/nasir.jsx";
+import AutonomousVehiclesPage from "./pages/autonomousvehicles.jsx";
+import RocketryPage from "./pages/rocketry.jsx";
+import TravelPage from "./pages/travel.jsx";
+import VintageAudioPage from "./pages/vintageaudio.jsx";
+
+function GlobalShortcuts({ onInterrupt }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -17,33 +24,26 @@ function GlobalShortcuts() {
     }
 
     function onKeyDown(e) {
+      // Cmd/Ctrl + C
       if (!(e.metaKey || e.ctrlKey)) return;
       if (e.shiftKey || e.altKey) return;
       if (String(e.key).toLowerCase() !== "c") return;
 
       if (isEditableTarget(e.target)) return;
+      if (location.pathname === "/") return;
 
-      if (location.pathname !== "/") {
-        e.preventDefault();
-        navigate("/");
-      }
+      e.preventDefault();
+
+      if (typeof onInterrupt === "function") onInterrupt();
+      navigate("/");
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, onInterrupt]);
 
   return null;
 }
-import DronesPage from "./pages/drones.jsx";
-import NasirPage from "./pages/nasir.jsx";
-import AutonomousVehiclesPage from "./pages/autonomousvehicles.jsx";
-import RocketryPage from "./pages/rocketry.jsx";
-import TravelPage from "./pages/travel.jsx";
-import VintageAudioPage from "./pages/vintageaudio.jsx";
-import { Suspense, lazy } from "react";
-
-const ValentinesPage = lazy(() => import("./pages/valentines.jsx"));
 
 const SANS =
   '"Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif';
@@ -178,8 +178,7 @@ function Landing({ theme, setTheme }) {
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          fontFamily:
-            "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+          fontFamily: MONO,
           fontSize: isTouchUI ? "1.35rem" : "1.05rem",
           lineHeight: 1,
           padding: 0,
@@ -187,46 +186,6 @@ function Landing({ theme, setTheme }) {
         }}
       >
         <span aria-hidden="true">{isLightMode ? "☾" : "☀"}</span>
-      </button>
-    );
-  }
-
-  // Mobile-only shortcut to the Valentines page
-  function ValentinesShortcut() {
-    return (
-      <button
-        type="button"
-        aria-label="Open Valentines Day page"
-        onClick={() => navigate("/valentines")}
-        style={{
-          position: "fixed",
-          left: 14,
-          top: 14,
-          zIndex: 50,
-          width: isTouchUI ? 56 : 44,
-          height: isTouchUI ? 48 : 38,
-          borderRadius: 0,
-          border: `3px solid ${isLight ? "#111" : "#f2f2f2"}`,
-          background: isLight ? "#ffffff" : "#0b0b0c",
-          color: isLight ? "rgba(18, 10, 12, 0.92)" : "rgba(235,235,235,0.92)",
-          boxShadow: isLight
-            ? "10px 10px 0 rgba(0,0,0,0.85)"
-            : "10px 10px 0 rgba(255,255,255,0.35)",
-          backdropFilter: "none",
-          WebkitBackdropFilter: "none",
-          cursor: "pointer",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily:
-            "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-          fontSize: isTouchUI ? "1.25rem" : "1.0rem",
-          lineHeight: 1,
-          padding: 0,
-          WebkitTapHighlightColor: "transparent",
-        }}
-      >
-        <span aria-hidden="true">&lt;3</span>
       </button>
     );
   }
@@ -273,12 +232,12 @@ function Landing({ theme, setTheme }) {
       return Array.isArray(parsed)
         ? parsed
         : [
-            { type: "system", text: "Nasir Sims Portfolio [Version Alpha]" },
+            { type: "system", text: "Nasir Sims Portfolio [Version Beta]" },
             { type: "system", text: "Type help to learn more" },
           ];
     } catch {
       return [
-        { type: "system", text: "Nasir Sims Portfolio [Version Alpha]" },
+        { type: "system", text: "Nasir Sims Portfolio [Version Beta]" },
         { type: "system", text: "Type help to learn more" },
       ];
     }
@@ -341,6 +300,23 @@ function Landing({ theme, setTheme }) {
   });
   const draggingRef = useRef({ active: false, dx: 0, dy: 0 });
   const inputRef = useRef(null);
+  const terminalBodyRef = useRef(null);
+  const stickToBottomRef = useRef(true);
+
+  // Auto-scroll terminal to bottom only when the user is already at/near the bottom.
+  useEffect(() => {
+    const el = terminalBodyRef.current;
+    if (!el) return;
+
+    if (!stickToBottomRef.current) return;
+
+    // Defer so layout updates (new lines) are reflected in scrollHeight.
+    window.requestAnimationFrame(() => {
+      const node = terminalBodyRef.current;
+      if (!node) return;
+      node.scrollTop = node.scrollHeight;
+    });
+  }, [history, isLoading, loadingPct]);
   const titlePillRef = useRef(null);
   const [titlePillH, setTitlePillH] = useState(76);
 
@@ -646,6 +622,22 @@ function Landing({ theme, setTheme }) {
   }, []);
 
   useEffect(() => {
+    try {
+      const pending = sessionStorage.getItem("pendingInterrupt");
+      if (!pending) return;
+      sessionStorage.removeItem("pendingInterrupt");
+
+      setHistory((h) => [
+        ...h,
+        { type: "output", text: "^C" },
+        { type: "error", text: "zsh: killed" },
+      ]);
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
     function generateWordCloud() {
       const vw = window.innerWidth || 1200;
       const vh = window.innerHeight || 800;
@@ -912,7 +904,16 @@ function Landing({ theme, setTheme }) {
 
   function focusInput() {
     try {
-      inputRef.current && inputRef.current.focus();
+      const el = inputRef.current;
+      if (!el) return;
+
+      el.focus();
+
+      // Ensure new typing appends to the end (prevents caret jumping to start after drag/refocus).
+      const len = (el.value || "").length;
+      if (typeof el.setSelectionRange === "function") {
+        el.setSelectionRange(len, len);
+      }
     } catch {
       // ignore
     }
@@ -1023,19 +1024,6 @@ function Landing({ theme, setTheme }) {
       effectiveCmd = "ls";
     }
 
-    if (effectiveCmd === "valentines day") {
-      effectiveCmd = "valentine's day";
-    }
-    if (!effectiveCmd) return;
-
-    if (effectiveCmd === "valentine's day") {
-      navigateWithLoading({
-        cmd: raw,
-        path: "/valentines",
-        label: "valentine's day",
-      });
-      return;
-    }
     // Jacob
     if (effectiveCmd === "jacob") {
       setHistory((h) => [
@@ -1354,7 +1342,6 @@ function Landing({ theme, setTheme }) {
         focusInput();
       }}
     >
-      {isTouchUI ? <ValentinesShortcut /> : null}
       {isTouchUI ? <ThemeToggle /> : null}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&display=swap');
@@ -1995,10 +1982,10 @@ function Landing({ theme, setTheme }) {
                   role="dialog"
                   aria-label="Contact"
                   style={{
-                    width: "min(520px, calc(100% - 24px))",
-                    maxHeight: "min(72vh, 640px)",
+                    width: "min(680px, calc(100% - 20px))",
+                    maxHeight: "min(82vh, 760px)",
                     overflow: "auto",
-                    borderRadius: 16,
+                    borderRadius: 20,
                     background: isLight
                       ? "rgba(245, 247, 249, 0.94)"
                       : "rgba(0, 0, 0, 0.86)",
@@ -2018,20 +2005,25 @@ function Landing({ theme, setTheme }) {
                       alignItems: "center",
                       justifyContent: "space-between",
                       gap: 12,
-                      padding: "0.9rem 1rem",
+                      padding: isCompact ? "1rem 1rem" : "1.1rem 1.2rem",
                       borderBottom: `1px solid ${INSET_LINE}`,
                       fontFamily: MONO,
                     }}
                   >
-                    <div style={{ fontSize: "0.95rem", opacity: 0.9 }}>
+                    <div
+                      style={{
+                        fontSize: isCompact ? "1.25rem" : "1.15rem",
+                        opacity: 0.95,
+                      }}
+                    >
                       Contact
                     </div>
                     <button
                       type="button"
                       onClick={() => closeContactModal()}
                       style={{
-                        width: 40,
-                        height: 36,
+                        width: isCompact ? 46 : 44,
+                        height: isCompact ? 42 : 40,
                         borderRadius: 10,
                         border: "none",
                         background: isLight
@@ -2040,7 +2032,7 @@ function Landing({ theme, setTheme }) {
                         color: FG,
                         cursor: "pointer",
                         fontFamily: MONO,
-                        fontSize: "1.35rem",
+                        fontSize: isCompact ? "1.9rem" : "1.7rem",
                         lineHeight: 1,
                         padding: 0,
                         display: "inline-flex",
@@ -2055,13 +2047,15 @@ function Landing({ theme, setTheme }) {
 
                   <div
                     style={{
-                      padding: "0.95rem 1.05rem 1.1rem",
+                      padding: isCompact
+                        ? "1.15rem 1.15rem 1.25rem"
+                        : "1.2rem 1.3rem 1.35rem",
                       fontFamily: MONO,
-                      fontSize: "0.92rem",
+                      fontSize: isCompact ? "1.22rem" : "1.12rem",
                       lineHeight: 1.55,
                       color: FG,
                       display: "grid",
-                      gap: "0.55rem",
+                      gap: "0.7rem",
                     }}
                   >
                     <div style={{ opacity: 0.85 }}>Email</div>
@@ -2079,7 +2073,7 @@ function Landing({ theme, setTheme }) {
                       nasir@wustl.edu
                     </a>
 
-                    <div style={{ height: 8 }} aria-hidden="true" />
+                    <div style={{ height: 14 }} aria-hidden="true" />
 
                     <div style={{ opacity: 0.85 }}>LinkedIn</div>
                     <a
@@ -2098,7 +2092,7 @@ function Landing({ theme, setTheme }) {
                       linkedin.com/in/nasir-sims
                     </a>
 
-                    <div style={{ height: 8 }} aria-hidden="true" />
+                    <div style={{ height: 14 }} aria-hidden="true" />
 
                     <div style={{ opacity: 0.85 }}>GitHub</div>
                     <a
@@ -2318,6 +2312,19 @@ function Landing({ theme, setTheme }) {
             {/* terminal body */}
             <div
               className="terminalBody"
+              ref={terminalBodyRef}
+              onScroll={(e) => {
+                try {
+                  const node = e.currentTarget;
+                  const threshold = 24; // px
+                  const atBottom =
+                    node.scrollTop + node.clientHeight >=
+                    node.scrollHeight - threshold;
+                  stickToBottomRef.current = atBottom;
+                } catch {
+                  // ignore
+                }
+              }}
               style={{
                 padding: "1rem 1.1rem",
                 fontFamily: MONO,
@@ -2434,7 +2441,7 @@ function Landing({ theme, setTheme }) {
                         fontSize: "0.9rem",
                         lineHeight: 1.55,
                         whiteSpace: "pre-wrap",
-                        overflowWrap: "break-word",
+                        overflowWrap: "anywhere",
                         wordBreak: "break-word",
                         pointerEvents: "none",
                         minHeight: "1.3rem",
@@ -2468,6 +2475,17 @@ function Landing({ theme, setTheme }) {
                         }
                         setInput(e.target.value);
                       }}
+                      onFocus={(e) => {
+                        try {
+                          const el = e.currentTarget;
+                          const len = (el.value || "").length;
+                          if (typeof el.setSelectionRange === "function") {
+                            el.setSelectionRange(len, len);
+                          }
+                        } catch {
+                          // ignore
+                        }
+                      }}
                       onKeyDown={(e) => {
                         if (e.key !== "ArrowUp" && e.key !== "ArrowDown")
                           return;
@@ -2476,7 +2494,6 @@ function Landing({ theme, setTheme }) {
                         if (!list.length) return;
 
                         e.preventDefault();
-
                         // first time entering history mode: save current draft
                         if (cmdIndexRef.current === -1) {
                           cmdDraftRef.current = input;
@@ -2636,10 +2653,16 @@ export default function App() {
       // ignore
     }
   }, [theme]);
-
+  function queueInterrupt() {
+    try {
+      sessionStorage.setItem("pendingInterrupt", String(Date.now()));
+    } catch {
+      // ignore
+    }
+  }
   return (
     <>
-      <GlobalShortcuts />
+      <GlobalShortcuts onInterrupt={queueInterrupt} />
       <Routes>
         <Route
           path="/"
@@ -2654,14 +2677,6 @@ export default function App() {
         <Route path="/rocketry" element={<RocketryPage />} />
         <Route path="/travel" element={<TravelPage />} />
         <Route path="/vintage-audio" element={<VintageAudioPage />} />
-        <Route
-          path="/valentines"
-          element={
-            <Suspense fallback={null}>
-              <ValentinesPage />
-            </Suspense>
-          }
-        />
       </Routes>
     </>
   );

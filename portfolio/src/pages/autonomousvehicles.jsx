@@ -199,15 +199,14 @@ export default function AutonomousVehiclesPage() {
                     estimates for speed.
                     <br />
                     <br />
-                    The software pipeline is ROS 2 end-to-end. The
-                    camera node publishes frames, image transport
-                    republishes a compressed stream for faster intra-ROS
-                    messaging, and the LaneNet-based image processor turns each
-                    frame into lane geometry and a trajectory to follow. An IMU
-                    driver node and a complementary filter node refine inertial
-                    measurements, and the driver stack consumes the perception
-                    outputs to generate continuous steering and throttle
-                    commands.
+                    The software pipeline is ROS 2 end-to-end. The camera node
+                    publishes frames, image transport republishes a compressed
+                    stream for faster intra-ROS messaging, and the LaneNet-based
+                    image processor turns each frame into lane geometry and a
+                    trajectory to follow. An IMU driver node and a complementary
+                    filter node refine inertial measurements, and the driver
+                    stack consumes the perception outputs to generate continuous
+                    steering and throttle commands.
                   </div>
                   <div className="miniCityMediaRow">
                     <div className="miniCityMediaItem">
@@ -306,13 +305,13 @@ export default function AutonomousVehiclesPage() {
           <div style={{ gridColumn: "span 6" }}>
             <TextPanel title="Classification Model for Turn Intent">
               <div style={BODY_TEXT_STYLE}>
-                To make the system modular, I explored a simple supervised
-                model that classifies a front-facing image as a
-                left, right, or straight turn context. The classifier acts as a
-                high level policy signal, with a separate control module
-                responsible for steering and speed tracking. This separation
-                makes it easier to debug and iterate, because you can improve
-                perception without rewriting the controller.
+                To make the system modular, I explored a simple supervised model
+                that classifies a front-facing image as a left, right, or
+                straight turn context. The classifier acts as a high level
+                policy signal, with a separate control module responsible for
+                steering and speed tracking. This separation makes it easier to
+                debug and iterate, because you can improve perception without
+                rewriting the controller.
                 <br />
                 <br />
                 This work builds on earlier reinforcement learning experiments
@@ -323,7 +322,7 @@ export default function AutonomousVehiclesPage() {
           </div>
         </div>
 
-        <TextPanel marginTop="1rem" title="My Research Papers">
+        <TextPanel marginTop="1rem" title="My Findings">
           <div style={{ ...BODY_TEXT_STYLE }}>
             <div style={{ display: "grid", gap: "0.65rem" }}>
               {PAPER_DOWNLOADS.map((p) => (

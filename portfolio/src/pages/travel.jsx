@@ -45,8 +45,8 @@ const TRAVEL_ENTRIES = [
     body: (
       <>
         In the summer of 2023, my dad and I travelled to Füssen, Germany to
-        visit my great aunt, Linda. It was my first time in Europe, and we spent
-        our days biking in the ttall and beautiful mountians, and accidentally
+        visit my great aunt. It was my first time in Europe, and we spent our
+        days biking in the ttall and beautiful mountians, and accidentally
         crossed into Austria.
       </>
     ),
@@ -58,11 +58,11 @@ const TRAVEL_ENTRIES = [
     images: [TRAVEL_MEDIA.F1_VIDEO, TRAVEL_MEDIA.COUR],
     body: (
       <>
-        After Germany, I met up with my friend Conor, and we flew to Barcelona,
-        Spain. The coolest thing we did was see the Formula 1 AWS Gran Premio de
-        España 2023. We bought tickets for the general field, but with some
-        social engineering, snuck into the only two seats left in the Grand
-        Stands to catch amazing views of the race.
+        After Germany, I met up with my friend, and we flew to Barcelona, Spain.
+        The coolest thing we did was see the Formula 1 AWS Gran Premio de España
+        2023. We bought tickets for the general field, but with some social
+        engineering, snuck into the only two seats left in the Grand Stands to
+        catch amazing views of the race.
       </>
     ),
   },
@@ -73,12 +73,11 @@ const TRAVEL_ENTRIES = [
     images: [TRAVEL_MEDIA.BEACH, TRAVEL_MEDIA.HOOD],
     body: (
       <>
-        For my 2024 Spring Break, my friends Jack, Conor, and I stayed with our
-        friend Lucas in Portland, Oregon. The beauty of Oregon was so jarring
-        from the flatness I am familiar with in Illinois. We had a car, so we
-        got to drive around the twisty mountian roads, visit the Japanese
-        Gardens, and beautiful beaches. The drinking water is also excellent in
-        Oregon!
+        For my 2024 Spring Break, two of my friends stayed with a family-friend
+        in Portland, Oregon. The beauty of Oregon was so jarring from the
+        flatness I am familiar with in Illinois. We had a car, so we got to
+        drive around the twisty mountian roads, visit the Japanese Gardens, and
+        beautiful beaches. The drinking water is also excellent in Oregon!
       </>
     ),
   },
@@ -89,13 +88,12 @@ const TRAVEL_ENTRIES = [
     images: [TRAVEL_MEDIA.HIKE, TRAVEL_MEDIA.SHUTIN],
     body: (
       <>
-        The weekend before finals, my girlfrind Gabbi, and our other friend
-        couple, Isabella and Andre, drove to the Johnson Shut-Ins in Missouri to
-        camp for two nights, hike, and swim in the flowing river. When we
-        arrived, it was pouring rain, triggering a "red-flag" warning for the
-        shut-in, meaning no one should enter. We did anyway, and learned quickly
-        that we should have heeded the warning after being swept away almost
-        immediately.
+        The weekend before finals, my girlfrind, and our other friend couple
+        drove to the Johnson Shut-Ins in Missouri to camp for two nights, hike,
+        and swim in the flowing river. When we arrived, it was pouring rain,
+        triggering a "red-flag" warning for the shut-in, meaning no one should
+        enter. We did anyway, and learned quickly that we should have heeded the
+        warning after being swept away almost immediately.
       </>
     ),
   },
@@ -134,9 +132,10 @@ const TRAVEL_ENTRIES = [
     ],
     body: (
       <>
-        For our next Spring Break, Gabbi, Isabella, Andre, and I flew to Puerto
-        Rico. We went to the beach every day, saw many museums, and went cliff
-        jumping on a rainforest excursion. The food there was also terrific.
+        For our next Spring Break, the same friend group from the Johnson
+        Shut-Ins flew to Puerto Rico. We went to the beach every day, saw many
+        museums, and went cliff jumping on a rainforest excursion. The food
+        there was also terrific.
       </>
     ),
   },
@@ -147,10 +146,10 @@ const TRAVEL_ENTRIES = [
     images: [TRAVEL_MEDIA.VERMONT_1, TRAVEL_MEDIA.MONTREAL],
     body: (
       <>
-        In early summer 2025, Conor was heading to Burlington, Vermont, to start
-        his internship. He, of course, needed a car there, so what better
+        In early summer 2025, my friend was heading to Burlington, Vermont, to
+        start his internship. He, of course, needed a car there, so what better
         vehicle to bring down than his 1996 Japanese Kei Truck? Only one
-        condition: Do it all using paper maps. We started the 1,000+ mile
+        condition, do it all using paper maps. We started the 1,000+ mile
         journey from Evanston, IL, to Burlington, Vermont. Along the way, we
         stopped in Detroit, Michigan, Toronto, Canada, and Montréal, Quebec
         before reaching Vermont. The truck only broke down once, after hitting a
@@ -166,15 +165,15 @@ const TRAVEL_ENTRIES = [
     images: [TRAVEL_MEDIA.TEXAS_TRIP],
     body: (
       <>
-        In the last week of summer, Conor prepared for his Co-Op in Houston,
+        In the last week of summer, my friend prepared for his Co-Op in Houston,
         Texas. Since his mini-truck wasn't suitable for daily driving there, he
-        bought a 1984 Volkswagen Westfalia camper van. We, along with Jack, flew
-        to San Francisco to pick it up and drove 1,500 miles to Houston in 4
-        days. We averaged 8-10 hours of driving each day, getting to Texas
-        without a working taillight assembly, AC, or, unbeknownst to us,
-        adequate coolant. We slept at two Texas state parks, stayed one night in
-        a hotel, and arrived in Houston just in time to catch our flights back
-        home.
+        bought a 1984 Volkswagen Westfalia camper van. We, along with another
+        friend, flew to San Francisco to pick it up and drove 1,500 miles to
+        Houston in 4 days. We averaged 8-10 hours of driving each day, getting
+        to Texas without a working taillight assembly, AC, or, unbeknownst to
+        us, adequate coolant. We slept at two Texas state parks, stayed one
+        night in a hotel, and arrived in Houston just in time to catch our
+        flights back home.
       </>
     ),
   },
@@ -195,7 +194,7 @@ const TRAVEL_ENTRIES = [
   {
     id: "edinburgh",
     date: "Today",
-    title: "The University of Edinburgh",
+    title: "Edinburgh, Scotland",
     images: [
       TRAVEL_MEDIA.LONDON,
       TRAVEL_MEDIA.PENTLANDS,
@@ -206,7 +205,7 @@ const TRAVEL_ENTRIES = [
       <>
         I am currently an exchange student at The University of Edinburgh, where
         I am continuing my study of Computer Science. It has been such an
-        amazing experience to live in a new continent. Edinburgh, UK, is a
+        amazing experience to live in a new continent. Edinburgh is a
         wonderful city full of vibrant culture, stunning natural scenery, and a
         lot of rain. While abroad, I have many trips planned, such as Dublin,
         Paris, Barcelona, London, and more.

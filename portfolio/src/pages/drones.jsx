@@ -18,6 +18,20 @@ export default function DronesPage() {
   return (
     <PageShell title={"Drones"} onBack={() => navigate("/")}>
       <GalleryGrid images={DRONE_IMAGES} columns={2} aspect="16 / 9" />
+      <div
+        style={{
+          marginTop: "0.5rem",
+          marginBottom: "1.5rem",
+          fontSize: "0.8rem",
+          opacity: 0.75,
+          textAlign: "right",
+          letterSpacing: "0.02em",
+        }}
+      >
+        <em>
+          Aerial imagery captured by Nasir Sims using a DJI Matrice 300 RTK with Zenmuse P1.
+        </em>
+      </div>
 
       <TextPanel marginTop="1rem" header={<span>{SECTION_HEADER}</span>}>
         In the summer of 2025, I flew DJI Drones for WashU's Facilities
