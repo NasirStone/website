@@ -57,25 +57,28 @@ export default function NasirPage() {
 
           <TextPanel title="About me">
             <div style={BODY_TEXT_STYLE}>
-              Hi, I'm Nasir! I'm a Junior studying Computer Science, with a
-              minor in Film & Media Studies at Washington University in St.
-              Louis.
+              Hi, I'm Nasir! I am a rising Senior studying Computer Science,
+              with a minor in Film & Media Studies at Washington University in
+              St. Louis.
               <br />
               <br />
               At WashU, I am involved in our High Powered Rocketry team,
-              WURocketry, where I serve as Chief Safety Officer. I was also
-              involved in an Autonomous Vehicle Research lab that aims to
-              develop safer agents through rapid, iterative simulations in CARLA
-              and a 1:8 scale city model. I also serve as an Information
-              Security GRC Analyst for WashU's IT department, and I am the Head
-              Teaching Assistant for MGT2001 - Introduction to Business
-              Fundamentals.
+              WURocketry, where I serve as Chief Safety Officer. I am also the
+              Head Teaching Assistant for Dr. Kiousis in the Olin School of
+              Business. I was also involved in an Autonomous Vehicle Research
+              lab, and served as an Information Security GRC Analyst for WashU's
+              IT department for two years.
               <br />
               <br />
               Outside of school, I love fixing things and getting my hands
               dirty. I repair anything from cars and bikes, to vintage audio
               equipment. I love road trips (my longest was 6,000+ miles), I
               collect all different music formats, and I have a pet lizard.
+              <br />
+              <br />
+              This summer I am working at CodeHS, where I will be developing
+              features for a Computer Science education platform serving over
+              one million students and teachers
               <br />
               <br />I built this website not only to showcase my software
               projects, but also to reveal my interests. Thanks for visiting!

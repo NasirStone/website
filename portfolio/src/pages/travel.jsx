@@ -22,10 +22,10 @@ const TRAVEL_MEDIA = {
   DRIVE: "images/travel/drive.webp",
   CALI_WATER: "images/travel/cali_water.webp",
   UTAH: "images/travel/utah.webp",
-  PR_GABBI: "images/travel/prgabbi.webp",
+  PR_BOY: "images/travel/prboy.webp",
   FLAGS: "images/travel/flags.webp",
   POSE: "images/travel/pose.webp",
-  PR_TOGETHER: "images/travel/prtogether.webp",
+  PR_VIEW: "images/travel/prview.webp",
   VERMONT_1: "images/travel/vermont1.webp",
   MONTREAL: "images/travel/montreal.webp",
   TEXAS_TRIP: "images/travel/texas_trip.webp",
@@ -88,12 +88,12 @@ const TRAVEL_ENTRIES = [
     images: [TRAVEL_MEDIA.HIKE, TRAVEL_MEDIA.SHUTIN],
     body: (
       <>
-        The weekend before finals, my girlfrind, and our other friend couple
-        drove to the Johnson Shut-Ins in Missouri to camp for two nights, hike,
-        and swim in the flowing river. When we arrived, it was pouring rain,
-        triggering a "red-flag" warning for the shut-in, meaning no one should
-        enter. We did anyway, and learned quickly that we should have heeded the
-        warning after being swept away almost immediately.
+        The weekend before finals, some friends and I drove to the Johnson
+        Shut-Ins in Missouri to camp for two nights, hike, and swim in the
+        flowing river. When we arrived, it was pouring rain, triggering a
+        "red-flag" warning for the shut-in, meaning no one should enter. We did
+        anyway, and learned quickly that we should have heeded the warning after
+        being swept away almost immediately.
       </>
     ),
   },
@@ -125,10 +125,10 @@ const TRAVEL_ENTRIES = [
     date: "Spring 2025",
     title: "Puerto Rico",
     images: [
-      TRAVEL_MEDIA.PR_GABBI,
+      TRAVEL_MEDIA.PR_BOY,
       TRAVEL_MEDIA.FLAGS,
       TRAVEL_MEDIA.POSE,
-      TRAVEL_MEDIA.PR_TOGETHER,
+      TRAVEL_MEDIA.PR_VIEW,
     ],
     body: (
       <>
@@ -193,7 +193,7 @@ const TRAVEL_ENTRIES = [
   },
   {
     id: "edinburgh",
-    date: "Today",
+    date: "Spring 2026",
     title: "Edinburgh, Scotland",
     images: [
       TRAVEL_MEDIA.LONDON,
@@ -203,12 +203,13 @@ const TRAVEL_ENTRIES = [
     ],
     body: (
       <>
-        I am currently an exchange student at The University of Edinburgh, where
-        I am continuing my study of Computer Science. It has been such an
-        amazing experience to live in a new continent. Edinburgh is a
-        wonderful city full of vibrant culture, stunning natural scenery, and a
-        lot of rain. While abroad, I have many trips planned, such as Dublin,
-        Paris, Barcelona, London, and more.
+        The spring semester of my junior year, I was an exchange student at The
+        University of Edinburgh, where I continued my study of Computer Science.
+        It was such an amazing experience to live outside of the US. Edinburgh
+        is a wonderful city full of vibrant culture, stunning natural scenery,
+        and a lot of rain. While abroad, I went to many different places, such
+        as Dublin, Paris, Barcelona, London, Marrakesh, and two road trips
+        within Scotland.
       </>
     ),
   },
